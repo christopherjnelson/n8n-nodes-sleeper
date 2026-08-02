@@ -6,6 +6,8 @@ import {
 	type INodeExecutionData,
 } from 'n8n-workflow';
 
+import type { SleeperPlayerOutputMode } from './validation';
+
 export type SleeperResponseShape = 'array' | 'object';
 
 function isJsonValue(value: unknown): boolean {
@@ -31,6 +33,14 @@ function isJsonValue(value: unknown): boolean {
 
 export function isJsonObject(value: unknown): value is IDataObject {
 	return value !== null && typeof value === 'object' && !Array.isArray(value) && isJsonValue(value);
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+	return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isPlayerMap(value: unknown): value is IDataObject {
+	return isPlainRecord(value) && Object.values(value).every((player) => isJsonObject(player));
 }
 
 function unexpectedResponseError(
@@ -101,6 +111,59 @@ export function toExecutionItems(
 			pairedItem: { item: itemIndex },
 		},
 	];
+}
+
+export function toPlayerMapExecutionItems(
+	node: INode,
+	response: unknown,
+	outputMode: SleeperPlayerOutputMode,
+	itemIndex: number,
+): INodeExecutionData[] {
+	const operation = 'Player → Get Many';
+	if (!isPlainRecord(response)) {
+		throw unexpectedResponseError(
+			node,
+			operation,
+			itemIndex,
+			'Expected Sleeper to return a JSON object keyed by player ID.',
+		);
+	}
+
+	if (outputMode === 'singleMap') {
+		if (!isPlayerMap(response)) {
+			throw unexpectedResponseError(
+				node,
+				operation,
+				itemIndex,
+				'Expected every player-map entry to be a JSON object.',
+			);
+		}
+
+		return [
+			{
+				json: response,
+				pairedItem: { item: itemIndex },
+			},
+		];
+	}
+
+	return Object.entries(response).map(([playerId, player]) => {
+		if (!isJsonObject(player)) {
+			throw unexpectedResponseError(
+				node,
+				operation,
+				itemIndex,
+				'Expected every player-map entry to be a JSON object.',
+			);
+		}
+
+		return {
+			json: Object.prototype.hasOwnProperty.call(player, 'player_id')
+				? player
+				: { player_id: playerId, ...player },
+			pairedItem: { item: itemIndex },
+		};
+	});
 }
 
 export function ensureExecutionError(

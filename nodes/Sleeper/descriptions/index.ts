@@ -1,11 +1,13 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { avatarDescription } from './AvatarDescription';
 import { draftDescription } from './DraftDescription';
 import { draftPickDescription } from './DraftPickDescription';
 import { draftTradedPickDescription } from './DraftTradedPickDescription';
 import { leagueDescription } from './LeagueDescription';
 import { leagueUserDescription } from './LeagueUserDescription';
 import { matchupDescription } from './MatchupDescription';
+import { playerDescription } from './PlayerDescription';
 import { playoffDescription } from './PlayoffDescription';
 import { rosterDescription } from './RosterDescription';
 import { sportDescription } from './SportDescription';
@@ -20,6 +22,10 @@ export const sleeperProperties: INodeProperties[] = [
 		type: 'options',
 		noDataExpression: true,
 		options: [
+			{
+				name: 'Avatar',
+				value: 'avatar',
+			},
 			{
 				name: 'Draft',
 				value: 'draft',
@@ -43,6 +49,10 @@ export const sleeperProperties: INodeProperties[] = [
 			{
 				name: 'Matchup',
 				value: 'matchup',
+			},
+			{
+				name: 'Player',
+				value: 'player',
 			},
 			{
 				name: 'Playoff',
@@ -71,6 +81,7 @@ export const sleeperProperties: INodeProperties[] = [
 		],
 		default: 'user',
 	},
+	...avatarDescription,
 	...draftDescription,
 	...draftPickDescription,
 	...draftTradedPickDescription,
@@ -78,6 +89,7 @@ export const sleeperProperties: INodeProperties[] = [
 	...leagueDescription,
 	...leagueUserDescription,
 	...matchupDescription,
+	...playerDescription,
 	...playoffDescription,
 	...rosterDescription,
 	...sportDescription,

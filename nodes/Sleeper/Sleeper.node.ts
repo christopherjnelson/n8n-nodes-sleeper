@@ -9,19 +9,34 @@ import {
 
 import { sleeperProperties } from './descriptions';
 import { sleeperApiRequest } from './transport/sleeperApiRequest';
-import { ensureExecutionError, toErrorExecutionItem, toExecutionItems } from './utils/output';
+import { createAvatarResult } from './utils/avatar';
 import {
+	ensureExecutionError,
+	toErrorExecutionItem,
+	toExecutionItems,
+	toPlayerMapExecutionItems,
+} from './utils/output';
+import {
+	getAvatarSize,
 	getBracketType,
+	getBooleanParameter,
+	getOptionalPositionCode,
+	getPlayerOutputMode,
 	getPositiveIntegerParameter,
+	getPositiveSafeIntegerParameter,
 	getRequiredTrimmedString,
 	getSeason,
 	getSleeperId,
 	getSport,
+	getTrendType,
+	type SleeperPlayerOutputMode,
 } from './utils/validation';
 
 interface SleeperOperationRequest {
 	pathSegments: string[];
-	responseShape: 'array' | 'object';
+	query?: Readonly<Record<string, string | boolean | undefined>>;
+	responseShape: 'array' | 'object' | 'playerMap';
+	playerOutputMode?: SleeperPlayerOutputMode;
 	context: string;
 }
 
@@ -43,6 +58,46 @@ function getOperationRequest(
 	operation: string,
 	itemIndex: number,
 ): SleeperOperationRequest {
+	if (resource === 'player' && operation === 'getMany') {
+		const sport = getSport(context, 'sport', itemIndex);
+		const activeOnly = getBooleanParameter(context, 'activeOnly', itemIndex, 'Active Only', true);
+		const position = getOptionalPositionCode(context, 'position', itemIndex);
+		const outputMode = getPlayerOutputMode(context, 'outputMode', itemIndex);
+
+		return {
+			pathSegments: ['players', sport],
+			query: {
+				active: activeOnly ? true : undefined,
+				position,
+			},
+			responseShape: 'playerMap',
+			playerOutputMode: outputMode,
+			context: 'Player → Get Many',
+		};
+	}
+
+	if (resource === 'player' && operation === 'getTrending') {
+		const sport = getSport(context, 'sport', itemIndex);
+		const trendType = getTrendType(context, 'trendType', itemIndex);
+		const lookbackHours = getPositiveSafeIntegerParameter(
+			context,
+			'lookbackHours',
+			itemIndex,
+			'Lookback Hours',
+		);
+		const limit = getPositiveSafeIntegerParameter(context, 'resultLimit', itemIndex, 'Limit');
+
+		return {
+			pathSegments: ['players', sport, 'trending', trendType],
+			query: {
+				lookback_hours: lookbackHours,
+				limit,
+			},
+			responseShape: 'array',
+			context: 'Player → Get Trending',
+		};
+	}
+
 	if (resource === 'draft' && operation === 'get') {
 		const draftId = getSleeperId(context, 'draftId', itemIndex, 'Draft ID');
 
@@ -217,7 +272,8 @@ export class Sleeper implements INodeType {
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Retrieve public Sleeper draft, user, league, roster, matchup, and NFL state data',
+		description:
+			'Retrieve public Sleeper draft, user, league, player, roster, matchup, avatar URL, and NFL state data',
 		defaults: {
 			name: 'Sleeper',
 		},
@@ -235,22 +291,49 @@ export class Sleeper implements INodeType {
 			try {
 				const resource = getRequiredTrimmedString(this, 'resource', itemIndex, 'Resource');
 				const operation = getRequiredTrimmedString(this, 'operation', itemIndex, 'Operation');
+
+				if (resource === 'avatar') {
+					if (operation !== 'getUrl') {
+						throw unsupportedSelection(this, resource, operation, itemIndex);
+					}
+
+					const avatarId = getRequiredTrimmedString(this, 'avatarId', itemIndex, 'Avatar ID');
+					const imageSize = getAvatarSize(this, 'imageSize', itemIndex);
+					outputItems.push({
+						json: createAvatarResult(avatarId, imageSize),
+						pairedItem: { item: itemIndex },
+					});
+					continue;
+				}
+
 				const request = getOperationRequest(this, resource, operation, itemIndex);
 				const response = await sleeperApiRequest.call(this, {
 					pathSegments: request.pathSegments,
+					query: request.query,
 					itemIndex,
 					operation: request.context,
 				});
 
-				outputItems.push(
-					...toExecutionItems(
-						this.getNode(),
-						response,
-						request.responseShape,
-						itemIndex,
-						request.context,
-					),
-				);
+				if (request.responseShape === 'playerMap') {
+					outputItems.push(
+						...toPlayerMapExecutionItems(
+							this.getNode(),
+							response,
+							request.playerOutputMode ?? 'singleMap',
+							itemIndex,
+						),
+					);
+				} else {
+					outputItems.push(
+						...toExecutionItems(
+							this.getNode(),
+							response,
+							request.responseShape,
+							itemIndex,
+							request.context,
+						),
+					);
+				}
 			} catch (error: unknown) {
 				const executionError = ensureExecutionError(this.getNode(), error, itemIndex);
 				if (!this.continueOnFail()) {

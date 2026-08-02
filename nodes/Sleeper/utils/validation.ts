@@ -2,6 +2,12 @@ import { NodeOperationError, type IExecuteFunctions } from 'n8n-workflow';
 
 export type SleeperSport = 'nfl';
 export type SleeperBracketType = 'winners' | 'losers';
+export type SleeperAvatarSize = 'full' | 'thumbnail';
+export type SleeperPlayerOutputMode = 'singleMap' | 'splitItems';
+export type SleeperTrendType = 'add' | 'drop';
+
+const MAX_POSITION_CODE_LENGTH = 16;
+const MAX_SAFE_INTEGER_BIGINT = BigInt(Number.MAX_SAFE_INTEGER);
 
 function invalidParameter(
 	context: IExecuteFunctions,
@@ -13,6 +19,17 @@ function invalidParameter(
 		description,
 		itemIndex,
 	});
+}
+
+function containsControlCharacter(value: string): boolean {
+	for (const character of value) {
+		const codePoint = character.codePointAt(0);
+		if (codePoint !== undefined && (codePoint <= 31 || codePoint === 127)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 export function getRequiredTrimmedString(
@@ -54,6 +71,27 @@ export function getSleeperId(
 	return getRequiredTrimmedString(context, parameterName, itemIndex, displayName);
 }
 
+export function getBooleanParameter(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+	displayName: string,
+	defaultValue: boolean,
+): boolean {
+	const value = context.getNodeParameter(parameterName, itemIndex, defaultValue);
+
+	if (typeof value !== 'boolean') {
+		throw invalidParameter(
+			context,
+			`${displayName} must be a boolean`,
+			`Turn ${displayName} on or off rather than entering a custom value.`,
+			itemIndex,
+		);
+	}
+
+	return value;
+}
+
 export function getPositiveIntegerParameter(
 	context: IExecuteFunctions,
 	parameterName: string,
@@ -87,6 +125,140 @@ export function getPositiveIntegerParameter(
 	}
 
 	return normalizedValue;
+}
+
+export function getPositiveSafeIntegerParameter(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+	displayName: string,
+): string {
+	const value = context.getNodeParameter(parameterName, itemIndex, '');
+	let normalizedValue: string | undefined;
+
+	if (typeof value === 'number') {
+		if (Number.isSafeInteger(value) && value > 0) {
+			normalizedValue = String(value);
+		}
+	} else if (typeof value === 'string') {
+		const trimmedValue = value.trim();
+		if (/^\d+$/.test(trimmedValue)) {
+			const integerValue = BigInt(trimmedValue);
+			if (integerValue > BigInt(0) && integerValue <= MAX_SAFE_INTEGER_BIGINT) {
+				normalizedValue = integerValue.toString(10);
+			}
+		}
+	}
+
+	if (normalizedValue === undefined) {
+		throw invalidParameter(
+			context,
+			`${displayName} must be a positive safe integer`,
+			`Enter ${displayName} as a whole number greater than zero and no greater than ${Number.MAX_SAFE_INTEGER}.`,
+			itemIndex,
+		);
+	}
+
+	return normalizedValue;
+}
+
+export function getOptionalPositionCode(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+): string | undefined {
+	const value = context.getNodeParameter(parameterName, itemIndex, '');
+
+	if (typeof value !== 'string') {
+		throw invalidParameter(
+			context,
+			'Position must be a string',
+			'Enter an optional Sleeper fantasy-position code as text, such as QB.',
+			itemIndex,
+		);
+	}
+
+	if (containsControlCharacter(value)) {
+		throw invalidParameter(
+			context,
+			'Position must be a valid fantasy-position code',
+			'Position cannot contain control characters.',
+			itemIndex,
+		);
+	}
+
+	const position = value.trim().toUpperCase();
+	if (position.length === 0) {
+		return undefined;
+	}
+
+	if (position.length > MAX_POSITION_CODE_LENGTH || !/^[A-Z0-9_-]+$/.test(position)) {
+		throw invalidParameter(
+			context,
+			'Position must be a valid fantasy-position code',
+			`Use no more than ${MAX_POSITION_CODE_LENGTH} letters, digits, underscores, or hyphens without spaces or URL syntax.`,
+			itemIndex,
+		);
+	}
+
+	return position;
+}
+
+export function getPlayerOutputMode(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+): SleeperPlayerOutputMode {
+	const outputMode = getRequiredTrimmedString(context, parameterName, itemIndex, 'Output Mode');
+
+	if (outputMode !== 'singleMap' && outputMode !== 'splitItems') {
+		throw invalidParameter(
+			context,
+			'Unsupported player output mode',
+			'Choose either Single Map or One Item per Player.',
+			itemIndex,
+		);
+	}
+
+	return outputMode;
+}
+
+export function getTrendType(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+): SleeperTrendType {
+	const trendType = getRequiredTrimmedString(context, parameterName, itemIndex, 'Trend Type');
+
+	if (trendType !== 'add' && trendType !== 'drop') {
+		throw invalidParameter(
+			context,
+			'Unsupported trend type',
+			'Choose either Adds or Drops.',
+			itemIndex,
+		);
+	}
+
+	return trendType;
+}
+
+export function getAvatarSize(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+): SleeperAvatarSize {
+	const avatarSize = getRequiredTrimmedString(context, parameterName, itemIndex, 'Image Size');
+
+	if (avatarSize !== 'full' && avatarSize !== 'thumbnail') {
+		throw invalidParameter(
+			context,
+			'Unsupported avatar image size',
+			'Choose either Full Size or Thumbnail.',
+			itemIndex,
+		);
+	}
+
+	return avatarSize;
 }
 
 export function getBracketType(
