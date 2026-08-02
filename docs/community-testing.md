@@ -56,7 +56,9 @@ Please include the following in compatibility or bug reports:
 
 Use the repository's
 [issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose) so reports
-contain enough environment and reproduction detail to triage.
+contain enough environment and reproduction detail to triage. General coordination and links to
+new reports belong in the pinned
+[v0.1.0 community-testing issue](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/1).
 
 ## Privacy and test-data rules
 

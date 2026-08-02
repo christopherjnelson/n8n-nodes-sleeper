@@ -290,8 +290,14 @@ n8n's Community Nodes service and reported `0.1.0`:
 - Structured bug, compatibility, and feature-request issue forms collect environment and
   reproduction data. Blank issues are disabled, and security reports route to private
   vulnerability reporting.
-- The public community-testing issue is created only after these assets are on `main` and CI is
-  green; its final URL is recorded here in the follow-up evidence update.
+- Pinned public coordination issue:
+  `https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/1`, created only after the
+  documentation and forms reached `main` and CI run `30752259170` passed.
+- Verified intake labels: `community-testing`, `bug`, `compatibility`, `documentation`,
+  `enhancement`, `security`, `upstream`, and `needs-reproduction`. Existing useful default labels
+  were preserved.
+- The existing GitHub `v0.1.0` prerelease notes now link to the guide and pinned issue. Its tag,
+  prerelease status, and release identity were not changed.
 - CI retains its single canonical Node.js 22.22.0 `build` check. A Node 22/24 matrix was not added
   because it would change the branch-protection check name and obscure the required canonical
   status. The release workflow and the full local Phase 2B-3 pass also exercise Node.js 24.
