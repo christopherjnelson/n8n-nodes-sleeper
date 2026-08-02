@@ -2,7 +2,7 @@
 	"name": "n8n-nodes-sleeper",
 	"version": "0.1.0",
 	"private": true,
-	"description": "Retrieve public Sleeper user, league, and NFL state data with n8n.",
+	"description": "Retrieve public Sleeper fantasy football data with n8n.",
 	"license": "MIT",
 	"homepage": "https://github.com/christopherjnelson/n8n-nodes-sleeper#readme",
 	"keywords": [

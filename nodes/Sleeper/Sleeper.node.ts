@@ -10,7 +10,14 @@ import {
 import { sleeperProperties } from './descriptions';
 import { sleeperApiRequest } from './transport/sleeperApiRequest';
 import { ensureExecutionError, toErrorExecutionItem, toExecutionItems } from './utils/output';
-import { getRequiredTrimmedString, getSeason, getSleeperId, getSport } from './utils/validation';
+import {
+	getBracketType,
+	getPositiveIntegerParameter,
+	getRequiredTrimmedString,
+	getSeason,
+	getSleeperId,
+	getSport,
+} from './utils/validation';
 
 interface SleeperOperationRequest {
 	pathSegments: string[];
@@ -73,6 +80,70 @@ function getOperationRequest(
 		};
 	}
 
+	if (resource === 'leagueUser' && operation === 'getMany') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+
+		return {
+			pathSegments: ['league', leagueId, 'users'],
+			responseShape: 'array',
+			context: 'League User → Get Many',
+		};
+	}
+
+	if (resource === 'roster' && operation === 'getMany') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+
+		return {
+			pathSegments: ['league', leagueId, 'rosters'],
+			responseShape: 'array',
+			context: 'Roster → Get Many',
+		};
+	}
+
+	if (resource === 'matchup' && operation === 'getMany') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+		const week = getPositiveIntegerParameter(context, 'week', itemIndex, 'Week');
+
+		return {
+			pathSegments: ['league', leagueId, 'matchups', week],
+			responseShape: 'array',
+			context: 'Matchup → Get Many',
+		};
+	}
+
+	if (resource === 'transaction' && operation === 'getMany') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+		const round = getPositiveIntegerParameter(context, 'round', itemIndex, 'Round or Week');
+
+		return {
+			pathSegments: ['league', leagueId, 'transactions', round],
+			responseShape: 'array',
+			context: 'Transaction → Get Many',
+		};
+	}
+
+	if (resource === 'playoff' && operation === 'getBracket') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+		const bracketType = getBracketType(context, 'bracketType', itemIndex);
+		const bracketPath = bracketType === 'winners' ? 'winners_bracket' : 'losers_bracket';
+
+		return {
+			pathSegments: ['league', leagueId, bracketPath],
+			responseShape: 'array',
+			context: 'Playoff → Get Bracket',
+		};
+	}
+
+	if (resource === 'tradedPick' && operation === 'getMany') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+
+		return {
+			pathSegments: ['league', leagueId, 'traded_picks'],
+			responseShape: 'array',
+			context: 'Traded Pick → Get Many',
+		};
+	}
+
 	if (resource === 'sport' && operation === 'getState') {
 		const sport = getSport(context, 'sport', itemIndex);
 
@@ -94,7 +165,7 @@ export class Sleeper implements INodeType {
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Retrieve public Sleeper user, league, and NFL state data',
+		description: 'Retrieve public Sleeper user, league, roster, matchup, and NFL state data',
 		defaults: {
 			name: 'Sleeper',
 		},

@@ -1,6 +1,7 @@
 import { NodeOperationError, type IExecuteFunctions } from 'n8n-workflow';
 
 export type SleeperSport = 'nfl';
+export type SleeperBracketType = 'winners' | 'losers';
 
 function invalidParameter(
 	context: IExecuteFunctions,
@@ -51,6 +52,60 @@ export function getSleeperId(
 	displayName: string,
 ): string {
 	return getRequiredTrimmedString(context, parameterName, itemIndex, displayName);
+}
+
+export function getPositiveIntegerParameter(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+	displayName: string,
+): string {
+	const value = context.getNodeParameter(parameterName, itemIndex, '');
+	let normalizedValue: string | undefined;
+
+	if (typeof value === 'number') {
+		if (Number.isSafeInteger(value) && value > 0) {
+			normalizedValue = String(value);
+		}
+	} else if (typeof value === 'string') {
+		const trimmedValue = value.trim();
+		if (/^\d+$/.test(trimmedValue)) {
+			const integerValue = BigInt(trimmedValue);
+			if (integerValue > BigInt(0)) {
+				normalizedValue = integerValue.toString(10);
+			}
+		}
+	}
+
+	if (normalizedValue === undefined) {
+		throw invalidParameter(
+			context,
+			`${displayName} must be a positive integer`,
+			`Enter ${displayName} as a whole number greater than zero.`,
+			itemIndex,
+		);
+	}
+
+	return normalizedValue;
+}
+
+export function getBracketType(
+	context: IExecuteFunctions,
+	parameterName: string,
+	itemIndex: number,
+): SleeperBracketType {
+	const bracketType = getRequiredTrimmedString(context, parameterName, itemIndex, 'Bracket Type');
+
+	if (bracketType !== 'winners' && bracketType !== 'losers') {
+		throw invalidParameter(
+			context,
+			'Unsupported bracket type',
+			'Choose either the winners or losers playoff bracket.',
+			itemIndex,
+		);
+	}
+
+	return bracketType;
 }
 
 export function getSeason(

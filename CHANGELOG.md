@@ -9,6 +9,10 @@
 - Add User → Get, League → Get, League → Get Many for User, and Sport → Get State.
 - Add mocked transport and programmatic execution tests for successful, empty, invalid, and
   failed responses across multiple input items.
+- Add League User → Get Many, Roster → Get Many, Matchup → Get Many, Transaction → Get Many,
+  Playoff → Get Bracket, and Traded Pick → Get Many using documented read-only endpoints.
+- Add positive-integer week and round validation, controlled playoff bracket paths, and mocked
+  contract coverage for raw array responses and multi-input execution.
 
 ## 0.1.0 - 2026-08-01
 
