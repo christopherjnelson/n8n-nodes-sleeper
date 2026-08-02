@@ -1,3 +1,4 @@
+# Manual-only by design; do not add automatic push or tag triggers.
 name: Release
 
 on:
