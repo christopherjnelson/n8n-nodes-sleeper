@@ -39,10 +39,18 @@ test('release workflow is manual-only, fail-closed, and separates token from OID
 	assert.match(firstPublish, /secrets\.NPM_TOKEN/);
 	assert.match(firstPublish, /npm publish .*--provenance --access public --tag/);
 	assert.match(firstPublish, /environment: npm-release/);
+	assert.match(
+		firstPublish,
+		/PACKAGE_TARBALL: \.\/package-tarball\/\$\{\{ needs\.quality\.outputs\.tarball \}\}/,
+	);
 
 	const trustedPublish = workflow.slice(workflow.indexOf('\n  trusted-publish:'));
 	assert.match(trustedPublish, /id-token: write/);
 	assert.match(trustedPublish, /npm publish .*--provenance --access public --tag/);
+	assert.match(
+		trustedPublish,
+		/PACKAGE_TARBALL: \.\/package-tarball\/\$\{\{ needs\.quality\.outputs\.tarball \}\}/,
+	);
 	assert.doesNotMatch(trustedPublish, /NODE_AUTH_TOKEN|secrets\.NPM_TOKEN/);
 	assert.doesNotMatch(workflow, /contents: write|packages: write/);
 	assert.doesNotMatch(workflow, /npm_[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]+/i);
