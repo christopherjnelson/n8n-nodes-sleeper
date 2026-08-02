@@ -1,0 +1,30 @@
+dist
+node_modules
+
+# Tests and local n8n development
+coverage
+.nyc_output
+.n8n
+.n8n-node-cli
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Package-manager and debug artifacts
+*.log
+.npm
+.pnpm-store
+.yarn
+
+# Editors and operating systems
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# TypeScript incremental state
+*.tsbuildinfo
