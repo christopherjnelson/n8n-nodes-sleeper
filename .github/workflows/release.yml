@@ -11,16 +11,14 @@ on:
         default: dry-run
         options:
           - dry-run
-          - first-publish
-          - trusted-publish
+          - trusted-stage
       npm_dist_tag:
-        description: npm dist tag
+        description: npm prerelease dist tag
         required: true
         type: choice
         default: next
         options:
           - next
-          - latest
       package_confirmation:
         description: Type n8n-nodes-sleeper exactly
         required: true
@@ -41,9 +39,12 @@ jobs:
       contents: read
     outputs:
       tarball: ${{ steps.pack.outputs.tarball }}
+      sha256: ${{ steps.pack.outputs.sha256 }}
     steps:
       - name: Check out selected source
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -54,7 +55,10 @@ jobs:
           node-version: '24.18.0'
           package-manager-cache: false
 
-      - name: Verify release intent, package name, and tag
+      - name: Install staged-publishing npm CLI
+        run: npm install --global npm@11.16.0
+
+      - name: Verify release intent, package name, and source ref
         env:
           RELEASE_MODE: ${{ inputs.release_mode }}
           PACKAGE_CONFIRMATION: ${{ inputs.package_confirmation }}
@@ -65,20 +69,41 @@ jobs:
           set -euo pipefail
           package_name="$(node -p "require('./package.json').name")"
           package_version="$(node -p "require('./package.json').version")"
+
           if [[ "$PACKAGE_CONFIRMATION" != "$package_name" ]]; then
             echo "::error::Package confirmation must exactly match $package_name"
             exit 1
           fi
-          if [[ "$RELEASE_MODE" != "dry-run" ]]; then
-            expected_tag="v${package_version}"
-            if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "$expected_tag" ]]; then
-              echo "::error::Publication requires the exact tag $expected_tag"
+
+          if [[ "$RELEASE_MODE" == "dry-run" ]]; then
+            if [[ "$REF_TYPE" != "branch" || "$REF_NAME" != "main" ]]; then
+              echo "::error::Dry runs must use the main branch"
               exit 1
             fi
-            if [[ "$(git rev-parse HEAD)" != "$SELECTED_SHA" ]]; then
-              echo "::error::Checked-out source does not match the selected tag commit"
-              exit 1
-            fi
+            exit 0
+          fi
+
+          if [[ "$RELEASE_MODE" != "trusted-stage" ]]; then
+            echo "::error::Unsupported release mode: $RELEASE_MODE"
+            exit 1
+          fi
+
+          expected_tag="v${package_version}"
+          if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "$expected_tag" ]]; then
+            echo "::error::Trusted staging requires the exact tag $expected_tag"
+            exit 1
+          fi
+          if [[ "$(git cat-file -t "$REF_NAME" 2>/dev/null || true)" != "tag" ]]; then
+            echo "::error::$REF_NAME must be an annotated tag"
+            exit 1
+          fi
+          if [[ "$(git rev-parse HEAD)" != "$SELECTED_SHA" ]]; then
+            echo "::error::Checked-out source does not match the selected workflow ref"
+            exit 1
+          fi
+          if [[ "$(git rev-parse "${REF_NAME}^{commit}")" != "$SELECTED_SHA" ]]; then
+            echo "::error::$REF_NAME does not point to the selected source commit"
+            exit 1
           fi
 
       - name: Install locked dependencies
@@ -105,11 +130,13 @@ jobs:
       - name: Run project package inspection
         run: pnpm run package:check
 
-      - name: Reject an existing registry version
+      - name: Reject an existing registry or staged version
+        if: inputs.release_mode == 'trusted-stage'
         run: |
           set -euo pipefail
           package_name="$(node -p "require('./package.json').name")"
           package_version="$(node -p "require('./package.json').version")"
+
           set +e
           registry_result="$(npm view "${package_name}@${package_version}" version --json 2>&1)"
           registry_status=$?
@@ -124,6 +151,37 @@ jobs:
             exit 1
           fi
 
+          set +e
+          npm stage list "$package_name" --json > /tmp/npm-stage-list.json 2> /tmp/npm-stage-list.err
+          staged_status=$?
+          set -e
+          if [[ $staged_status -eq 0 ]]; then
+            PACKAGE_NAME="$package_name" PACKAGE_VERSION="$package_version" node <<'NODE'
+          const fs = require('node:fs');
+          const staged = JSON.parse(fs.readFileSync('/tmp/npm-stage-list.json', 'utf8'));
+          const duplicate = staged.some(
+            (item) =>
+              item.packageName === process.env.PACKAGE_NAME &&
+              item.version === process.env.PACKAGE_VERSION,
+          );
+          if (duplicate) {
+            console.error(
+              `::error::${process.env.PACKAGE_NAME}@${process.env.PACKAGE_VERSION} is already staged`,
+            );
+            process.exit(1);
+          }
+          NODE
+          else
+            stage_error="$(</tmp/npm-stage-list.err)"
+            if [[ "$stage_error" == *"E401"* || "$stage_error" == *"ENEEDAUTH"* || "$stage_error" == *"Unauthorized"* ]]; then
+              echo "::warning::Staged-version listing requires interactive npm authentication; the registry will still atomically reject a duplicate version"
+            else
+              echo "$stage_error"
+              echo "::error::Could not safely check existing staged versions"
+              exit 1
+            fi
+          fi
+
       - name: Create and inspect exact package tarball
         id: pack
         run: |
@@ -132,7 +190,9 @@ jobs:
           npm pack --json --pack-destination release-artifact > /tmp/npm-pack.json
           tarball="$(node -p "require('/tmp/npm-pack.json')[0].filename")"
           tar -tzf "release-artifact/${tarball}"
+          sha256="$(sha256sum "release-artifact/${tarball}" | cut -d ' ' -f 1)"
           echo "tarball=${tarball}" >> "$GITHUB_OUTPUT"
+          echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
 
       - name: Retain inspected package tarball
         uses: actions/upload-artifact@v4
@@ -142,39 +202,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  first-publish:
-    name: Transitional first publication
-    if: inputs.release_mode == 'first-publish'
-    needs: quality
-    runs-on: ubuntu-latest
-    environment: npm-release
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Set up Node.js and npm registry
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24.18.0'
-          registry-url: https://registry.npmjs.org
-          package-manager-cache: false
-
-      - name: Download inspected tarball
-        uses: actions/download-artifact@v4
-        with:
-          name: package-tarball-${{ github.run_id }}
-          path: package-tarball
-
-      - name: Publish first version with provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_DIST_TAG: ${{ inputs.npm_dist_tag }}
-          PACKAGE_TARBALL: ./package-tarball/${{ needs.quality.outputs.tarball }}
-        run: npm publish "$PACKAGE_TARBALL" --provenance --access public --tag "$NPM_DIST_TAG"
-
-  trusted-publish:
-    name: Tokenless trusted publication
-    if: inputs.release_mode == 'trusted-publish'
+  trusted-stage:
+    name: Trusted staged publication
+    if: inputs.release_mode == 'trusted-stage'
     needs: quality
     runs-on: ubuntu-latest
     environment: npm-release
@@ -188,14 +218,26 @@ jobs:
           node-version: '24.18.0'
           package-manager-cache: false
 
+      - name: Install staged-publishing npm CLI
+        run: npm install --global npm@11.16.0
+
       - name: Download inspected tarball
         uses: actions/download-artifact@v4
         with:
           name: package-tarball-${{ github.run_id }}
           path: package-tarball
 
-      - name: Publish through npm trusted publishing
+      - name: Reverify inspected tarball
+        env:
+          EXPECTED_SHA256: ${{ needs.quality.outputs.sha256 }}
+          PACKAGE_TARBALL: ./package-tarball/${{ needs.quality.outputs.tarball }}
+        run: |
+          set -euo pipefail
+          echo "${EXPECTED_SHA256}  ${PACKAGE_TARBALL}" | sha256sum --check --strict
+          tar -tzf "$PACKAGE_TARBALL"
+
+      - name: Stage through npm trusted publishing
         env:
           NPM_DIST_TAG: ${{ inputs.npm_dist_tag }}
           PACKAGE_TARBALL: ./package-tarball/${{ needs.quality.outputs.tarball }}
-        run: npm publish "$PACKAGE_TARBALL" --provenance --access public --tag "$NPM_DIST_TAG"
+        run: npm stage publish "$PACKAGE_TARBALL" --provenance --access public --tag "$NPM_DIST_TAG"
