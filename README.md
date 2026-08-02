@@ -1,5 +1,7 @@
 # n8n-nodes-sleeper
 
+[![CI](https://github.com/christopherjnelson/n8n-nodes-sleeper/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/christopherjnelson/n8n-nodes-sleeper/actions/workflows/ci.yml)
+
 > [!IMPORTANT]
 > This is an unofficial community project and is not affiliated with, endorsed by, or
 > sponsored by Sleeper or Blitz Studios.
@@ -10,9 +12,11 @@ has no runtime dependencies.
 
 ## Status
 
-The package is not yet published to npm. The direct action node is feature complete for the
-planned `0.1.0` prerelease. Triggers and higher-level convenience operations remain possible
-future work; this project does not claim n8n verification.
+The source repository is public at
+[github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
+The package is not yet published to npm. The direct action node is feature complete for the planned
+`0.1.0` prerelease. Triggers and higher-level convenience operations remain possible future work;
+this project does not claim n8n verification.
 
 ## Features
 

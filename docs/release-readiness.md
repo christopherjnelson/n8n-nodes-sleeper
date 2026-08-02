@@ -39,7 +39,7 @@ All Phase 2A validation gates passed:
 | Typecheck                   | `pnpm run typecheck`                               | Pass        |
 | Lint                        | `pnpm run lint`                                    | Pass        |
 | Formatting                  | `pnpm run format:check`                            | Pass        |
-| Mocked/artifact tests       | `pnpm run test`                                    | Pass, 93/93 |
+| Mocked/artifact tests       | `pnpm run test`                                    | Pass, 94/94 |
 | Build                       | `pnpm run build`                                   | Pass        |
 | Project package check       | `pnpm run package:check`                           | Pass        |
 | Independent package dry run | `npm pack --dry-run --json` with a temporary cache | Pass        |
@@ -105,17 +105,22 @@ success data. This is intentional and avoids personal identifiers and unnecessar
 - Package version: `0.1.0`, appropriate for the intended first public prerelease.
 - npm name check: the registry returned HTTP 404 for `n8n-nodes-sleeper` on 2026-08-02. This is
   evidence of availability at check time, not a reservation.
-- Repository/homepage/bugs metadata targets the intended public GitHub repository. Exact,
-  case-sensitive remote matching cannot be verified until that repository exists.
+- Repository/homepage/bugs metadata matches the public repository at
+  `https://github.com/christopherjnelson/n8n-nodes-sleeper`.
 - Current npm guidance adds staged publishing as the preferred human-approval option after a
   package exists; it cannot be used for the first package publication.
 
-## Remaining human checks and release blockers
+## Phase 2B-1 publication checks
 
-- Create and verify the exact public GitHub repository and enable private vulnerability
-  reporting.
-- Review repository metadata after the remote exists and configure branch protection.
-- Configure the `npm-release` environment and required reviewers.
+- The exact public GitHub repository exists with `main` as its default branch.
+- GitHub Actions CI passed on the initial pushed commit in run `30733344303`.
+- GitHub private vulnerability reporting is enabled and verified.
+- The `npm-release` environment exists without secrets or reviewers and accepts deployments only
+  from tags matching `v*`.
+- The npm package remains unpublished; no Git tag or GitHub release has been created.
+
+## Remaining release blockers
+
 - Approve the matching Git tag and short-lived granular first-publication token.
 - After first publication, verify provenance, revoke the token, configure npm trusted
   publishing, and decide between direct and staged trusted publication.
