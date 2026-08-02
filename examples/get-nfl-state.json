@@ -1,0 +1,44 @@
+{
+	"name": "Sleeper - Get NFL State",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "bf4b0dad-b1af-43dc-9329-c884bc8fc401",
+			"name": "When clicking ‘Execute workflow’",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0]
+		},
+		{
+			"parameters": {
+				"resource": "sport",
+				"operation": "getState",
+				"sport": "nfl"
+			},
+			"id": "e1b1bf8c-3610-4d85-aa62-56b5f3074a02",
+			"name": "Get NFL State",
+			"type": "n8n-nodes-sleeper.sleeper",
+			"typeVersion": 1,
+			"position": [240, 0]
+		}
+	],
+	"pinData": {},
+	"connections": {
+		"When clicking ‘Execute workflow’": {
+			"main": [
+				[
+					{
+						"node": "Get NFL State",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"active": false,
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"tags": []
+}

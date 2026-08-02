@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Audit all direct-node labels and descriptions while preserving workflow-facing resource,
+  operation, and parameter values.
+- Replace scaffold artwork with original light/dark crescent-and-football icons and add icon
+  safety and metadata contracts.
+- Add importable example workflows, prerelease documentation, a security policy, and release
+  readiness guidance.
+- Add a manual-only, tag-gated GitHub Actions workflow for dry-run, transitional first publish,
+  and tokenless trusted-publishing modes.
 - Add a shared, GET-only Sleeper API transport with fixed-origin URL construction, safe path
   encoding, finite timeouts, and n8n-native error normalization.
 - Add reusable validation and output conversion for opaque string IDs, four-digit seasons,
@@ -24,6 +32,6 @@
 - Add Avatar → Get URL for local full-size and thumbnail Sleeper CDN URL construction without
   network requests or binary output.
 
-## 0.1.0 - 2026-08-01
+## 0.1.0 - Pending
 
-- Scaffold the unpublished Sleeper community-node project.
+- Intended first public prerelease. Not yet published.

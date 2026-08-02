@@ -1,0 +1,78 @@
+{
+	"name": "Sleeper - Resolve User and Retrieve Leagues",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "2fcaf905-9005-4e58-8bbb-26a713b62611",
+			"name": "When clicking ‘Execute workflow’",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0]
+		},
+		{
+			"parameters": {
+				"assignments": {
+					"assignments": [
+						{
+							"id": "a13ee785-bc79-4ef6-bf49-dac644a4d812",
+							"name": "username",
+							"value": "REPLACE_WITH_SLEEPER_USERNAME",
+							"type": "string"
+						}
+					]
+				},
+				"options": {}
+			},
+			"id": "60ea1d2e-becb-4ee9-b37c-30a4989c1a13",
+			"name": "Set Sample Username",
+			"type": "n8n-nodes-base.set",
+			"typeVersion": 3.4,
+			"position": [240, 0],
+			"notesInFlow": true,
+			"notes": "Replace the sample value with a public Sleeper username before running."
+		},
+		{
+			"parameters": {
+				"resource": "user",
+				"operation": "get",
+				"usernameOrUserId": "={{ $json.username }}"
+			},
+			"id": "d8e37625-25c1-46a7-bd62-d4f866073614",
+			"name": "Resolve Sleeper User",
+			"type": "n8n-nodes-sleeper.sleeper",
+			"typeVersion": 1,
+			"position": [500, 0]
+		},
+		{
+			"parameters": {
+				"resource": "league",
+				"operation": "getManyForUser",
+				"userId": "={{ $json.user_id }}",
+				"sport": "nfl",
+				"season": "2026"
+			},
+			"id": "3eb2eb67-7bd3-4d4d-8f9e-b57e2e9bfc15",
+			"name": "Get User Leagues for 2026",
+			"type": "n8n-nodes-sleeper.sleeper",
+			"typeVersion": 1,
+			"position": [760, 0]
+		}
+	],
+	"pinData": {},
+	"connections": {
+		"When clicking ‘Execute workflow’": {
+			"main": [[{ "node": "Set Sample Username", "type": "main", "index": 0 }]]
+		},
+		"Set Sample Username": {
+			"main": [[{ "node": "Resolve Sleeper User", "type": "main", "index": 0 }]]
+		},
+		"Resolve Sleeper User": {
+			"main": [[{ "node": "Get User Leagues for 2026", "type": "main", "index": 0 }]]
+		}
+	},
+	"active": false,
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"tags": []
+}

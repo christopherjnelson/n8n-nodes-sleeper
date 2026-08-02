@@ -1,0 +1,63 @@
+{
+	"name": "Sleeper - Trending Adds With Attribution",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "a331db3c-21ed-4685-b052-1ed9a0697a21",
+			"name": "When clicking ‘Execute workflow’",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0]
+		},
+		{
+			"parameters": {
+				"resource": "player",
+				"operation": "getTrending",
+				"sport": "nfl",
+				"trendType": "add",
+				"lookbackHours": 24,
+				"resultLimit": 5
+			},
+			"id": "abf62f59-6fb9-4c47-bbb8-b780217ee222",
+			"name": "Get Trending Adds",
+			"type": "n8n-nodes-sleeper.sleeper",
+			"typeVersion": 1,
+			"position": [260, 0]
+		},
+		{
+			"parameters": {
+				"assignments": {
+					"assignments": [
+						{
+							"id": "5a83b659-74bd-4927-af3f-ff84b9df8523",
+							"name": "attribution",
+							"value": "Data from Sleeper",
+							"type": "string"
+						}
+					]
+				},
+				"includeOtherFields": true,
+				"options": {}
+			},
+			"id": "868f8a4b-18e5-47bf-a2be-fb2df8ebc124",
+			"name": "Add Sleeper Attribution",
+			"type": "n8n-nodes-base.set",
+			"typeVersion": 3.4,
+			"position": [520, 0]
+		}
+	],
+	"pinData": {},
+	"connections": {
+		"When clicking ‘Execute workflow’": {
+			"main": [[{ "node": "Get Trending Adds", "type": "main", "index": 0 }]]
+		},
+		"Get Trending Adds": {
+			"main": [[{ "node": "Add Sleeper Attribution", "type": "main", "index": 0 }]]
+		}
+	},
+	"active": false,
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"tags": []
+}
