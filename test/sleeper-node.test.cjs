@@ -52,6 +52,9 @@ test('exposes only the implemented resources and operations', () => {
 	assert.deepEqual(
 		resource.options.map((option) => option.value),
 		[
+			'draft',
+			'draftPick',
+			'draftTradedPick',
 			'league',
 			'leagueUser',
 			'matchup',
@@ -71,6 +74,9 @@ test('exposes only the implemented resources and operations', () => {
 			]),
 		),
 		{
+			draft: ['get', 'getManyForLeague', 'getManyForUser'],
+			draftPick: ['getMany'],
+			draftTradedPick: ['getMany'],
 			user: ['get'],
 			league: ['get', 'getManyForUser'],
 			leagueUser: ['getMany'],
@@ -94,6 +100,9 @@ test('uses resource-specific operation and parameter display conditions', () => 
 	const { description } = new Sleeper();
 	const operations = getOperationProperties(description);
 	assert.deepEqual(operations.map((property) => property.displayOptions.show.resource[0]).sort(), [
+		'draft',
+		'draftPick',
+		'draftTradedPick',
 		'league',
 		'leagueUser',
 		'matchup',
@@ -107,8 +116,6 @@ test('uses resource-specific operation and parameter display conditions', () => 
 
 	const expectedConditions = {
 		usernameOrUserId: { resource: ['user'], operation: ['get'] },
-		userId: { resource: ['league'], operation: ['getManyForUser'] },
-		season: { resource: ['league'], operation: ['getManyForUser'] },
 		week: { resource: ['matchup'], operation: ['getMany'] },
 		round: { resource: ['transaction'], operation: ['getMany'] },
 		bracketType: { resource: ['playoff'], operation: ['getBracket'] },
@@ -119,12 +126,24 @@ test('uses resource-specific operation and parameter display conditions', () => 
 		assert.deepEqual(property.displayOptions.show, show);
 	}
 
+	for (const name of ['userId', 'season']) {
+		const properties = description.properties.filter((candidate) => candidate.name === name);
+		assert.deepEqual(
+			properties.map((property) => property.displayOptions.show),
+			[
+				{ resource: ['draft'], operation: ['getManyForUser'] },
+				{ resource: ['league'], operation: ['getManyForUser'] },
+			],
+		);
+	}
+
 	const leagueIdProperties = description.properties.filter(
 		(candidate) => candidate.name === 'leagueId',
 	);
 	assert.deepEqual(
 		leagueIdProperties.map((property) => property.displayOptions.show),
 		[
+			{ resource: ['draft'], operation: ['getManyForLeague'] },
 			{ resource: ['league'], operation: ['get'] },
 			{ resource: ['leagueUser'], operation: ['getMany'] },
 			{ resource: ['matchup'], operation: ['getMany'] },
@@ -148,7 +167,7 @@ test('shows NFL as the only sport option', () => {
 		(property) => property.name === 'sport',
 	);
 
-	assert.equal(sportProperties.length, 2);
+	assert.equal(sportProperties.length, 3);
 	for (const property of sportProperties) {
 		assert.deepEqual(property.options, [{ name: 'NFL', value: 'nfl' }]);
 		assert.equal(property.default, 'nfl');
