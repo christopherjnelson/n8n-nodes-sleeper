@@ -101,6 +101,7 @@ test('README has prerelease sections and every relative link resolves', () => {
 		'Rate guidance',
 		'Error behavior',
 		'Privacy and public data',
+		'Community testing',
 		'AI-tool use',
 		'Compatibility',
 		'Limitations',
@@ -113,12 +114,12 @@ test('README has prerelease sections and every relative link resolves', () => {
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.match(readme, /Version `0\.1\.0` is available through the npm `next` dist-tag/i);
+	assert.match(readme, /Version `0\.1\.0` is public as a prerelease for community testing/i);
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(readme, /has not been promoted to `latest`/i);
-	assert.match(readme, /not yet n8n verified/i);
-	assert.doesNotMatch(readme, /npm install n8n-nodes-sleeper@latest/);
+	assert.match(readme, /npm's `latest`\s+and `next` tags currently both resolve to `0\.1\.0`/i);
+	assert.match(readme, /is not n8n verified/i);
+	assert.match(readme, /docs\/community-testing\.md/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
 		const target = match[1];
@@ -126,6 +127,77 @@ test('README has prerelease sections and every relative link resolves', () => {
 		const fileTarget = target.split('#')[0];
 		assert.ok(fs.existsSync(path.join(projectRoot, fileTarget)), `README link missing: ${target}`);
 	}
+});
+
+test('community-testing documentation and structured issue forms remain complete', () => {
+	const guide = read('docs/community-testing.md');
+	for (const heading of [
+		'Release under test',
+		'Installation methods',
+		'Requested test coverage',
+		'Privacy and test-data rules',
+		'Known limitations',
+		'Success criteria',
+	]) {
+		assert.match(guide, new RegExp(`^## ${heading}$`, 'm'));
+	}
+	assert.match(guide, /18 direct operations across 14 resources/);
+	assert.match(guide, /n8n-nodes-sleeper@next/);
+	assert.match(guide, /n8n-nodes-sleeper@0\.1\.0/);
+	assert.match(guide, /private vulnerability reporting/);
+	assert.match(guide, /`latest` and `next` both currently resolve to `0\.1\.0`/);
+
+	const templateDirectory = path.join(projectRoot, '.github', 'ISSUE_TEMPLATE');
+	assert.deepEqual(fs.readdirSync(templateDirectory).sort(), [
+		'bug.yml',
+		'compatibility.yml',
+		'config.yml',
+		'feature_request.yml',
+	]);
+
+	const bug = read('.github/ISSUE_TEMPLATE/bug.yml');
+	for (const id of [
+		'n8n_version',
+		'package_version',
+		'node_version',
+		'deployment_type',
+		'operation',
+		'expected',
+		'observed',
+		'reproduction',
+		'execution_output',
+		'sensitive_data',
+	]) {
+		assert.match(bug, new RegExp(`^    id: ${id}$`, 'm'));
+	}
+
+	const compatibility = read('.github/ISSUE_TEMPLATE/compatibility.yml');
+	for (const id of [
+		'n8n_version',
+		'node_version',
+		'install_method',
+		'platform',
+		'package_load',
+		'tested_operations',
+		'overall_status',
+	]) {
+		assert.match(compatibility, new RegExp(`^    id: ${id}$`, 'm'));
+	}
+
+	const feature = read('.github/ISSUE_TEMPLATE/feature_request.yml');
+	for (const id of [
+		'workflow_problem',
+		'desired_behavior',
+		'sleeper_endpoint',
+		'request_type',
+		'use_case',
+	]) {
+		assert.match(feature, new RegExp(`^    id: ${id}$`, 'm'));
+	}
+
+	const config = read('.github/ISSUE_TEMPLATE/config.yml');
+	assert.match(config, /^blank_issues_enabled: false$/m);
+	assert.match(config, /security\/advisories\/new/);
 });
 
 test('package files intentionally exclude source, tests, examples, and release documentation', () => {

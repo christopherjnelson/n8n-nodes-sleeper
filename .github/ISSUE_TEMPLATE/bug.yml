@@ -1,0 +1,83 @@
+name: Bug report
+description: Report a reproducible problem with the Sleeper community node
+title: '[Bug]: '
+labels:
+  - bug
+  - community-testing
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping test the prerelease. Remove private or identifying data before submitting.
+        Report security issues privately through the repository Security tab instead of this form.
+  - type: input
+    id: n8n_version
+    attributes:
+      label: n8n version
+      placeholder: 2.32.7
+    validations:
+      required: true
+  - type: input
+    id: package_version
+    attributes:
+      label: n8n-nodes-sleeper version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js version
+      placeholder: 22.22.0
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment_type
+    attributes:
+      label: Deployment type
+      options:
+        - npm or local process
+        - Docker or container
+        - n8n Desktop
+        - Other self-hosted deployment
+    validations:
+      required: true
+  - type: input
+    id: operation
+    attributes:
+      label: Resource and operation
+      placeholder: Player → Get Trending
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Sanitized reproduction steps
+      description: Include the install method, node configuration, and the smallest workflow that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: execution_output
+    attributes:
+      label: Sanitized execution output
+      description: Paste only the relevant output or error. Remove usernames, league data, cookies, tokens, and credentials.
+      render: shell
+  - type: checkboxes
+    id: sensitive_data
+    attributes:
+      label: Sensitive-data check
+      options:
+        - label: I removed credentials, cookies, tokens, private identifiers, and unnecessary personal data.
+          required: true

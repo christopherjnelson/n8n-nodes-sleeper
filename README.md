@@ -14,9 +14,10 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-Version `0.1.0` is available through the npm `next` dist-tag as an early community-testing
-release. It has not been promoted to `latest` and is not yet n8n verified. Triggers and
-higher-level convenience operations remain possible future work.
+Version `0.1.0` is public as a prerelease for community testing and is not n8n verified.
+Triggers and higher-level convenience operations remain possible future work. npm's `latest`
+and `next` tags currently both resolve to `0.1.0` because it is the first and only published
+version; no stable-promotion command was run, and future prereleases remain intended for `next`.
 
 ## Features
 
@@ -28,13 +29,7 @@ higher-level convenience operations remain possible future work.
 
 ## Installation
 
-### npm prerelease
-
-Install the early community-testing release from the `next` dist-tag:
-
-```bash
-npm install n8n-nodes-sleeper@next
-```
+### Community Nodes interface
 
 For self-hosted n8n, open **Settings → Community Nodes** and enter this package name:
 
@@ -42,8 +37,21 @@ For self-hosted n8n, open **Settings → Community Nodes** and enter this packag
 n8n-nodes-sleeper
 ```
 
-This release is not on `latest` and is not yet n8n verified. Availability in n8n Cloud requires
-separate n8n verification and is not implied by npm publication.
+The normal package name currently resolves to `0.1.0` through npm's required `latest` tag. This
+does not represent a stable-release promotion. Availability in n8n Cloud requires separate n8n
+verification and is not implied by npm publication.
+
+### npm prerelease
+
+Install explicitly from the prerelease testing tag:
+
+```bash
+npm install n8n-nodes-sleeper@next
+```
+
+For an exact reproducible selector, use `n8n-nodes-sleeper@0.1.0`. See the
+[community-testing guide](docs/community-testing.md) for the requested test evidence and privacy
+rules.
 
 ### Local development
 
@@ -139,6 +147,15 @@ access private accounts, or request private endpoints. Workflows can still store
 or forward returned public data, so workflow owners remain responsible for downstream data
 handling and retention.
 
+## Community testing
+
+Version `0.1.0` needs feedback from clean, supported self-hosted n8n environments. Follow the
+[community-testing guide](docs/community-testing.md), then use the
+[structured issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose)
+for compatibility results, reproducible bugs, or feature requests. Report suspected security
+issues only through
+[private vulnerability reporting](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/advisories/new).
+
 ## AI-tool use
 
 The node can be selected as an n8n AI tool. Operations remain deterministic and read-only, and
@@ -183,11 +200,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
 
 ## Release and provenance
 
-Releases are manual, tag-gated GitHub Actions runs. The first publication uses a short-lived
-granular npm token because a brand-new package cannot yet have a trusted publisher. Later
-releases use npm trusted publishing (or staged trusted publishing after owner approval) with
-OIDC and provenance. Developer machines do not publish. See
-[docs/releasing.md](docs/releasing.md).
+Releases are manual, tag-gated GitHub Actions runs. Future legitimate versions use npm trusted
+publishing with GitHub OIDC to create a staged package; the owner must inspect and approve that
+stage separately with 2FA before it becomes public. The workflow has no direct-publish or token
+fallback, and developer machines do not publish. See [docs/releasing.md](docs/releasing.md).
 
 ## Contributing
 

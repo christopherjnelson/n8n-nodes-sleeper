@@ -1,78 +1,80 @@
 # Releasing
 
-Tag creation and publication require the exact owner confirmation defined by the active release
-plan. The workflow at `.github/workflows/release.yml` is manual-only and defaults to `dry-run`
-with the `next` dist tag.
+The permanent release path is manual, tag-gated, tokenless, and staged. The workflow at
+`.github/workflows/release.yml` supports only `dry-run` and `trusted-stage`; `dry-run` is the
+default and neither mode approves a staged package.
 
-## Repository publication status
+## Trusted-publisher binding
 
-The source is public at
-`https://github.com/christopherjnelson/n8n-nodes-sleeper`. GitHub Actions CI passed on the
-initial pushed history, private vulnerability reporting is enabled, and the `npm-release`
-environment accepts only tags matching `v*`. The environment has no required reviewer because a
-sole-maintainer reviewer rule could deadlock recovery, and it has no npm secret.
+npm is configured by the package owner with this exact trust tuple:
 
-The first-publication procedure uses a temporary environment secret only after its irreversible
-checkpoint. Trusted publishing is deliberately deferred to a later phase.
+- Provider: GitHub Actions
+- Organization or user: `christopherjnelson`
+- Repository: `n8n-nodes-sleeper`
+- Workflow filename: `release.yml`
+- Environment: `npm-release`
+- Allowed action: `npm stage publish` only; direct `npm publish` is not allowed
 
-## Before the first publish
+The filename in npm is only `release.yml`, not its repository path. Names and casing must remain
+exact, and only one trusted publisher may be configured. The package's Publishing Access setting
+is owner-confirmed as **Require two-factor authentication and disallow tokens**. Repository and
+environment secret counts are zero, and the workflow contains no token fallback.
 
-A brand-new npm package cannot have trusted publishing or staged publishing configured. After
-separate, explicit Phase 2B-2 owner approval:
+The `npm-release` GitHub environment accepts only `v*` tags. It intentionally has no required
+reviewer because a sole-maintainer reviewer rule could deadlock recovery; administrator recovery
+remains available. Do not broaden its deployment policy or add credential variables.
 
-1. Enable 2FA on the npm owner account.
-2. Create a short-lived granular npm token limited to the initial publication. Do not use a
-   classic token.
-3. Add it directly as the environment secret `NPM_TOKEN` in the `npm-release` environment. Do
-   not create a repository-wide secret or expose the value to an agent, terminal argument, file,
-   command history, or log.
-4. Confirm the workflow remains `.github/workflows/release.yml`.
-5. Create and push `v<package-version>` only after release approval.
-6. Manually run `first-publish` from that tag, enter `n8n-nodes-sleeper` exactly, and select
-   `next`.
-7. Verify the npm package contents, dist tag, repository link, signatures, and provenance.
-8. Remove the `npm-release` environment secret immediately, then revoke the transitional token
-   on npm and confirm both cleanup steps.
+## Safe dry run
 
-The first-publish job uses `npm publish --provenance --access public --tag <tag>` with the
-temporary token. It cannot run from a branch, cannot infer a tag, and refuses an already
-published version.
+Dispatch `release.yml` from `main` with the default `dry-run` mode and the exact package-name
+confirmation. The unprotected dry-run job uses no npm authentication and no OIDC permission. It
+installs the frozen lockfile, runs all validation gates, builds, inspects and packs the package,
+and uploads the tarball as a workflow artifact. It never stages or publishes.
 
-## After the package exists
+## Future release procedure
 
-1. Configure npm trusted publishing for the exact public GitHub owner/repository,
-   `release.yml`, and `npm-release` environment.
-2. Prefer granting `--allow-stage-publish` only when the team wants npm's human approval gate;
-   grant `--allow-publish` only when direct trusted publication is an explicit policy choice.
-3. Confirm the case-sensitive `repository` URL in `package.json` exactly matches GitHub.
-4. Remove `NPM_TOKEN` from GitHub and restrict traditional token publishing on npm.
-5. Keep the workflow filename stable because npm binds trust to that filename.
-6. Use `trusted-publish` only after the trust relationship exists. The job has no
-   `NODE_AUTH_TOKEN` and authenticates with GitHub OIDC.
-7. Verify provenance after every release with npm's package page and `npm audit signatures` in
-   a clean consumer project.
+Use this procedure only for a legitimate, reviewed new package version:
 
-Trusted publishing requires a GitHub-hosted runner, `id-token: write`, Node 22.14 or newer,
-and npm 11.5.1 or newer. The workflow uses newer versions. npm automatically generates
-provenance for trusted publication; the explicit `--provenance` flag records the project's
-intent.
+1. Update the version and changelog, then run every local quality and package gate.
+2. Review and approve the source, create an annotated `v<package-version>` tag, and push it
+   without moving or reusing an existing tag.
+3. Dispatch `release.yml` from that exact tag with `trusted-stage`, confirm
+   `n8n-nodes-sleeper`, and keep the prerelease dist-tag choice at `next`.
+4. Let the protected GitHub-hosted job verify the annotated tag, selected source, unpublished
+   version, quality gates, and exact tarball before GitHub OIDC runs `npm stage publish`.
+5. Inspect the staged package on npm. Approval is a separate owner action and must be completed
+   manually with 2FA through npm's website or supported interactive tooling.
+6. After approval, verify the public version, tarball, signatures, provenance, and intended
+   dist-tags from a clean consumer environment.
+7. Create or update the GitHub release for the unchanged version tag and document the evidence.
 
-## Optional staged publishing
+Never automate stage approval, fall back to a traditional token, or replace staging with direct
+publication. The workflow rejects an already published version, so `0.1.0` cannot be staged
+again. A true OIDC stage authentication test must wait for the next legitimate version.
 
-npm staged publishing adds a human 2FA approval after CI uploads a package but before it becomes
-public. It requires an existing package, Node 22.14 or newer, and npm 11.15.0 or newer. It is
-therefore unavailable for the first publication. If adopted later, change the reviewed trusted
-job deliberately from `npm publish` to `npm stage publish`, grant only trusted
-`--allow-stage-publish`, review the staged tarball, and approve it interactively with 2FA. Do
-not silently fall back from staged to direct publication.
+## Tooling requirements
+
+Trusted publishing requires a GitHub-hosted runner, `id-token: write`, Node.js 22.14 or newer,
+and npm 11.5.1 or newer. Staged publishing requires npm 11.15.0 or newer. The workflow pins
+Node.js 24 and npm 11.16.0, grants `contents: read` and `id-token: write` only to the protected
+stage job, and relies on npm-generated provenance for trusted publication.
 
 ## Dist-tag policy
 
-Use `next` for `0.x` community testing. Use `latest` only after explicit stable-release approval;
-never promote a prerelease silently.
+Future prerelease and community-testing versions use `next`. Use `latest` only after explicit
+stable-release approval; never promote a prerelease silently. npm currently maps both `latest`
+and `next` to `0.1.0` because the first publication created npm's required `latest` key. No
+stable-promotion command was run, and neither current tag should be mutated during community
+testing.
 
-## Rollback
+## Historical note
 
-npm versions are immutable. For a bad release, stop promotion, deprecate the faulty version,
-publish a fixed new version, and document the incident in `CHANGELOG.md`. Never attempt to
-reuse the same version.
+Version `0.1.0` required a one-time token publication because trusted and staged publishing can
+only be configured after a package exists. That temporary token and GitHub secret were removed
+and revoked. This is historical evidence, not an available release path.
+
+## Recovery
+
+npm versions are immutable. For a bad release, do not approve a pending stage. If the version is
+already public, stop promotion, deprecate it when appropriate, publish a fixed new version, and
+document the incident in `CHANGELOG.md`. Never reuse a version or move its tag.

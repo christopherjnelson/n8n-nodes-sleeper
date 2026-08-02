@@ -227,3 +227,84 @@ The disposable n8n startup emitted upstream optional-peer/deprecation warnings, 
 internal Python runner virtual environment was absent, and warned that future n8n versions will
 prefer containerized development. These did not prevent the JavaScript node, UI, imports, or
 smoke executions. They do not add dependencies to this package.
+
+## Phase 2B-3 trusted staging and community-testing preparation
+
+### Trusted publication controls
+
+- Workflow migration commit: `f3730ee97462ce31f42ade1cb743d0daf087adda`. GitHub Actions CI
+  run `30751070611` passed its canonical `build` job.
+- `.github/workflows/release.yml` is manual-only and exposes only default `dry-run` and protected
+  `trusted-stage` modes. The dry run uses no environment, npm authentication, or OIDC permission.
+- The protected job grants `contents: read` and `id-token: write`, uses a GitHub-hosted runner and
+  the `npm-release` environment, verifies an exact annotated version tag and unpublished version,
+  runs every gate, verifies the packed tarball, and stops after `npm stage publish`.
+- Direct `npm publish`, token environment variables, token fallbacks, automated stage approval,
+  `latest` promotion, and dist-tag mutation commands are absent from the workflow.
+- npm trust tuple: GitHub Actions, `christopherjnelson`, `n8n-nodes-sleeper`, workflow filename
+  `release.yml`, environment `npm-release`, and `npm stage publish` allowed without direct
+  `npm publish`.
+- Verification level: **owner-confirmed**. The owner supplied the required exact checkpoint
+  `TRUSTED PUBLISHER CONFIGURED STAGE-ONLY; TOKENS DISALLOWED`. npm's authenticated settings and
+  current `npm trust list`/`npm stage list` cannot be read anonymously, and no persistent local
+  credential was created to automate that check.
+- Publishing Access is therefore recorded as owner-confirmed **Require two-factor authentication
+  and disallow tokens**, not independently agent-verified. The workflow and documentation need no
+  token; repository and environment secret and variable counts remain zero.
+- A true OIDC authentication and stage test is intentionally unproven until the next legitimate
+  version. No workflow was dispatched in `trusted-stage`, no staged package appeared, and only
+  public version `0.1.0` exists.
+- The `npm-release` environment still permits only `v*` deployment tags, has no credential
+  variables, and retains administrator recovery without a sole-maintainer reviewer deadlock.
+
+### Public selector and n8n installation validation
+
+Fresh disposable npm projects tested `n8n-nodes-sleeper@0.1.0`,
+`n8n-nodes-sleeper@next`, and the unqualified `n8n-nodes-sleeper` selector with npm 11.16.0
+and Node.js 24.18.0 on Linux 7.1.3-1-default x86_64. Each resolved version `0.1.0`, registry
+integrity
+`sha512-qvQIA1pE8mRJidVByBcf86bMYY1wR5VD1p0wECWZsG/koNB2FRryOmZRqQ/Ve03zY+Sw5icyewONkN42GpR5Tg==`,
+and tarball SHA-256 `ba8b6bbb9993e3997b7a595e2930d29437287b28910ea515997c2520336b10fb`.
+
+A separate disposable n8n `2.32.7` instance installed the unqualified public package through
+n8n's Community Nodes service and reported `0.1.0`:
+
+- Sleeper registered exactly once, requested no credentials, and exposed all 14 resources and
+  18 operations.
+- Both n8n icon routes matched the built SVG SHA-256
+  `244b4127fdfa0ec189637a750620674077d35a643f27a837e1180080366b2ed2`.
+- Sport → Get State succeeded against the live public endpoint with one state item.
+- Player → Get Trending succeeded for NFL Adds, 24 hours, limit 5, with five ordered raw
+  player-ID/count items.
+- Avatar → Get URL succeeded locally for a synthetic ID and produced the correctly encoded
+  thumbnail URL.
+- No Player → Get Many workflow ran, so no player-map request was made.
+- The temporary owner, workflows, cookies, database, installed package, process, and test folder
+  were removed after the smoke pass.
+
+### Community intake and compatibility decision
+
+- `docs/community-testing.md` documents normal, `next`, and exact-version installation, requested
+  evidence, privacy rules, limitations, and prerelease success criteria without claiming existing
+  tester counts.
+- Structured bug, compatibility, and feature-request issue forms collect environment and
+  reproduction data. Blank issues are disabled, and security reports route to private
+  vulnerability reporting.
+- The public community-testing issue is created only after these assets are on `main` and CI is
+  green; its final URL is recorded here in the follow-up evidence update.
+- CI retains its single canonical Node.js 22.22.0 `build` check. A Node 22/24 matrix was not added
+  because it would change the branch-protection check name and obscure the required canonical
+  status. The release workflow and the full local Phase 2B-3 pass also exercise Node.js 24.
+- No n8n verification submission was made and no verification status is claimed.
+
+### Phase 2B-3 local package evidence
+
+- Current mocked, artifact, documentation, and workflow contract suite: 97 tests after the new
+  issue-form coverage is included.
+- Independent dry-run package: 28 files, 17,278 bytes compressed, 80,669 bytes unpacked, SHA-1
+  `7c5a3d9f6aa4089641413c46d9eb5e19f7b02d99`, and integrity
+  `sha512-cA0Bef7RrdCtOK0npTS0JSIRxsJkG0BQ3VzVU1x36rFeHStRQr4KKbnnsqpYZTSf69v+8z6XIid0dq1aUUtIUA==`.
+  The expected size change is limited to the packaged README; the allowlisted 28-file shape is
+  unchanged.
+- The only open Dependabot alert remains reviewed moderate development-only `uuid` alert #8.
+- npm dist-tags remain `latest → 0.1.0` and `next → 0.1.0`; no mutation command ran.

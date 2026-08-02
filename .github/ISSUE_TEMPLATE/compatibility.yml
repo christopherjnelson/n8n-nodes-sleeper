@@ -1,0 +1,81 @@
+name: Compatibility report
+description: Share installation and operation results from a supported self-hosted n8n environment
+title: '[Compatibility]: '
+labels:
+  - compatibility
+  - community-testing
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for reporting a clean install or compatibility problem for version 0.1.0.
+  - type: input
+    id: n8n_version
+    attributes:
+      label: n8n version
+      placeholder: 2.32.7
+    validations:
+      required: true
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js version
+      placeholder: 22.22.0
+    validations:
+      required: true
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Installation method
+      options:
+        - n8n Community Nodes interface
+        - npm package name
+        - npm @next selector
+        - npm exact-version selector
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system or container image
+      placeholder: Ubuntu 24.04 or n8nio/n8n:2.32.7
+    validations:
+      required: true
+  - type: dropdown
+    id: package_load
+    attributes:
+      label: Package-load result
+      options:
+        - Loaded once with icons and no credentials
+        - Loaded with UI or icon problems
+        - Failed to load
+    validations:
+      required: true
+  - type: textarea
+    id: tested_operations
+    attributes:
+      label: Tested operations
+      description: List each resource and operation, including any continue-on-fail or AI-tool testing.
+    validations:
+      required: true
+  - type: dropdown
+    id: overall_status
+    attributes:
+      label: Overall status
+      options:
+        - Pass
+        - Pass with notes
+        - Fail
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Include sanitized details that will help reproduce unexpected behavior.
+  - type: checkboxes
+    id: sensitive_data
+    attributes:
+      label: Sensitive-data check
+      options:
+        - label: I removed credentials, cookies, tokens, private identifiers, and unnecessary personal data.
+          required: true

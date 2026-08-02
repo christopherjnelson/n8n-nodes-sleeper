@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a direct public Sleeper operation or a clearly scoped future capability
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: workflow_problem
+    attributes:
+      label: Workflow problem
+      description: Describe the workflow need without prescribing an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: desired_behavior
+    attributes:
+      label: Desired behavior
+    validations:
+      required: true
+  - type: input
+    id: sleeper_endpoint
+    attributes:
+      label: Documented public Sleeper endpoint
+      description: Link the relevant public endpoint, or explain why no direct endpoint exists.
+  - type: dropdown
+    id: request_type
+    attributes:
+      label: Request type
+      options:
+        - Direct endpoint
+        - Convenience operation
+        - Trigger idea
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Example use case
+      description: Show the inputs and desired output shape with synthetic or sanitized data.
+    validations:
+      required: true
+  - type: checkboxes
+    id: public_scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This request does not require account cookies, private endpoints, or pasted credentials.
+          required: true
