@@ -10,6 +10,8 @@ const {
 	sleeperApiRequest,
 } = require('../dist/nodes/Sleeper/transport/sleeperApiRequest.js');
 const {
+	getBracketType,
+	getPositiveIntegerParameter,
 	getRequiredTrimmedString,
 	getSeason,
 	getSleeperId,
@@ -128,6 +130,74 @@ test('maps only the controlled NFL sport value', () => {
 	);
 });
 
+test('normalizes positive integer parameters from safe numbers and decimal strings', () => {
+	assert.equal(
+		getPositiveIntegerParameter(createParameterContext({ week: 18 }), 'week', 0, 'Week'),
+		'18',
+	);
+	assert.equal(
+		getPositiveIntegerParameter(createParameterContext({ week: ' 0018 ' }), 'week', 0, 'Week'),
+		'18',
+	);
+	assert.equal(
+		getPositiveIntegerParameter(
+			createParameterContext({ round: '90071992547409931234' }),
+			'round',
+			0,
+			'Round or Week',
+		),
+		'90071992547409931234',
+	);
+});
+
+test('rejects invalid positive integer parameters with the input item index', () => {
+	for (const value of [
+		undefined,
+		null,
+		'',
+		'   ',
+		false,
+		true,
+		[],
+		{},
+		Number.NaN,
+		Infinity,
+		0,
+		-1,
+		1.5,
+		'1.5',
+		'-1',
+		'week',
+		9007199254740992,
+	]) {
+		assert.throws(
+			() => getPositiveIntegerParameter(createParameterContext({ week: value }), 'week', 4, 'Week'),
+			(error) =>
+				error instanceof NodeOperationError &&
+				error.message === 'Week must be a positive integer' &&
+				error.context.itemIndex === 4,
+		);
+	}
+});
+
+test('maps only controlled playoff bracket types', () => {
+	assert.equal(
+		getBracketType(createParameterContext({ bracketType: 'winners' }), 'bracketType', 0),
+		'winners',
+	);
+	assert.equal(
+		getBracketType(createParameterContext({ bracketType: 'losers' }), 'bracketType', 0),
+		'losers',
+	);
+	assert.throws(
+		() => getBracketType(createParameterContext({ bracketType: 'custom_path' }), 'bracketType', 2),
+		(error) =>
+			error instanceof NodeOperationError &&
+			error.message === 'Unsupported bracket type' &&
+			error.context.itemIndex === 2,
+	);
+});
+
 test('converts object and array responses without changing JSON fields', () => {
 	const nested = {
 		league_id: '90071992547409931234',
@@ -160,6 +230,16 @@ test('rejects null, primitives, and invalid array entries deliberately', () => {
 		() => toExecutionItems(getNode(), [{ ok: true }, null], 'array', 2, 'Get Many'),
 		(error) => error instanceof NodeOperationError && error.context.itemIndex === 2,
 	);
+
+	for (const response of [null, { unexpected: true }, 'not-an-array', 42]) {
+		assert.throws(
+			() => toExecutionItems(getNode(), response, 'array', 3, 'Roster → Get Many'),
+			(error) =>
+				error instanceof NodeOperationError &&
+				error.message.includes('Unexpected response') &&
+				error.context.itemIndex === 3,
+		);
+	}
 });
 
 test('creates concise paired continuation items from native errors', () => {
