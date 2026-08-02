@@ -2,7 +2,7 @@
 	"name": "n8n-nodes-sleeper",
 	"version": "0.1.0",
 	"private": true,
-	"description": "Retrieve public Sleeper fantasy football league, roster, matchup, transaction, draft, and player data.",
+	"description": "Retrieve public Sleeper user, league, and NFL state data with n8n.",
 	"license": "MIT",
 	"homepage": "https://github.com/christopherjnelson/n8n-nodes-sleeper#readme",
 	"keywords": [
@@ -36,7 +36,7 @@
 		"lint:fix": "n8n-node lint --fix",
 		"format:check": "prettier --check .",
 		"format:write": "prettier --write .",
-		"test": "node --test test/*.test.cjs",
+		"test": "pnpm run build && node --test --experimental-test-isolation=none test/*.test.cjs",
 		"validate": "n8n-node lint",
 		"package:check": "npm pack --dry-run",
 		"release": "n8n-node release",
