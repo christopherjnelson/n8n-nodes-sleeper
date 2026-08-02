@@ -16,7 +16,7 @@ export const draftDescription: INodeProperties[] = [
 				name: 'Get',
 				value: 'get',
 				action: 'Get a draft',
-				description: 'Retrieve one public Sleeper draft by its stable draft ID',
+				description: 'Retrieve one public Sleeper draft by its opaque draft ID',
 			},
 			{
 				name: 'Get Many for League',
@@ -39,7 +39,7 @@ export const draftDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'The stable Sleeper draft ID. IDs are handled as strings to preserve every digit.',
+		description: 'The exact opaque Sleeper draft ID, handled as text to preserve every digit',
 		displayOptions: {
 			show: {
 				resource: ['draft'],
@@ -53,7 +53,8 @@ export const draftDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'The stable Sleeper league ID. All drafts returned by Sleeper are preserved.',
+		description:
+			'The exact opaque Sleeper league ID. All drafts returned by Sleeper are preserved.',
 		displayOptions: {
 			show: {
 				resource: ['draft'],

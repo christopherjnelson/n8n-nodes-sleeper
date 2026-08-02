@@ -16,7 +16,7 @@ export const leagueDescription: INodeProperties[] = [
 				name: 'Get',
 				value: 'get',
 				action: 'Get a league',
-				description: 'Retrieve one Sleeper league by its stable league ID',
+				description: 'Retrieve one public Sleeper league by its opaque league ID',
 			},
 			{
 				name: 'Get Many for User',
@@ -33,8 +33,7 @@ export const leagueDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description:
-			'The stable Sleeper league ID. IDs are handled as strings to preserve every digit.',
+		description: 'The exact opaque Sleeper league ID, handled as text to preserve every digit',
 		displayOptions: {
 			show: {
 				resource: ['league'],

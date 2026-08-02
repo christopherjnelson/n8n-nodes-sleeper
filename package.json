@@ -1,7 +1,6 @@
 {
 	"name": "n8n-nodes-sleeper",
 	"version": "0.1.0",
-	"private": true,
 	"description": "Retrieve public Sleeper fantasy football data with n8n.",
 	"license": "MIT",
 	"homepage": "https://github.com/christopherjnelson/n8n-nodes-sleeper#readme",
@@ -25,6 +24,9 @@
 	},
 	"engines": {
 		"node": ">=22.22.0"
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"packageManager": "pnpm@11.15.0",
 	"scripts": {

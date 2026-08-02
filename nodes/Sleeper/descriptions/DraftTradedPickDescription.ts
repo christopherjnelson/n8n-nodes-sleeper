@@ -29,7 +29,7 @@ export const draftTradedPickDescription: INodeProperties[] = [
 		required: true,
 		default: '',
 		description:
-			'The stable Sleeper draft ID. Use Traded Pick → Get Many for league-scoped records.',
+			'The exact opaque Sleeper draft ID. Use Traded Pick → Get Many for league-scoped records.',
 		displayOptions: {
 			show: {
 				resource: ['draftTradedPick'],

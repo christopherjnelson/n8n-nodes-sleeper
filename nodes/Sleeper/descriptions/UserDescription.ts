@@ -27,7 +27,7 @@ export const userDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'sleeperuser',
+		placeholder: 'replace-with-username-or-user-ID',
 		description:
 			'A Sleeper username or stable user ID. Usernames can change; retain the returned user_id for future workflow use.',
 		displayOptions: {

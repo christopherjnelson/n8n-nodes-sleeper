@@ -28,7 +28,7 @@ export const draftPickDescription: INodeProperties[] = [
 		required: true,
 		default: '',
 		description:
-			'The stable Sleeper draft ID. Embedded pick metadata is preserved without player enrichment.',
+			'The exact opaque Sleeper draft ID. Embedded pick metadata is preserved without enrichment.',
 		displayOptions: {
 			show: {
 				resource: ['draftPick'],

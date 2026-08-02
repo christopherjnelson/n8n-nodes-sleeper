@@ -271,9 +271,8 @@ export class Sleeper implements INodeType {
 		icon: { light: 'file:sleeper.svg', dark: 'file:sleeper.dark.svg' },
 		group: ['output'],
 		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description:
-			'Retrieve public Sleeper draft, user, league, player, roster, matchup, avatar URL, and NFL state data',
+		subtitle: 'Read-only public data',
+		description: 'Retrieve public Sleeper fantasy football and NFL state data without credentials',
 		defaults: {
 			name: 'Sleeper',
 		},

@@ -17,14 +17,14 @@ export const playerDescription: INodeProperties[] = [
 				value: 'getMany',
 				action: 'Get many players',
 				description:
-					"Retrieve Sleeper's large keyed player map using optional server-side filters. Sleeper recommends using this endpoint sparingly and generally no more than once daily; there is no documented single-player endpoint.",
+					"Retrieve Sleeper's keyed player map with server-side filters. Unfiltered data is about 5 MB; use it sparingly. No single-player endpoint is documented.",
 			},
 			{
 				name: 'Get Trending',
 				value: 'getTrending',
 				action: 'Get trending players',
 				description:
-					'Sleeper requires attribution when displaying or republishing these raw trending player IDs and counts',
+					'Retrieve raw player IDs and counts. Sleeper requires attribution when displaying or republishing them.',
 			},
 		],
 		default: 'getMany',

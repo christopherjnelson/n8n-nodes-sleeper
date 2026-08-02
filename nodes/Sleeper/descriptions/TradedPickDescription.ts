@@ -16,7 +16,8 @@ export const tradedPickDescription: INodeProperties[] = [
 				name: 'Get Many',
 				value: 'getMany',
 				action: 'Get many traded picks',
-				description: 'Retrieve all raw traded-pick records in a league without joining other data',
+				description:
+					'Retrieve league-scoped traded-pick records. Use Draft Traded Pick for one draft.',
 			},
 		],
 		default: 'getMany',
@@ -27,8 +28,7 @@ export const tradedPickDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description:
-			'The stable Sleeper league ID. IDs are handled as strings to preserve every digit.',
+		description: 'The exact opaque Sleeper league ID, handled as text to preserve every digit',
 		displayOptions: {
 			show: {
 				resource: ['tradedPick'],
