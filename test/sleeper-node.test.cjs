@@ -52,12 +52,14 @@ test('exposes only the implemented resources and operations', () => {
 	assert.deepEqual(
 		resource.options.map((option) => option.value),
 		[
+			'avatar',
 			'draft',
 			'draftPick',
 			'draftTradedPick',
 			'league',
 			'leagueUser',
 			'matchup',
+			'player',
 			'playoff',
 			'roster',
 			'sport',
@@ -74,6 +76,7 @@ test('exposes only the implemented resources and operations', () => {
 			]),
 		),
 		{
+			avatar: ['getUrl'],
 			draft: ['get', 'getManyForLeague', 'getManyForUser'],
 			draftPick: ['getMany'],
 			draftTradedPick: ['getMany'],
@@ -81,6 +84,7 @@ test('exposes only the implemented resources and operations', () => {
 			league: ['get', 'getManyForUser'],
 			leagueUser: ['getMany'],
 			matchup: ['getMany'],
+			player: ['getMany', 'getTrending'],
 			playoff: ['getBracket'],
 			roster: ['getMany'],
 			sport: ['getState'],
@@ -100,12 +104,14 @@ test('uses resource-specific operation and parameter display conditions', () => 
 	const { description } = new Sleeper();
 	const operations = getOperationProperties(description);
 	assert.deepEqual(operations.map((property) => property.displayOptions.show.resource[0]).sort(), [
+		'avatar',
 		'draft',
 		'draftPick',
 		'draftTradedPick',
 		'league',
 		'leagueUser',
 		'matchup',
+		'player',
 		'playoff',
 		'roster',
 		'sport',
@@ -167,7 +173,7 @@ test('shows NFL as the only sport option', () => {
 		(property) => property.name === 'sport',
 	);
 
-	assert.equal(sportProperties.length, 3);
+	assert.equal(sportProperties.length, 4);
 	for (const property of sportProperties) {
 		assert.deepEqual(property.options, [{ name: 'NFL', value: 'nfl' }]);
 		assert.equal(property.default, 'nfl');
