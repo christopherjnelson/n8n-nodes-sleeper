@@ -1,0 +1,200 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_mode:
+        description: Release mode
+        required: true
+        type: choice
+        default: dry-run
+        options:
+          - dry-run
+          - first-publish
+          - trusted-publish
+      npm_dist_tag:
+        description: npm dist tag
+        required: true
+        type: choice
+        default: next
+        options:
+          - next
+          - latest
+      package_confirmation:
+        description: Type n8n-nodes-sleeper exactly
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Quality gates and package inspection
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      tarball: ${{ steps.pack.outputs.tarball }}
+    steps:
+      - name: Check out selected source
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.18.0'
+          package-manager-cache: false
+
+      - name: Verify release intent, package name, and tag
+        env:
+          RELEASE_MODE: ${{ inputs.release_mode }}
+          PACKAGE_CONFIRMATION: ${{ inputs.package_confirmation }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SELECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
+          if [[ "$PACKAGE_CONFIRMATION" != "$package_name" ]]; then
+            echo "::error::Package confirmation must exactly match $package_name"
+            exit 1
+          fi
+          if [[ "$RELEASE_MODE" != "dry-run" ]]; then
+            expected_tag="v${package_version}"
+            if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "$expected_tag" ]]; then
+              echo "::error::Publication requires the exact tag $expected_tag"
+              exit 1
+            fi
+            if [[ "$(git rev-parse HEAD)" != "$SELECTED_SHA" ]]; then
+              echo "::error::Checked-out source does not match the selected tag commit"
+              exit 1
+            fi
+          fi
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run official n8n validation
+        run: pnpm run validate
+
+      - name: Run typecheck
+        run: pnpm run typecheck
+
+      - name: Run lint
+        run: pnpm run lint
+
+      - name: Check formatting
+        run: pnpm run format:check
+
+      - name: Run all tests
+        run: pnpm run test
+
+      - name: Build package
+        run: pnpm run build
+
+      - name: Run project package inspection
+        run: pnpm run package:check
+
+      - name: Reject an existing registry version
+        run: |
+          set -euo pipefail
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
+          set +e
+          registry_result="$(npm view "${package_name}@${package_version}" version --json 2>&1)"
+          registry_status=$?
+          set -e
+          if [[ $registry_status -eq 0 ]]; then
+            echo "::error::${package_name}@${package_version} already exists on npm"
+            exit 1
+          fi
+          if [[ "$registry_result" != *"E404"* ]]; then
+            echo "$registry_result"
+            echo "::error::Could not prove that the package version is unpublished"
+            exit 1
+          fi
+
+      - name: Create and inspect exact package tarball
+        id: pack
+        run: |
+          set -euo pipefail
+          mkdir release-artifact
+          npm pack --json --pack-destination release-artifact > /tmp/npm-pack.json
+          tarball="$(node -p "require('/tmp/npm-pack.json')[0].filename")"
+          tar -tzf "release-artifact/${tarball}"
+          echo "tarball=${tarball}" >> "$GITHUB_OUTPUT"
+
+      - name: Retain inspected package tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-tarball-${{ github.run_id }}
+          path: release-artifact/${{ steps.pack.outputs.tarball }}
+          if-no-files-found: error
+          retention-days: 7
+
+  first-publish:
+    name: Transitional first publication
+    if: inputs.release_mode == 'first-publish'
+    needs: quality
+    runs-on: ubuntu-latest
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Set up Node.js and npm registry
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.18.0'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Download inspected tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: package-tarball-${{ github.run_id }}
+          path: package-tarball
+
+      - name: Publish first version with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_DIST_TAG: ${{ inputs.npm_dist_tag }}
+          PACKAGE_TARBALL: package-tarball/${{ needs.quality.outputs.tarball }}
+        run: npm publish "$PACKAGE_TARBALL" --provenance --access public --tag "$NPM_DIST_TAG"
+
+  trusted-publish:
+    name: Tokenless trusted publication
+    if: inputs.release_mode == 'trusted-publish'
+    needs: quality
+    runs-on: ubuntu-latest
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.18.0'
+          package-manager-cache: false
+
+      - name: Download inspected tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: package-tarball-${{ github.run_id }}
+          path: package-tarball
+
+      - name: Publish through npm trusted publishing
+        env:
+          NPM_DIST_TAG: ${{ inputs.npm_dist_tag }}
+          PACKAGE_TARBALL: package-tarball/${{ needs.quality.outputs.tarball }}
+        run: npm publish "$PACKAGE_TARBALL" --provenance --access public --tag "$NPM_DIST_TAG"
