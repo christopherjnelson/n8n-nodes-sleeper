@@ -1,8 +1,8 @@
 # Releasing
 
-No release command in this document is authorized until the owner explicitly approves Phase 2B-2.
-The workflow at `.github/workflows/release.yml` is manual-only and defaults to `dry-run` with
-the `next` dist tag.
+Tag creation and publication require the exact owner confirmation defined by the active release
+plan. The workflow at `.github/workflows/release.yml` is manual-only and defaults to `dry-run`
+with the `next` dist tag.
 
 ## Repository publication status
 
@@ -12,8 +12,8 @@ initial pushed history, private vulnerability reporting is enabled, and the `npm
 environment accepts only tags matching `v*`. The environment has no required reviewer because a
 sole-maintainer reviewer rule could deadlock recovery, and it has no npm secret.
 
-The npm package remains unpublished. No Git tag, GitHub release, npm token, npm trusted publisher,
-or npm ownership has been created or configured.
+The first-publication procedure uses a temporary environment secret only after its irreversible
+checkpoint. Trusted publishing is deliberately deferred to a later phase.
 
 ## Before the first publish
 
@@ -23,13 +23,16 @@ separate, explicit Phase 2B-2 owner approval:
 1. Enable 2FA on the npm owner account.
 2. Create a short-lived granular npm token limited to the initial publication. Do not use a
    classic token.
-3. Store it only as the repository secret `NPM_TOKEN`.
+3. Add it directly as the environment secret `NPM_TOKEN` in the `npm-release` environment. Do
+   not create a repository-wide secret or expose the value to an agent, terminal argument, file,
+   command history, or log.
 4. Confirm the workflow remains `.github/workflows/release.yml`.
 5. Create and push `v<package-version>` only after release approval.
 6. Manually run `first-publish` from that tag, enter `n8n-nodes-sleeper` exactly, and select
    `next`.
 7. Verify the npm package contents, dist tag, repository link, signatures, and provenance.
-8. Revoke the transitional token immediately and remove `NPM_TOKEN` from GitHub.
+8. Remove the `npm-release` environment secret immediately, then revoke the transitional token
+   on npm and confirm both cleanup steps.
 
 The first-publish job uses `npm publish --provenance --access public --tag <tag>` with the
 temporary token. It cannot run from a branch, cannot infer a tag, and refuses an already

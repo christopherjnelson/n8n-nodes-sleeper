@@ -14,9 +14,9 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-The package is not yet published to npm. The direct action node is feature complete for the planned
-`0.1.0` prerelease. Triggers and higher-level convenience operations remain possible future work;
-this project does not claim n8n verification.
+Version `0.1.0` is available through the npm `next` dist-tag as an early community-testing
+release. It has not been promoted to `latest` and is not yet n8n verified. Triggers and
+higher-level convenience operations remain possible future work.
 
 ## Features
 
@@ -28,7 +28,24 @@ this project does not claim n8n verification.
 
 ## Installation
 
-### Current local development
+### npm prerelease
+
+Install the early community-testing release from the `next` dist-tag:
+
+```bash
+npm install n8n-nodes-sleeper@next
+```
+
+For self-hosted n8n, open **Settings → Community Nodes** and enter this package name:
+
+```text
+n8n-nodes-sleeper
+```
+
+This release is not on `latest` and is not yet n8n verified. Availability in n8n Cloud requires
+separate n8n verification and is not implied by npm publication.
+
+### Local development
 
 Clone this repository, install the locked development dependencies, and start the disposable
 development instance:
@@ -38,14 +55,7 @@ pnpm install --frozen-lockfile
 pnpm run dev --custom-user-folder /tmp/n8n-nodes-sleeper-dev
 ```
 
-This is the only supported installation route before publication. Do not install development
-builds into an active n8n service.
-
-### After npm publication
-
-After an approved release exists, self-hosted n8n users can install `n8n-nodes-sleeper`
-through **Settings → Community Nodes**. Availability in n8n Cloud requires separate n8n
-verification and is not implied by npm publication.
+Do not install development builds into an active n8n service.
 
 ## Supported operations
 

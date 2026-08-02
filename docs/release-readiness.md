@@ -1,4 +1,4 @@
-# Phase 2A release readiness
+# Release readiness
 
 - Date tested: 2026-08-02 (America/New_York)
 - Operating system: openSUSE Tumbleweed, Linux 7.1.3-1-default, x86_64
@@ -7,6 +7,49 @@
 - npm: 11.16.0
 - n8n: 2.32.7
 - `@n8n/node-cli`: 0.42.0
+
+## Phase 2B-2 prerelease preparation
+
+- Audited dependency base commit: `26733c7b321db1309b8a85253ba89e8fae67a031`.
+- Intended release commit: the `chore: prepare 0.1.0 prerelease` commit created from that exact
+  base after these release-facing documentation changes. Its immutable SHA must be reported and
+  approved at the mandatory checkpoint because a commit cannot contain its own SHA.
+- Intended annotated tag: `v0.1.0`.
+- Intended npm dist-tag: `next`; `latest` must not be created or moved to `0.1.0`.
+- Pre-documentation release dry run: GitHub Actions run `30734575981`, success, on
+  `26733c7b321db1309b8a85253ba89e8fae67a031`. Its 28-file artifact was byte-for-byte identical
+  to the independently packed local tarball, and both publication jobs were skipped.
+- Remaining irreversible checkpoint: stop before creating `v0.1.0` or adding `NPM_TOKEN` until
+  the owner replies with exactly `PUBLISH 0.1.0 TO NEXT` after reviewing the final commit, CI,
+  dry run, dependency disposition, and tarball details.
+- First publication must use the protected `npm-release` environment, a temporary granular npm
+  token stored only as its `NPM_TOKEN` environment secret, and
+  `npm publish --provenance --access public --tag next` from the exact tag. Remove the GitHub
+  secret and revoke the npm token immediately after publication verification.
+
+## Dependency-alert triage
+
+GitHub reported 10 open Dependabot alerts before remediation: three high, five moderate, and two
+low. All were transitive lockfile findings. The high alerts and eight other alerts were resolved
+with supported direct dependency updates; no override or forced resolution was used.
+
+| Alert | Package     | Severity | Advisory              | Vulnerable / fixed           | Relationship and exposure                                                                                                                                     | Resolution                                                          |
+| ----- | ----------- | -------- | --------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| #1    | `undici`    | Moderate | `GHSA-2mjp-6q6p-2qxm` | `<6.24.0` / `6.24.0`         | Transitive development dependency of `release-it`; excluded from the tarball and not run by CI or publication                                                 | Resolved by `release-it` 21.0.1 (`undici` 7.29.0)                   |
+| #2    | `undici`    | High     | `GHSA-f269-vfmq-vjvj` | `>=6.0.0 <6.24.0` / `6.24.0` | Same release-tool path; its WebSocket parser was not exercised by project gates                                                                               | Resolved by `release-it` 21.0.1                                     |
+| #3    | `undici`    | Moderate | `GHSA-4992-7rv2-5pvq` | `<6.24.0` / `6.24.0`         | Same release-tool path; no project use of the `upgrade` option                                                                                                | Resolved by `release-it` 21.0.1                                     |
+| #6    | `lodash`    | Moderate | `GHSA-f23m-r3pf-42rh` | `<=4.17.23` / `4.18.0`       | Transitive through the development copy of `n8n-workflow`; absent from the tarball                                                                            | Resolved by `n8n-workflow` 2.32.1 (`lodash` 4.18.1)                 |
+| #7    | `lodash`    | High     | `GHSA-r5fr-rjxr-66jc` | `4.x <=4.17.23` / `4.18.0`   | Same development path; this project never invokes `_.template` with imports                                                                                   | Resolved by `n8n-workflow` 2.32.1                                   |
+| #8    | `uuid`      | Moderate | `GHSA-w5hq-g745-h8pq` | `<11.1.1` / `11.1.1`         | Remaining path is `@n8n/node-cli` → AI utilities → LangChain; excluded from the tarball, not used by this non-AI node, and not exercised by CI or publication | Open pending a supported upstream CLI/LangChain update; no override |
+| #9    | `form-data` | High     | `GHSA-hmw2-7cc7-3qxx` | `>=4.0.0 <4.0.6` / `4.0.6`   | Transitive through the development copy of `n8n-workflow`; no multipart request path is used                                                                  | Resolved by `n8n-workflow` 2.32.1 (`form-data` 4.0.6)               |
+| #10   | `undici`    | Low      | `GHSA-35p6-xmwp-9g52` | `<6.27.0` / `6.27.0`         | Transitive development release-tool path only                                                                                                                 | Resolved by `release-it` 21.0.1                                     |
+| #12   | `undici`    | Moderate | `GHSA-p88m-4jfj-68fv` | `<6.27.0` / `6.27.0`         | Transitive development release-tool path only                                                                                                                 | Resolved by `release-it` 21.0.1                                     |
+| #13   | `undici`    | Low      | `GHSA-g8m3-5g58-fq7m` | `<6.27.0` / `6.27.0`         | Transitive development release-tool path only                                                                                                                 | Resolved by `release-it` 21.0.1                                     |
+
+An independent `pnpm audit` initially found these alerts plus three newer high-severity `undici`
+advisories not yet represented in the repository's Dependabot list. After remediation it reports
+zero critical, high, or low findings and one moderate finding: the same upstream `uuid` path in
+the official n8n development CLI. GitHub likewise reports only alert #8 open.
 
 ## Isolated test method
 
@@ -84,7 +127,8 @@ Both metadata references resolve and both icons are included by the package allo
 Examples and development/release documentation are intentionally repository-only. The npm
 tarball is restricted to package metadata, README, LICENSE, CHANGELOG, compiled node code,
 the third-party notice, compiled descriptions/transport/helpers, node metadata, and both icons. The
-final dry run contains 28 entries, is 17,278 bytes compressed, and is 80,691 bytes unpacked. It
+release-preparation dry run contains 28 entries, is 16,933 bytes compressed, and is 79,749 bytes
+unpacked. It
 contains no examples, tests, source TypeScript, source maps, declaration files, release
 documentation, or credentials.
 
@@ -110,20 +154,25 @@ success data. This is intentional and avoids personal identifiers and unnecessar
 - Current npm guidance adds staged publishing as the preferred human-approval option after a
   package exists; it cannot be used for the first package publication.
 
-## Phase 2B-1 publication checks
+## GitHub publication controls
 
 - The exact public GitHub repository exists with `main` as its default branch.
-- GitHub Actions CI passed on the initial pushed commit in run `30733344303`.
+- GitHub Actions CI passed on the dependency-remediation commit in run `30734535665`.
 - GitHub private vulnerability reporting is enabled and verified.
 - The `npm-release` environment exists without secrets or reviewers and accepts deployments only
   from tags matching `v*`.
-- The npm package remains unpublished; no Git tag or GitHub release has been created.
+- At the Phase 2B-2 preflight check, the npm package was unpublished and no Git tag or GitHub
+  release existed.
 
 ## Remaining release blockers
 
-- Approve the matching Git tag and short-lived granular first-publication token.
-- After first publication, verify provenance, revoke the token, configure npm trusted
-  publishing, and decide between direct and staged trusted publication.
+- Commit and push the release-facing documentation, wait for green CI, and rerun the release
+  workflow dry run because README and CHANGELOG affect the tarball.
+- Present the exact release commit, final artifact data, CI, dry-run result, and dependency
+  disposition, then obtain the exact mandatory owner confirmation.
+- After confirmation, use the short-lived granular first-publication token, verify npm and
+  provenance, remove the GitHub secret, and revoke the token.
+- Configure npm trusted publishing only in Phase 2B-3 after this first publication is complete.
 - Submit to n8n only in a later explicitly approved phase; no verification is currently claimed.
 
 The disposable n8n startup emitted upstream optional-peer/deprecation warnings, noted that its

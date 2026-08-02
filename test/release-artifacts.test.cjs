@@ -113,8 +113,12 @@ test('README has prerelease sections and every relative link resolves', () => {
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.match(readme, /not yet published to npm/i);
-	assert.match(readme, /does not claim n8n verification/i);
+	assert.match(readme, /Version `0\.1\.0` is available through the npm `next` dist-tag/i);
+	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
+	assert.match(readme, /Settings → Community Nodes/);
+	assert.match(readme, /has not been promoted to `latest`/i);
+	assert.match(readme, /not yet n8n verified/i);
+	assert.doesNotMatch(readme, /npm install n8n-nodes-sleeper@latest/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
 		const target = match[1];
