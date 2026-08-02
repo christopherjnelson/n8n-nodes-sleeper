@@ -11,21 +11,49 @@
 ## Phase 2B-2 prerelease preparation
 
 - Audited dependency base commit: `26733c7b321db1309b8a85253ba89e8fae67a031`.
-- Intended release commit: the `chore: prepare 0.1.0 prerelease` commit created from that exact
-  base after these release-facing documentation changes. Its immutable SHA must be reported and
-  approved at the mandatory checkpoint because a commit cannot contain its own SHA.
-- Intended annotated tag: `v0.1.0`.
-- Intended npm dist-tag: `next`; `latest` must not be created or moved to `0.1.0`.
+- Release-preparation commit: `89b5f865e4bda8a1e2d7d25620207af057d26df0`.
+- Final release commit after correcting the explicit tarball path in `release.yml`:
+  `c89de5c7506a49bdb6465d9d1f48123e8ceaa736`.
+- Annotated tag: `v0.1.0`, tag object `fc69ca480c04047f51da420393fb2399fc08dde6`,
+  targeting the final release commit exactly.
+- Intended npm dist-tag: `next`. npm also created its required `latest` key for this first and
+  only package version despite publication using `--tag next`. An authorized GitHub Actions
+  removal attempt returned `E400`; the owner explicitly accepted this npm registry constraint.
 - Pre-documentation release dry run: GitHub Actions run `30734575981`, success, on
   `26733c7b321db1309b8a85253ba89e8fae67a031`. Its 28-file artifact was byte-for-byte identical
   to the independently packed local tarball, and both publication jobs were skipped.
-- Remaining irreversible checkpoint: stop before creating `v0.1.0` or adding `NPM_TOKEN` until
-  the owner replies with exactly `PUBLISH 0.1.0 TO NEXT` after reviewing the final commit, CI,
-  dry run, dependency disposition, and tarball details.
-- First publication must use the protected `npm-release` environment, a temporary granular npm
-  token stored only as its `NPM_TOKEN` environment secret, and
-  `npm publish --provenance --access public --tag next` from the exact tag. Remove the GitHub
-  secret and revoke the npm token immediately after publication verification.
+- Final corrected dry run: GitHub Actions run `30735471914`, success, on the final release
+  commit. The artifact remained byte-for-byte identical to the approved tarball.
+- The owner supplied the exact irreversible confirmation `PUBLISH 0.1.0 TO NEXT` before the tag
+  and npm secret were created.
+- Successful first-publication run: `30735834076`, using the protected `npm-release`
+  environment and `npm publish --provenance --access public --tag next` from `v0.1.0`.
+- The temporary GitHub environment secret was removed, both environment and repository secret
+  counts returned to zero, and the owner confirmed revocation of both temporary npm tokens.
+
+## Post-publication verification
+
+- Public package: `https://www.npmjs.com/package/n8n-nodes-sleeper/v/0.1.0`.
+- Registry tarball: 28 files, 16,933 bytes compressed, 79,749 bytes unpacked.
+- Registry SHA-1: `0d5ab631a5417be3cb736e155cc5a775c1f5f495`.
+- Independent SHA-256: `ba8b6bbb9993e3997b7a595e2930d29437287b28910ea515997c2520336b10fb`.
+- Registry integrity:
+  `sha512-qvQIA1pE8mRJidVByBcf86bMYY1wR5VD1p0wECWZsG/koNB2FRryOmZRqQ/Ve03zY+Sw5icyewONkN42GpR5Tg==`.
+- The independently downloaded registry tarball was byte-for-byte identical to the approved
+  local and GitHub Actions artifacts. Its file list, metadata, notices, and both icons matched.
+- SLSA provenance names the public repository, `.github/workflows/release.yml`, tag `v0.1.0`,
+  final release commit `c89de5c7506a49bdb6465d9d1f48123e8ceaa736`, GitHub-hosted runner,
+  and successful run `30735834076` attempt 1.
+- `npm audit signatures` verified registry signatures for 94 packages and attestations for six
+  packages in a clean installation project.
+- `npm install n8n-nodes-sleeper@next` succeeded in a clean temporary project and resolved the
+  package to exactly `0.1.0`.
+- A bare standalone npm install auto-installed the wildcard host peer `n8n-workflow@2.16.0`.
+  Its separate transitive tree reported four high and one moderate advisory. Those dependencies
+  are absent from the Sleeper tarball; supported n8n `2.32.7` supplies its own newer workflow
+  runtime. This host-peer behavior is retained as a reviewed post-publication finding.
+- GitHub release `v0.1.0` is a prerelease, is not GitHub's latest release, contains no attached
+  local tarball, and points through the exact tag to the final release commit.
 
 ## Dependency-alert triage
 
@@ -51,7 +79,7 @@ advisories not yet represented in the repository's Dependabot list. After remedi
 zero critical, high, or low findings and one moderate finding: the same upstream `uuid` path in
 the official n8n development CLI. GitHub likewise reports only alert #8 open.
 
-## Isolated test method
+## Pre-publication isolated test method
 
 The node was loaded with the official CLI on `127.0.0.1:5689` using a disposable user folder:
 
@@ -114,6 +142,26 @@ No response payload or execution database was retained.
 | Player   | Get Many     | Live success       | NFL, Active Only, Position `QB`, Single Map | One bounded keyed map         | One keyed-map item; unfiltered map was not requested | Pass   |
 | Avatar   | Get URL      | Local-only success | Synthetic avatar ID, Full Size              | One local URL object; no HTTP | Expected ID, size, and encoded CDN URL               | Pass   |
 
+## Published-package isolated n8n validation
+
+n8n `2.32.7` ran on `127.0.0.1:56983` with a new temporary user folder, a disposable owner,
+telemetry and personalization disabled, and no production credentials or workflows. n8n's
+environment-managed community-package loader installed `n8n-nodes-sleeper@next` from the public
+registry and reported installed version `0.1.0`.
+
+- The loaded catalog contained exactly one `n8n-nodes-sleeper.sleeper` registration.
+- All 14 resources and 18 operations loaded, with zero Sleeper credentials.
+- Both theme icon endpoints rendered files matching the published SVG hashes.
+- Avatar → Get URL succeeded locally for a synthetic ID and emitted the expected encoded
+  thumbnail URL.
+- Sport → Get State succeeded against the public API and returned the current 2026 preseason
+  state.
+- Player → Get Trending succeeded for Adds, 24 hours, limit 3, returning exactly three raw
+  ordered ID/count items.
+- No Player → Get Many workflow ran, so no unfiltered player-map request was made.
+- The n8n process, temporary database, installed package, owner, workflows, cookies, and npm
+  cache were removed after testing.
+
 ## Icon review
 
 Both SVGs use a square `0 0 24 24` view box and incorporate the MIT-licensed Tabler Icons
@@ -147,8 +195,8 @@ success data. This is intentional and avoids personal identifiers and unnecessar
 
 - Runtime dependencies: none.
 - Package version: `0.1.0`, appropriate for the intended first public prerelease.
-- npm name check: the registry returned HTTP 404 for `n8n-nodes-sleeper` on 2026-08-02. This is
-  evidence of availability at check time, not a reservation.
+- npm public access is independently demonstrated by anonymous metadata, tarball retrieval, and
+  clean installation of `n8n-nodes-sleeper@next`.
 - Repository/homepage/bugs metadata matches the public repository at
   `https://github.com/christopherjnelson/n8n-nodes-sleeper`.
 - Current npm guidance adds staged publishing as the preferred human-approval option after a
@@ -164,16 +212,16 @@ success data. This is intentional and avoids personal identifiers and unnecessar
 - At the Phase 2B-2 preflight check, the npm package was unpublished and no Git tag or GitHub
   release existed.
 
-## Remaining release blockers
+## Next phase boundary
 
-- Commit and push the release-facing documentation, wait for green CI, and rerun the release
-  workflow dry run because README and CHANGELOG affect the tarball.
-- Present the exact release commit, final artifact data, CI, dry-run result, and dependency
-  disposition, then obtain the exact mandatory owner confirmation.
-- After confirmation, use the short-lived granular first-publication token, verify npm and
-  provenance, remove the GitHub secret, and revoke the token.
-- Configure npm trusted publishing only in Phase 2B-3 after this first publication is complete.
-- Submit to n8n only in a later explicitly approved phase; no verification is currently claimed.
+- Phase 2B-2 publication, provenance, public installation, isolated n8n testing, credential
+  cleanup, and GitHub prerelease creation are complete.
+- The owner accepted npm's unavoidable `latest` key for the sole published version after the
+  registry rejected its removal. This is a documented deviation from the requested dist-tag
+  state; `next` also resolves to `0.1.0`, and no explicit promotion command was run.
+- Configure npm trusted publishing only in Phase 2B-3. No trusted publisher exists yet.
+- Submit to n8n only in a later explicitly approved phase; no submission or verification is
+  currently claimed.
 
 The disposable n8n startup emitted upstream optional-peer/deprecation warnings, noted that its
 internal Python runner virtual environment was absent, and warned that future n8n versions will
