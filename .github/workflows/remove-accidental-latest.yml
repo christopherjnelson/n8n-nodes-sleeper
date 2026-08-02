@@ -1,0 +1,81 @@
+# One-time corrective workflow for npm's automatic first-publication dist-tag.
+name: Remove accidental npm latest dist-tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_confirmation:
+        description: Type n8n-nodes-sleeper exactly
+        required: true
+        type: string
+      dist_tag_confirmation:
+        description: Type latest exactly
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: remove-accidental-npm-latest
+  cancel-in-progress: false
+
+jobs:
+  remove-latest:
+    name: Remove accidental latest dist-tag
+    runs-on: ubuntu-latest
+    environment: npm-release
+    steps:
+      - name: Set up Node.js and npm registry
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.18.0'
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify exact cleanup intent and current tags
+        env:
+          PACKAGE_CONFIRMATION: ${{ inputs.package_confirmation }}
+          DIST_TAG_CONFIRMATION: ${{ inputs.dist_tag_confirmation }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$PACKAGE_CONFIRMATION" != "n8n-nodes-sleeper" ]]; then
+            echo "::error::Package confirmation must exactly match n8n-nodes-sleeper"
+            exit 1
+          fi
+          if [[ "$DIST_TAG_CONFIRMATION" != "latest" ]]; then
+            echo "::error::Dist-tag confirmation must exactly match latest"
+            exit 1
+          fi
+          if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "v0.1.0-cleanup-latest" ]]; then
+            echo "::error::Cleanup must run from the temporary v0.1.0-cleanup-latest tag"
+            exit 1
+          fi
+          if [[ "$(npm view n8n-nodes-sleeper@next version)" != "0.1.0" ]]; then
+            echo "::error::next must point to 0.1.0 before cleanup"
+            exit 1
+          fi
+          if [[ "$(npm view n8n-nodes-sleeper@latest version)" != "0.1.0" ]]; then
+            echo "::error::latest must point to 0.1.0 before cleanup"
+            exit 1
+          fi
+
+      - name: Remove only the accidental latest dist-tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm dist-tag rm n8n-nodes-sleeper latest
+
+      - name: Verify final dist-tags
+        run: |
+          set -euo pipefail
+          tags="$(npm view n8n-nodes-sleeper dist-tags --json)"
+          TAGS="$tags" node <<'NODE'
+          const tags = JSON.parse(process.env.TAGS);
+          if (tags.next !== '0.1.0') {
+            throw new Error(`next must remain 0.1.0, received ${String(tags.next)}`);
+          }
+          if (Object.hasOwn(tags, 'latest')) {
+            throw new Error(`latest must be absent, received ${String(tags.latest)}`);
+          }
+          NODE
