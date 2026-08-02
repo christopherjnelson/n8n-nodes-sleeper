@@ -132,6 +132,7 @@ test('package files intentionally exclude source, tests, examples, and release d
 		'README.md',
 		'LICENSE',
 		'CHANGELOG.md',
+		'THIRD_PARTY_NOTICES.md',
 	]);
 	assert.deepEqual(packageMetadata.dependencies ?? {}, {});
 	assert.equal(packageMetadata.scripts.prepublishOnly, 'n8n-node prerelease');

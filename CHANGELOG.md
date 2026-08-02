@@ -4,8 +4,8 @@
 
 - Audit all direct-node labels and descriptions while preserving workflow-facing resource,
   operation, and parameter values.
-- Replace scaffold artwork with original light/dark crescent-and-football icons and add icon
-  safety and metadata contracts.
+- Replace scaffold artwork with safe light/dark football icons incorporating the MIT-licensed
+  Tabler Icons `ball-american-football` asset and add icon safety and metadata contracts.
 - Add importable example workflows, prerelease documentation, a security policy, and release
   readiness guidance.
 - Add a manual-only, tag-gated GitHub Actions workflow for dry-run, transitional first publish,

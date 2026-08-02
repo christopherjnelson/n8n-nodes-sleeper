@@ -76,7 +76,7 @@ test('keeps the public workflow-facing resource and operation values stable', ()
 	assert.equal(description.subtitle, 'Read-only public data');
 });
 
-test('uses safe original SVG icons for both n8n themes', () => {
+test('uses safe Tabler football SVG icons for both n8n themes', () => {
 	const { description } = new Sleeper();
 	assert.deepEqual(description.icon, {
 		light: 'file:sleeper.svg',
@@ -88,12 +88,31 @@ test('uses safe original SVG icons for both n8n themes', () => {
 		assert.ok(fs.existsSync(iconPath));
 		const svg = fs.readFileSync(iconPath, 'utf8');
 		assert.match(svg, /^<svg\b/);
-		assert.match(svg, /viewBox="0 0 64 64"/);
+		const viewBox = svg
+			.match(/viewBox="([^"]+)"/)?.[1]
+			.split(/\s+/)
+			.map(Number);
+		assert.ok(viewBox);
+		assert.equal(viewBox[2], viewBox[3]);
+		assert.match(svg, /<rect\b[^>]*\bwidth="24"[^>]*\bheight="24"[^>]*\brx="5"/);
+		assert.match(svg, /<g\b[^>]*\bstroke="#f8fafc"/);
 		assert.doesNotMatch(svg, /<script\b|<animate\b|<foreignObject\b/i);
 		assert.doesNotMatch(svg, /(?:href|src)\s*=|url\s*\(|data:/i);
 		assert.doesNotMatch(svg.replace('http://www.w3.org/2000/svg', ''), /https?:\/\//i);
 		assert.doesNotMatch(svg, /<image\b|<text\b|<metadata\b/i);
+		assert.doesNotMatch(svg, /M42 6C27|#28346a|#b9c9ff|#d9892b|#f0a54b/i);
 	}
+});
+
+test('includes the Tabler football icon attribution and MIT license', () => {
+	const noticePath = path.join(projectRoot, 'THIRD_PARTY_NOTICES.md');
+	assert.ok(fs.existsSync(noticePath));
+	const notice = fs.readFileSync(noticePath, 'utf8');
+	assert.match(notice, /Tabler Icons/);
+	assert.match(notice, /ball-american-football/);
+	assert.match(notice, /MIT License/);
+	assert.match(notice, /github\.com\/tabler\/tabler-icons/);
+	assert.ok(packageMetadata.files.includes('THIRD_PARTY_NOTICES.md'));
 });
 
 test('keeps prerelease package metadata publishable without runtime dependencies', () => {

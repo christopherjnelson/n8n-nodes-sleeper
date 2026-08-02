@@ -56,7 +56,7 @@ All Phase 2A validation gates passed:
 - The trending attribution notice rendered. Internal `resultLimit` appeared only as **Limit**.
 - The node subtitle rendered as **Read-only public data**. `usableAsTool: true` remained in
   metadata, with no credential or AI runtime dependency.
-- The original light and dark icons rendered in node search and remained recognizable at n8n's
+- The light and dark football icons rendered in node search and remained recognizable at n8n's
   small display size.
 - All three examples imported in n8n 2.32.7 with their Sleeper and core node types resolved.
 
@@ -73,19 +73,20 @@ No response payload or execution database was retained.
 
 ## Icon review
 
-Both SVGs use a square `0 0 64 64` view box and an original crescent/orbit plus abstract
-football-lace motif. Temporary renders were reviewed at 16, 24, 32, 60, and 128 pixels in
-light and dark contexts. The files contain no scripts, animation, external references, embedded
-raster data, text/fonts, filters, or metadata. Both metadata references resolve and both icons
-are included by the package allowlist.
+Both SVGs use a square `0 0 24 24` view box and incorporate the MIT-licensed Tabler Icons
+`ball-american-football` paths on a custom rounded-square background. Temporary renders were
+reviewed at 16, 24, 32, 60, and 128 pixels in light and dark contexts. The files contain no
+scripts, animation, external references, embedded raster data, text/fonts, filters, or metadata.
+Both metadata references resolve and both icons are included by the package allowlist.
 
 ## Package contents
 
 Examples and development/release documentation are intentionally repository-only. The npm
 tarball is restricted to package metadata, README, LICENSE, CHANGELOG, compiled node code,
-compiled descriptions/transport/helpers, node metadata, and both icons. The final dry run contains
-27 entries, is 16,378 bytes compressed, and is 78,513 bytes unpacked. It contains no examples,
-tests, source TypeScript, source maps, declaration files, release documentation, or credentials.
+the third-party notice, compiled descriptions/transport/helpers, node metadata, and both icons. The
+final dry run contains 28 entries, is 17,278 bytes compressed, and is 80,691 bytes unpacked. It
+contains no examples, tests, source TypeScript, source maps, declaration files, release
+documentation, or credentials.
 
 The default npm cache is read-only in the validation sandbox, so both package inspections used
 `npm_config_cache=/tmp/n8n-sleeper-npm-cache`. This changes only npm's local cache location, not the

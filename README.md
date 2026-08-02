@@ -189,10 +189,13 @@ MIT. See [LICENSE](LICENSE).
 Sleeper API data and names remain the property of their respective owners. Trending-data users
 must provide the attribution required by Sleeper's API documentation.
 
+The node icon incorporates the MIT-licensed `ball-american-football` icon from Tabler Icons,
+adapted and displayed on a custom background. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## Non-affiliation
 
 This project is unofficial. It is not affiliated with, endorsed by, sponsored by, or produced
-by Sleeper or Blitz Studios. The original node icon does not use Sleeper's logo, mascot, app
+by Sleeper or Blitz Studios. The node icon does not use Sleeper's logo, mascot, app
 icon, or copied brand artwork.
 
 ## Official resources
