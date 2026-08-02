@@ -13,6 +13,10 @@
   Playoff → Get Bracket, and Traded Pick → Get Many using documented read-only endpoints.
 - Add positive-integer week and round validation, controlled playoff bracket paths, and mocked
   contract coverage for raw array responses and multi-input execution.
+- Add Draft → Get, Draft → Get Many for League, Draft → Get Many for User, Draft Pick → Get
+  Many, and Draft Traded Pick → Get Many using documented read-only endpoints.
+- Preserve raw draft, pick, and draft-scoped traded-pick records with strict response-shape
+  handling, exact string IDs, per-input parameter resolution, and paired output metadata.
 
 ## 0.1.0 - 2026-08-01
 

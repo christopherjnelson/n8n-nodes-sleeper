@@ -43,6 +43,58 @@ function getOperationRequest(
 	operation: string,
 	itemIndex: number,
 ): SleeperOperationRequest {
+	if (resource === 'draft' && operation === 'get') {
+		const draftId = getSleeperId(context, 'draftId', itemIndex, 'Draft ID');
+
+		return {
+			pathSegments: ['draft', draftId],
+			responseShape: 'object',
+			context: 'Draft → Get',
+		};
+	}
+
+	if (resource === 'draft' && operation === 'getManyForLeague') {
+		const leagueId = getSleeperId(context, 'leagueId', itemIndex, 'League ID');
+
+		return {
+			pathSegments: ['league', leagueId, 'drafts'],
+			responseShape: 'array',
+			context: 'Draft → Get Many for League',
+		};
+	}
+
+	if (resource === 'draft' && operation === 'getManyForUser') {
+		const userId = getSleeperId(context, 'userId', itemIndex, 'User ID');
+		const sport = getSport(context, 'sport', itemIndex);
+		const season = getSeason(context, 'season', itemIndex);
+
+		return {
+			pathSegments: ['user', userId, 'drafts', sport, season],
+			responseShape: 'array',
+			context: 'Draft → Get Many for User',
+		};
+	}
+
+	if (resource === 'draftPick' && operation === 'getMany') {
+		const draftId = getSleeperId(context, 'draftId', itemIndex, 'Draft ID');
+
+		return {
+			pathSegments: ['draft', draftId, 'picks'],
+			responseShape: 'array',
+			context: 'Draft Pick → Get Many',
+		};
+	}
+
+	if (resource === 'draftTradedPick' && operation === 'getMany') {
+		const draftId = getSleeperId(context, 'draftId', itemIndex, 'Draft ID');
+
+		return {
+			pathSegments: ['draft', draftId, 'traded_picks'],
+			responseShape: 'array',
+			context: 'Draft Traded Pick → Get Many',
+		};
+	}
+
 	if (resource === 'user' && operation === 'get') {
 		const usernameOrUserId = getRequiredTrimmedString(
 			context,
@@ -165,7 +217,7 @@ export class Sleeper implements INodeType {
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Retrieve public Sleeper user, league, roster, matchup, and NFL state data',
+		description: 'Retrieve public Sleeper draft, user, league, roster, matchup, and NFL state data',
 		defaults: {
 			name: 'Sleeper',
 		},

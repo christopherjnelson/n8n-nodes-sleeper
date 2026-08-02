@@ -1,5 +1,8 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { draftDescription } from './DraftDescription';
+import { draftPickDescription } from './DraftPickDescription';
+import { draftTradedPickDescription } from './DraftTradedPickDescription';
 import { leagueDescription } from './LeagueDescription';
 import { leagueUserDescription } from './LeagueUserDescription';
 import { matchupDescription } from './MatchupDescription';
@@ -17,6 +20,18 @@ export const sleeperProperties: INodeProperties[] = [
 		type: 'options',
 		noDataExpression: true,
 		options: [
+			{
+				name: 'Draft',
+				value: 'draft',
+			},
+			{
+				name: 'Draft Pick',
+				value: 'draftPick',
+			},
+			{
+				name: 'Draft Traded Pick',
+				value: 'draftTradedPick',
+			},
 			{
 				name: 'League',
 				value: 'league',
@@ -56,6 +71,9 @@ export const sleeperProperties: INodeProperties[] = [
 		],
 		default: 'user',
 	},
+	...draftDescription,
+	...draftPickDescription,
+	...draftTradedPickDescription,
 	...userDescription,
 	...leagueDescription,
 	...leagueUserDescription,
