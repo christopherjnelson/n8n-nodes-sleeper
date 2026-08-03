@@ -1,5 +1,7 @@
 const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
@@ -13,8 +15,40 @@ test('registers the version 1 Sleeper node without credentials', () => {
 	assert.equal(packageMetadata.name, 'n8n-nodes-sleeper');
 	assert.deepEqual(packageMetadata.n8n.credentials, []);
 	assert.deepEqual(packageMetadata.n8n.nodes, ['dist/nodes/Sleeper/Sleeper.node.js']);
-	assert.equal(nodeMetadata.node, 'n8n-nodes-sleeper');
+	assert.equal(nodeMetadata.node, 'n8n-nodes-sleeper.sleeper');
 	assert.equal(nodeMetadata.nodeVersion, '1.0');
+	assert.deepEqual(nodeMetadata.categories, ['Development']);
+	assert.equal(nodeMetadata.categories.includes('Developer Tools'), false);
+});
+
+test('packs the corrected compiled Sleeper codex metadata', (t) => {
+	const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'sleeper-metadata-pack-'));
+	t.after(() => fs.rmSync(temporaryDirectory, { recursive: true, force: true }));
+
+	const packResult = JSON.parse(
+		execFileSync(
+			'npm',
+			['pack', '--json', '--ignore-scripts', '--pack-destination', temporaryDirectory],
+			{
+				cwd: projectRoot,
+				encoding: 'utf8',
+				env: {
+					...process.env,
+					npm_config_cache: path.join(temporaryDirectory, 'npm-cache'),
+				},
+			},
+		),
+	);
+	const tarballPath = path.join(temporaryDirectory, packResult[0].filename);
+	const packedMetadata = JSON.parse(
+		execFileSync('tar', ['-xOf', tarballPath, 'package/dist/nodes/Sleeper/Sleeper.node.json'], {
+			encoding: 'utf8',
+		}),
+	);
+
+	assert.equal(packedMetadata.node, 'n8n-nodes-sleeper.sleeper');
+	assert.deepEqual(packedMetadata.categories, ['Development']);
+	assert.equal(packedMetadata.categories.includes('Developer Tools'), false);
 });
 
 test('keeps the public workflow-facing resource and operation values stable', () => {
@@ -116,7 +150,7 @@ test('includes the Tabler football icon attribution and MIT license', () => {
 });
 
 test('keeps prerelease package metadata publishable without runtime dependencies', () => {
-	assert.equal(packageMetadata.version, '0.1.0');
+	assert.equal(packageMetadata.version, '0.1.1');
 	assert.equal(packageMetadata.private, undefined);
 	assert.deepEqual(packageMetadata.dependencies ?? {}, {});
 	assert.deepEqual(packageMetadata.publishConfig, { access: 'public' });

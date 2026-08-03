@@ -4,6 +4,11 @@
 
 - No changes yet.
 
+## [0.1.1] - 2026-08-03
+
+- Correct the n8n codex node identifier and supported category metadata for Creator Portal
+  compatibility.
+
 ## [0.1.0] - 2026-08-02
 
 - Add all 18 credential-free, read-only operations across user, league, roster, matchup,
