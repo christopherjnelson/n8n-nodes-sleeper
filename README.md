@@ -14,10 +14,11 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-Version `0.1.0` is public as a prerelease for community testing and is not n8n verified.
-Triggers and higher-level convenience operations remain possible future work. npm's `latest`
-and `next` tags currently both resolve to `0.1.0` because it is the first and only published
-version; no stable-promotion command was run, and future prereleases remain intended for `next`.
+Version `0.1.1` is the current public prerelease for community testing and is not n8n verified.
+It contains only the codex metadata corrections requested during n8n Creator Portal manual
+review; API behavior and workflow-facing values are unchanged. npm's `next` tag resolves to
+`0.1.1`, while `latest` intentionally remains at `0.1.0` with no stable-promotion command run.
+Triggers and higher-level convenience operations remain possible future work.
 
 ## Features
 
@@ -49,7 +50,7 @@ Install explicitly from the prerelease testing tag:
 npm install n8n-nodes-sleeper@next
 ```
 
-For an exact reproducible selector, use `n8n-nodes-sleeper@0.1.0`. See the
+For an exact reproducible selector, use `n8n-nodes-sleeper@0.1.1`. See the
 [community-testing guide](docs/community-testing.md) for the requested test evidence and privacy
 rules.
 
@@ -108,6 +109,12 @@ The repository includes importable, inactive workflows with no credentials:
 Replace the clearly marked sample username before running the user-leagues example. The
 examples are repository resources and are intentionally excluded from the npm tarball.
 
+## Community workflow examples
+
+The separate [Sleeper workflow collection](https://github.com/christopherjnelson/n8n-workflows/tree/master/sleeper)
+includes **Preseason League Command Center** and **Daily Trending Players Digest to Discord**.
+Their own setup guides cover the additional n8n configuration and credentials they require.
+
 ## Player data guidance
 
 **Player → Get Many** returns Sleeper's object keyed by player ID. The unfiltered response is
@@ -149,7 +156,7 @@ handling and retention.
 
 ## Community testing
 
-Version `0.1.0` needs feedback from clean, supported self-hosted n8n environments. Follow the
+Version `0.1.1` needs feedback from clean, supported self-hosted n8n environments. Follow the
 [community-testing guide](docs/community-testing.md), then use the
 [structured issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose)
 for compatibility results, reproducible bugs, or feature requests. Report suspected security
@@ -200,10 +207,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
 
 ## Release and provenance
 
-Releases are manual, tag-gated GitHub Actions runs. Future legitimate versions use npm trusted
-publishing with GitHub OIDC to create a staged package; the owner must inspect and approve that
-stage separately with 2FA before it becomes public. The workflow has no direct-publish or token
-fallback, and developer machines do not publish. See [docs/releasing.md](docs/releasing.md).
+Releases are manual, tag-gated GitHub Actions runs. Version `0.1.1` proved the trusted-stage path
+end to end: GitHub OIDC created the staged package and the owner approved it separately with 2FA.
+The workflow has no direct-publish or token fallback, and developer machines do not publish.
+See [docs/releasing.md](docs/releasing.md).
 
 ## Contributing
 

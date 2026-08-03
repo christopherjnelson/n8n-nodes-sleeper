@@ -3,7 +3,7 @@
 ## Release under test
 
 - Package: `n8n-nodes-sleeper`
-- Version: `0.1.0`
+- Version: `0.1.1`
 - Status: public prerelease for community testing; not n8n verified
 - Coverage: 18 direct operations across 14 resources
 - Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
@@ -21,7 +21,7 @@ n8n-nodes-sleeper
 ```
 
 The normal installer currently resolves `0.1.0` because npm's required `latest` tag points to
-the only published version. This is first-package behavior, not a stable-release promotion.
+the original prerelease. This is not a stable-release promotion.
 
 ### npm testing
 
@@ -31,12 +31,15 @@ Use the prerelease testing tag:
 npm install n8n-nodes-sleeper@next
 ```
 
+Creator Portal correction testers should use this selector, which currently resolves to
+`0.1.1`, or the exact selector below. Version `0.1.1` remains a community-testing prerelease.
+
 ### Exact-version testing
 
 For reproducible testing, pin the public version:
 
 ```bash
-npm install n8n-nodes-sleeper@0.1.0
+npm install n8n-nodes-sleeper@0.1.1
 ```
 
 ## Requested test coverage
@@ -80,8 +83,8 @@ not a public issue.
   polling, and generally fetch the full player map no more than once daily.
 - One reviewed moderate `uuid` alert remains through upstream n8n development tooling. It is not
   a runtime dependency and is absent from the published tarball.
-- npm `latest` and `next` both currently resolve to `0.1.0` because this is the package's first
-  and only published version. No stable promotion command was run.
+- npm `next` resolves to `0.1.1`, while `latest` intentionally remains at `0.1.0`. No stable
+  promotion command was run.
 
 ## Success criteria
 

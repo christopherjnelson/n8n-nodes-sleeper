@@ -96,6 +96,7 @@ test('README has prerelease sections and every relative link resolves', () => {
 		'Installation',
 		'Supported operations',
 		'Usage examples',
+		'Community workflow examples',
 		'Player data guidance',
 		'Trending players and attribution',
 		'Rate guidance',
@@ -114,10 +115,13 @@ test('README has prerelease sections and every relative link resolves', () => {
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.match(readme, /Version `0\.1\.0` is public as a prerelease for community testing/i);
+	assert.match(readme, /Version `0\.1\.1` is the current public prerelease for community testing/i);
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(readme, /npm's `latest`\s+and `next` tags currently both resolve to `0\.1\.0`/i);
+	assert.match(
+		readme,
+		/npm's `next` tag resolves to\s+`0\.1\.1`, while `latest` intentionally remains at `0\.1\.0`/i,
+	);
 	assert.match(readme, /is not n8n verified/i);
 	assert.match(readme, /docs\/community-testing\.md/);
 
@@ -143,9 +147,12 @@ test('community-testing documentation and structured issue forms remain complete
 	}
 	assert.match(guide, /18 direct operations across 14 resources/);
 	assert.match(guide, /n8n-nodes-sleeper@next/);
-	assert.match(guide, /n8n-nodes-sleeper@0\.1\.0/);
+	assert.match(guide, /n8n-nodes-sleeper@0\.1\.1/);
 	assert.match(guide, /private vulnerability reporting/);
-	assert.match(guide, /`latest` and `next` both currently resolve to `0\.1\.0`/);
+	assert.match(
+		guide,
+		/`next` resolves to `0\.1\.1`, while `latest` intentionally remains at `0\.1\.0`/,
+	);
 
 	const templateDirectory = path.join(projectRoot, '.github', 'ISSUE_TEMPLATE');
 	assert.deepEqual(fs.readdirSync(templateDirectory).sort(), [

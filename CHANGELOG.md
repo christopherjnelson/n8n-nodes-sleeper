@@ -6,8 +6,11 @@
 
 ## [0.1.1] - 2026-08-03
 
-- Correct the n8n codex node identifier and supported category metadata for Creator Portal
-  compatibility.
+- Change the n8n codex node identifier from `n8n-nodes-sleeper` to
+  `n8n-nodes-sleeper.sleeper` for Creator Portal compatibility.
+- Remove the unsupported `Developer Tools` category, leaving exactly `Development`.
+- Preserve all runtime behavior and workflow-facing resources, operations, parameters,
+  credentials, outputs, and icons.
 
 ## [0.1.0] - 2026-08-02
 

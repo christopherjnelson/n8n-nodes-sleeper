@@ -8,6 +8,29 @@
 - n8n: 2.32.7
 - `@n8n/node-cli`: 0.42.0
 
+## Phase 2B-4 v0.1.1 Creator Portal metadata correction
+
+- n8n Creator Portal manual review found two codex metadata issues: the node identifier lacked
+  its class-derived suffix, and `Developer Tools` was not a supported category.
+- Release commit `19f24c3c4d0a70b86a978dad3c08bf09aa9de3ef` changed the codex `node` value to
+  `n8n-nodes-sleeper.sleeper` and categories to exactly `["Development"]`. No runtime,
+  credential, operation, parameter, output, icon, dependency, or workflow-facing behavior
+  changed.
+- The final local suite contained 98 passing tests. Main-branch CI run `30826603193` and release
+  dry-run workflow `30826693788` both completed successfully.
+- The unchanged annotated `v0.1.1` tag targets the release commit exactly. Trusted-stage run
+  `30827973997` authenticated through GitHub OIDC and created the staged package without an npm
+  token; the owner approved staged package `63c0b8b9-fdea-4b00-b6a9-d8aeb0d6e16a` separately
+  with npm 2FA.
+- Public package metadata, tarball, signatures, and provenance were verified after approval. The
+  registry tarball contains 28 files, is 17,354 bytes compressed, and has SHA-256
+  `2eb66b1926027c269628fda5f695dbc143592d3ddea6bdda3a0e9b4fbf627b02`; provenance identifies
+  the exact repository, workflow, tag, and release commit.
+- npm dist-tags are `next → 0.1.1` and `latest → 0.1.0`. No stable promotion or intentional
+  `latest` mutation occurred.
+- Trusted publishing and separate staged-package approval are now proven end to end. Creator
+  Portal resubmission remains a manual owner action and is not claimed here.
+
 ## Phase 2B-2 prerelease preparation
 
 - Audited dependency base commit: `26733c7b321db1309b8a85253ba89e8fae67a031`.
@@ -219,7 +242,8 @@ success data. This is intentional and avoids personal identifiers and unnecessar
 - The owner accepted npm's unavoidable `latest` key for the sole published version after the
   registry rejected its removal. This is a documented deviation from the requested dist-tag
   state; `next` also resolves to `0.1.0`, and no explicit promotion command was run.
-- Configure npm trusted publishing only in Phase 2B-3. No trusted publisher exists yet.
+- At this Phase 2B-2 checkpoint, trusted publishing had not yet been configured; Phase 2B-3
+  records the later configuration.
 - Submit to n8n only in a later explicitly approved phase; no submission or verification is
   currently claimed.
 
@@ -251,9 +275,8 @@ smoke executions. They do not add dependencies to this package.
 - Publishing Access is therefore recorded as owner-confirmed **Require two-factor authentication
   and disallow tokens**, not independently agent-verified. The workflow and documentation need no
   token; repository and environment secret and variable counts remain zero.
-- A true OIDC authentication and stage test is intentionally unproven until the next legitimate
-  version. No workflow was dispatched in `trusted-stage`, no staged package appeared, and only
-  public version `0.1.0` exists.
+- At this Phase 2B-3 preparation checkpoint, a true OIDC authentication and stage test remained
+  unproven. Phase 2B-4 above records the later successful `0.1.1` trusted stage and publication.
 - The `npm-release` environment still permits only `v*` deployment tags, has no credential
   variables, and retains administrator recovery without a sole-maintainer reviewer deadlock.
 
@@ -305,12 +328,13 @@ n8n's Community Nodes service and reported `0.1.0`:
 
 ### Phase 2B-3 local package evidence
 
-- Current mocked, artifact, documentation, and workflow contract suite: 97 tests after the new
-  issue-form coverage is included.
+- At this checkpoint, the mocked, artifact, documentation, and workflow contract suite contained
+  97 tests after the new issue-form coverage was included.
 - Independent dry-run package: 28 files, 17,278 bytes compressed, 80,669 bytes unpacked, SHA-1
   `7c5a3d9f6aa4089641413c46d9eb5e19f7b02d99`, and integrity
   `sha512-cA0Bef7RrdCtOK0npTS0JSIRxsJkG0BQ3VzVU1x36rFeHStRQr4KKbnnsqpYZTSf69v+8z6XIid0dq1aUUtIUA==`.
   The expected size change is limited to the packaged README; the allowlisted 28-file shape is
   unchanged.
 - The only open Dependabot alert remains reviewed moderate development-only `uuid` alert #8.
-- npm dist-tags remain `latest → 0.1.0` and `next → 0.1.0`; no mutation command ran.
+- At this checkpoint, npm dist-tags remained `latest → 0.1.0` and `next → 0.1.0`; no mutation
+  command ran. Phase 2B-4 records the later `next → 0.1.1` state.

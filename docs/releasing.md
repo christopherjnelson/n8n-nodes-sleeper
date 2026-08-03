@@ -49,8 +49,17 @@ Use this procedure only for a legitimate, reviewed new package version:
 7. Create or update the GitHub release for the unchanged version tag and document the evidence.
 
 Never automate stage approval, fall back to a traditional token, or replace staging with direct
-publication. The workflow rejects an already published version, so `0.1.0` cannot be staged
-again. A true OIDC stage authentication test must wait for the next legitimate version.
+publication. The workflow rejects an already published version, so `0.1.1` cannot be staged
+again.
+
+## Proven v0.1.1 trusted stage
+
+Version `0.1.1` proved this process end to end. The trust binding used workflow filename
+`release.yml` and environment `npm-release`; GitHub OIDC created the staged package, and the
+owner approved it separately with npm 2FA. An earlier environment-field misspelling caused
+`ENEEDAUTH` because npm saves trusted-publisher values without validating them. After correcting
+that field, the immutable annotated `v0.1.1` tag was safely reused because it still targeted the
+same reviewed commit; the tag was never moved or recreated.
 
 ## Tooling requirements
 
@@ -62,10 +71,9 @@ stage job, and relies on npm-generated provenance for trusted publication.
 ## Dist-tag policy
 
 Future prerelease and community-testing versions use `next`. Use `latest` only after explicit
-stable-release approval; never promote a prerelease silently. npm currently maps both `latest`
-and `next` to `0.1.0` because the first publication created npm's required `latest` key. No
-stable-promotion command was run, and neither current tag should be mutated during community
-testing.
+stable-release approval; never promote a prerelease silently. npm currently maps `next` to
+`0.1.1` and `latest` to `0.1.0`. No stable-promotion command was run, and neither current tag
+should be mutated during community testing.
 
 ## Historical note
 
