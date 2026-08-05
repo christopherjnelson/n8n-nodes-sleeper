@@ -235,17 +235,79 @@ test('changing Draft ID replaces the fingerprint, re-baselines, and does not rep
 	});
 });
 
-test('a lower current maximum is treated as a reset baseline without replay', async () => {
-	let response = [pick(8)];
+test('a lower current maximum emits nothing and retains the saved watermark', async () => {
+	let response = [pick(42)];
 	const fixture = createPollContext({ requestHandler: async () => response });
 	await poll(fixture);
-	response = [pick(1), pick(2)];
+	response = [pick(40)];
 	assert.equal(await poll(fixture), null);
-	assert.equal(fixture.staticData.highestObservedPickNo, 2);
-	response = [pick(1), pick(2), pick(3)];
+	assert.equal(fixture.staticData.highestObservedPickNo, 42);
+});
+
+test('an empty response after a nonzero baseline retains the saved watermark', async () => {
+	let response = [pick(12)];
+	const fixture = createPollContext({ requestHandler: async () => response });
+	await poll(fixture);
+	response = [];
+	assert.equal(await poll(fixture), null);
+	assert.equal(fixture.staticData.highestObservedPickNo, 12);
+});
+
+test('a temporary truncated response cannot replay picks and later higher picks still emit', async () => {
+	let response = [pick(40), pick(41), pick(42)];
+	const fixture = createPollContext({ requestHandler: async () => response });
+	await poll(fixture);
+
+	response = [pick(40)];
+	assert.equal(await poll(fixture), null);
+	assert.equal(fixture.staticData.highestObservedPickNo, 42);
+
+	response = [pick(40), pick(41), pick(42)];
+	assert.equal(await poll(fixture), null);
+	assert.equal(fixture.staticData.highestObservedPickNo, 42);
+
+	response = [pick(45), pick(40), pick(43), pick(42), pick(41)];
 	assert.deepEqual(
 		(await poll(fixture))[0].map((item) => item.json.pick_no),
-		[3],
+		[43, 45],
+	);
+	assert.equal(fixture.staticData.highestObservedPickNo, 45);
+});
+
+test('all picks emitted by one poll share one deterministically calculated observed_at', async () => {
+	const OriginalDate = global.Date;
+	const firstTimestamp = Date.UTC(2026, 7, 5, 17, 0, 0);
+	let dateConstructions = 0;
+	global.Date = class extends OriginalDate {
+		constructor(...arguments_) {
+			if (arguments_.length > 0) {
+				super(...arguments_);
+				return;
+			}
+
+			super(firstTimestamp + dateConstructions * 1_000);
+			dateConstructions++;
+		}
+	};
+
+	let result;
+	try {
+		const fixture = createPollContext({
+			staticData: {
+				configurationFingerprint: JSON.stringify(['draftPickMade', 'draft-one']),
+				highestObservedPickNo: 1,
+			},
+			requestHandler: async () => [pick(4), pick(2), pick(3)],
+		});
+		result = await poll(fixture);
+	} finally {
+		global.Date = OriginalDate;
+	}
+
+	assert.equal(dateConstructions, 1);
+	assert.deepEqual(
+		result[0].map((item) => item.json.observed_at),
+		Array(3).fill(new OriginalDate(firstTimestamp).toISOString()),
 	);
 });
 

@@ -173,8 +173,7 @@ export class SleeperTrigger implements INodeType {
 			return null;
 		}
 
-		if (currentMaximum < staticData.highestObservedPickNo) {
-			staticData.highestObservedPickNo = currentMaximum;
+		if (currentMaximum <= staticData.highestObservedPickNo) {
 			return null;
 		}
 
@@ -184,6 +183,7 @@ export class SleeperTrigger implements INodeType {
 			return null;
 		}
 
-		return [toTriggerItems(newPicks, new Date().toISOString())];
+		const observedAt = new Date().toISOString();
+		return [toTriggerItems(newPicks, observedAt)];
 	}
 }

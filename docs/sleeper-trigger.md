@@ -17,9 +17,13 @@ The node requests `GET /draft/{draft_id}/picks`, validates and sorts the complet
   identical API responses do not create duplicates, and gaps in pick numbers are allowed.
 - Changing the event or Draft ID establishes a new baseline without replaying the previous
   configuration's records.
-- If the current maximum falls below the saved maximum, the node treats the draft as reset,
-  establishes the lower maximum as the new baseline, and emits nothing.
-- Failed requests and malformed responses do not advance state.
+- The saved maximum is a monotonic watermark for the current configuration. Empty, incomplete, or
+  lower responses emit nothing and never reduce it, preventing a later complete response from
+  replaying previously emitted picks.
+- Failed requests and malformed responses do not advance or reduce state.
+- If a draft is genuinely cleared and restarted under the same Draft ID, reset the trigger state by
+  changing its configuration or recreating the trigger before watching the restarted draft.
 
 Each emitted item keeps the raw draft-pick fields at the top level and adds only `event` and
-`observed_at`. The trigger does not fetch the player map or join player, roster, team, or user data.
+`observed_at`. Every item emitted by one poll shares the same observation timestamp. The trigger
+does not fetch the player map or join player, roster, team, or user data.
