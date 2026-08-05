@@ -4,10 +4,12 @@
 
 - Package: `n8n-nodes-sleeper`
 - Version: `0.1.1`
-- Status: public prerelease for community testing; not n8n verified
+- Status: verified by n8n, published on npm, and available directly in n8n Cloud
 - Coverage: 18 direct operations across 14 resources
 - Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
-- Not included: trigger nodes, writes, joins, enrichment, or composite convenience operations
+- Published-package exclusions: trigger nodes, writes, joins, enrichment, and composite convenience
+  operations. Main contains unreleased 0.2.0 development for Draft Pick Made and Transaction
+  Created or Updated polling; neither event is in npm `0.1.1` or n8n Cloud.
 
 ## Installation methods
 
@@ -20,8 +22,13 @@ install a community node, and enter:
 n8n-nodes-sleeper
 ```
 
-The normal installer currently resolves `0.1.0` because npm's required `latest` tag points to
-the original prerelease. This is not a stable-release promotion.
+The normal installer resolves the current published version, `0.1.1`, because npm's `latest` tag
+points to `0.1.1`.
+
+### n8n Cloud
+
+Search for **Sleeper** in the node picker or canvas. The verified published action node is
+available directly in n8n Cloud. The unreleased Sleeper Trigger is not yet available there.
 
 ### npm testing
 
@@ -31,8 +38,8 @@ Use the prerelease testing tag:
 npm install n8n-nodes-sleeper@next
 ```
 
-Creator Portal correction testers should use this selector, which currently resolves to
-`0.1.1`, or the exact selector below. Version `0.1.1` remains a community-testing prerelease.
+This selector currently resolves to `0.1.1`, as does `latest`. Version `0.1.1` remains the current
+published community-testing release.
 
 ### Exact-version testing
 
@@ -60,8 +67,10 @@ Please include the following in compatibility or bug reports:
 Use the repository's
 [issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose) so reports
 contain enough environment and reproduction detail to triage. General coordination and links to
-new reports belong in the pinned
+new reports may reference the historical
 [v0.1.0 community-testing issue](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/1).
+That issue still contains stale v0.1.0, npm-tag, verification, and trigger statements; follow this
+guide for current status until the issue is updated separately.
 
 ## Privacy and test-data rules
 
@@ -77,14 +86,14 @@ not a public issue.
 ## Known limitations
 
 - The package is read-only and exposes only NFL in its visible sport choices.
-- It has no write operations, triggers, joins, enrichment, or composite convenience operations.
+- Published `0.1.1` has no write operations, triggers, joins, enrichment, or composite convenience
+  operations. The two trigger events on `main` remain unreleased 0.2.0 development.
 - Sleeper documents no single-player endpoint; the node does not invent one.
 - **Player → Get Many** can return a large map. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
 - One reviewed moderate `uuid` alert remains through upstream n8n development tooling. It is not
   a runtime dependency and is absent from the published tarball.
-- npm `next` resolves to `0.1.1`, while `latest` intentionally remains at `0.1.0`. No stable
-  promotion command was run.
+- npm `next` and `latest` both resolve to `0.1.1`.
 
 ## Success criteria
 

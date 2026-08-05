@@ -1,5 +1,19 @@
 # Release readiness
 
+## Current project status — 2026-08-05
+
+- `n8n-nodes-sleeper` is verified by n8n and available directly in n8n Cloud.
+- npm `0.1.1` is the current published version; both `latest` and `next` resolve to `0.1.1`.
+- Published `0.1.1` contains the action node and 18 read operations, not the Sleeper Trigger.
+- Main contains unreleased 0.2.0 development for Draft Pick Made and Transaction Created or
+  Updated polling. Neither event is currently available from npm or n8n Cloud.
+- Creator Portal verification is complete; no additional submission is described as pending.
+- The dated sections below are preserved as historical checkpoint evidence. Their npm tags,
+  verification state, and outstanding actions describe those checkpoints rather than current
+  project status.
+
+## Historical release ledger
+
 - Date tested: 2026-08-02 (America/New_York)
 - Operating system: openSUSE Tumbleweed, Linux 7.1.3-1-default, x86_64
 - Node.js: 24.18.0
@@ -8,7 +22,7 @@
 - n8n: 2.32.7
 - `@n8n/node-cli`: 0.42.0
 
-## Phase 2B-4 v0.1.1 Creator Portal metadata correction
+## Historical checkpoint: Phase 2B-4 v0.1.1 Creator Portal metadata correction
 
 - n8n Creator Portal manual review found two codex metadata issues: the node identifier lacked
   its class-derived suffix, and `Developer Tools` was not a supported category.
@@ -26,10 +40,11 @@
   registry tarball contains 28 files, is 17,354 bytes compressed, and has SHA-256
   `2eb66b1926027c269628fda5f695dbc143592d3ddea6bdda3a0e9b4fbf627b02`; provenance identifies
   the exact repository, workflow, tag, and release commit.
-- npm dist-tags are `next → 0.1.1` and `latest → 0.1.0`. No stable promotion or intentional
-  `latest` mutation occurred.
-- Trusted publishing and separate staged-package approval are now proven end to end. Creator
-  Portal resubmission remains a manual owner action and is not claimed here.
+- At this checkpoint, npm dist-tags were `next → 0.1.1` and `latest → 0.1.0`. No stable promotion
+  or intentional `latest` mutation occurred during that checkpoint.
+- Trusted publishing and separate staged-package approval were proven end to end. At this
+  historical checkpoint, Creator Portal resubmission remained a manual owner action; verification
+  was completed later, as recorded in the current-status section above.
 
 ## Phase 2B-2 prerelease preparation
 

@@ -124,6 +124,8 @@ test('README has current release-status sections and every relative link resolve
 	assert.match(readme, /is a verified n8n community node/i);
 	assert.match(readme, /available\s+directly in n8n Cloud/i);
 	assert.match(readme, /Sleeper Trigger[\s\S]*unreleased development/i);
+	assert.match(readme, /Draft Pick Made[\s\S]*Transaction Created or Updated/);
+	assert.match(readme, /published `0\.1\.1` package does not include the Sleeper Trigger/i);
 	assert.match(readme, /docs\/community-testing\.md/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -150,10 +152,10 @@ test('community-testing documentation and structured issue forms remain complete
 	assert.match(guide, /n8n-nodes-sleeper@next/);
 	assert.match(guide, /n8n-nodes-sleeper@0\.1\.1/);
 	assert.match(guide, /private vulnerability reporting/);
-	assert.match(
-		guide,
-		/`next` resolves to `0\.1\.1`, while `latest` intentionally remains at `0\.1\.0`/,
-	);
+	assert.match(guide, /Status: verified by n8n/);
+	assert.match(guide, /available directly in n8n Cloud/);
+	assert.match(guide, /npm `next` and `latest` both resolve to `0\.1\.1`/);
+	assert.match(guide, /unreleased 0\.2\.0 development/);
 
 	const templateDirectory = path.join(projectRoot, '.github', 'ISSUE_TEMPLATE');
 	assert.deepEqual(fs.readdirSync(templateDirectory).sort(), [
@@ -206,6 +208,36 @@ test('community-testing documentation and structured issue forms remain complete
 	const config = read('.github/ISSUE_TEMPLATE/config.yml');
 	assert.match(config, /^blank_issues_enabled: false$/m);
 	assert.match(config, /security\/advisories\/new/);
+});
+
+test('trigger and release guidance distinguish current status from historical evidence', () => {
+	const triggerGuide = read('docs/sleeper-trigger.md');
+	for (const statement of [
+		/Transaction Created or Updated/,
+		/GET \/league\/\{league_id\}\/transactions\/\{round\}/,
+		/first production poll establishes/,
+		/status_updated/,
+		/1,000 tracked IDs/,
+		/no\s+current-week lookup yet/,
+		/not instant backend delivery/,
+		/no player, roster, owner, or team enrichment/,
+	]) {
+		assert.match(triggerGuide, statement);
+	}
+
+	const plan = read('docs/0.2.0-plan.md');
+	assert.match(plan, /Phase 1B \(\*\*Transaction Created or Updated\*\*\) are complete/);
+	assert.match(plan, /unreleased 0\.2\.0 development/);
+	assert.match(plan, /does not add current-week lookup, filters,\s+backend webhooks/);
+
+	const readiness = read('docs/release-readiness.md');
+	assert.match(readiness, /^## Current project status — 2026-08-05$/m);
+	assert.match(readiness, /both `latest` and `next` resolve to `0\.1\.1`/);
+	assert.match(readiness, /dated sections below are preserved as historical checkpoint evidence/);
+	assert.match(readiness, /Historical checkpoint: Phase 2B-4/);
+
+	const releasing = read('docs/releasing.md');
+	assert.match(releasing, /npm currently maps both `next` and\s+`latest` to `0\.1\.1`/);
 });
 
 test('package files intentionally exclude source, tests, examples, and release documentation', () => {

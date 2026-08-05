@@ -71,9 +71,9 @@ stage job, and relies on npm-generated provenance for trusted publication.
 ## Dist-tag policy
 
 Future prerelease and community-testing versions use `next`. Use `latest` only after explicit
-stable-release approval; never promote a prerelease silently. npm currently maps `next` to
-`0.1.1` and `latest` to `0.1.0`. No stable-promotion command was run, and neither current tag
-should be mutated during community testing.
+stable-release approval; never promote a prerelease silently. npm currently maps both `next` and
+`latest` to `0.1.1`. No dist-tag should be mutated without an explicitly approved release or
+promotion task.
 
 ## Historical note
 

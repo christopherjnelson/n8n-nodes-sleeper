@@ -1,8 +1,10 @@
 # Sleeper Trigger behavior
 
 The Sleeper Trigger polls Sleeper's documented public HTTP API. Sleeper does not document webhook
-subscriptions for these events, so polling frequency should remain comfortably below Sleeper's
-published rate guidance.
+subscriptions for these events, so this is not instant backend delivery and polling frequency
+should remain comfortably below Sleeper's published rate guidance. Draft Pick Made and Transaction
+Created or Updated are unreleased 0.2.0 development; neither event is in npm `0.1.1` or the current
+n8n Cloud package.
 
 ## Draft Pick Made
 
@@ -27,3 +29,39 @@ The node requests `GET /draft/{draft_id}/picks`, validates and sorts the complet
 Each emitted item keeps the raw draft-pick fields at the top level and adds only `event` and
 `observed_at`. Every item emitted by one poll shares the same observation timestamp. The trigger
 does not fetch the player map or join player, roster, team, or user data.
+
+## Transaction Created or Updated
+
+Configure an explicit **League ID** and positive-integer **Round or Week**. The node trims the
+League ID while preserving it as an opaque string and requests exactly one documented endpoint per
+poll: `GET /league/{league_id}/transactions/{round}`. It does not query NFL state, so there is no
+current-week lookup yet.
+
+The complete response must be an array of plain transaction objects. Every object must have a
+unique, non-empty string `transaction_id` and a non-negative safe-integer `status_updated`. The
+node validates the full response before reading or changing production state, preserves all raw
+fields and string IDs, and sorts deterministically by `status_updated` and then `transaction_id`.
+
+- A manual test is only a preview. It does not read, establish, or change production state and
+  returns the transaction with the greatest `status_updated`, using the transaction ID as a
+  deterministic tie-breaker. An empty response returns no preview. The preview's
+  `event: transaction.changed` metadata does not mean a new production change was detected.
+- The first production poll establishes every returned transaction ID and timestamp as the
+  baseline and emits nothing. An empty response establishes an empty baseline.
+- Later polls emit a new ID or an existing ID only when its `status_updated` value increases.
+  Equal or lower values do not emit. Detection deliberately does not hash or compare the complete
+  raw transaction.
+- Missing IDs are retained. Empty, truncated, stale, or reordered responses cannot delete state,
+  lower a saved timestamp, or make an unchanged transaction replay when it reappears.
+- Changing the event, League ID, or Round or Week creates an isolated baseline and does not replay
+  history from the previous configuration.
+- Static state stores only the configuration fingerprint and an array mapping transaction IDs to
+  their highest observed `status_updated`. It never stores transaction objects. The explicit
+  maximum is 1,000 tracked IDs per configuration; exceeding it fails without eviction, partial
+  output, or state mutation.
+- Failed requests and malformed responses emit nothing and leave state unchanged.
+
+Every changed item keeps the raw transaction fields at the top level and adds only
+`event: transaction.changed` and a batch-level `observed_at` timestamp. All items from one poll
+share that timestamp. The trigger performs no player, roster, owner, or team enrichment and has no
+transaction, status, roster, or owner filters.
