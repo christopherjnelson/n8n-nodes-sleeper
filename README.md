@@ -14,45 +14,54 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-Version `0.1.1` is the current public prerelease for community testing and is not n8n verified.
-It contains only the codex metadata corrections requested during n8n Creator Portal manual
-review; API behavior and workflow-facing values are unchanged. npm's `next` tag resolves to
-`0.1.1`, while `latest` intentionally remains at `0.1.0` with no stable-promotion command run.
-Triggers and higher-level convenience operations remain possible future work.
+`n8n-nodes-sleeper` is a verified n8n community node. Version `0.1.1` is the current published npm
+release, and both npm's `latest` and `next` tags resolve to `0.1.1`. The verified node is available
+directly in n8n Cloud, while self-hosted users can install it through Community Nodes. Future npm
+updates are subject to n8n's update review process.
+
+Development of `0.2.0` is underway on `main`, including a new Sleeper Trigger. That trigger is
+unreleased development and is not included in the published npm `0.1.1` package, which contains
+the existing action node and its 18 read operations.
 
 ## Features
 
 - 18 deterministic read operations across 14 resources
 - Exact opaque string IDs, per-input execution, paired-item metadata, and `continueOnFail()`
 - Raw Sleeper response fields without hidden joins, enrichment, caching, or truncation
-- NFL-only visible sport choices and no credentials, writes, or private endpoints
+- NFL-only documented public API scope with zero credentials and zero runtime dependencies
 - `usableAsTool: true` for n8n AI agents without bundling an AI dependency
 
 ## Installation
 
-### Community Nodes interface
+### n8n Cloud
 
-For self-hosted n8n, open **Settings → Community Nodes** and enter this package name:
+Search for **Sleeper** from the node picker or canvas. The verified node is available directly in
+n8n Cloud.
+
+### Self-hosted n8n
+
+Where Community Nodes are supported, open **Settings → Community Nodes** and enter:
 
 ```text
 n8n-nodes-sleeper
 ```
 
-The normal package name currently resolves to `0.1.0` through npm's required `latest` tag. This
-does not represent a stable-release promotion. Availability in n8n Cloud requires separate n8n
-verification and is not implied by npm publication.
+### npm
 
-### npm prerelease
-
-Install explicitly from the prerelease testing tag:
+The default package selector resolves to the current published release, `0.1.1`:
 
 ```bash
-npm install n8n-nodes-sleeper@next
+npm install n8n-nodes-sleeper
 ```
 
-For an exact reproducible selector, use `n8n-nodes-sleeper@0.1.1`. See the
-[community-testing guide](docs/community-testing.md) for the requested test evidence and privacy
-rules.
+For an exact-version install:
+
+```bash
+npm install n8n-nodes-sleeper@0.1.1
+```
+
+See the [community-testing guide](docs/community-testing.md) for requested test evidence and
+privacy rules.
 
 ### Local development
 
@@ -181,10 +190,13 @@ peer dependency range.
 
 ## Limitations
 
-The node supports only NFL in its visible interface. It intentionally omits authentication,
-lineup changes, adds/drops, trades, draft actions, league-setting changes, chat, Sleeper Picks,
-paid contests, triggers, player search, single-player lookup, composite standings, scoreboards,
-roster resolution, activity feeds, enrichment, and hidden caching.
+The published `0.1.1` node supports only NFL in its visible interface. It intentionally omits
+authentication, lineup changes, adds/drops, trades, draft actions, league-setting changes, chat,
+Sleeper Picks, paid contests, triggers, player search, single-player lookup, composite standings,
+scoreboards, roster resolution, activity feeds, enrichment, and hidden caching.
+
+Polling-trigger development is underway for `0.2.0`. The published `0.1.1` package does not yet
+include the Sleeper Trigger.
 
 **Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
 does not verify that the image exists, and emits no binary data.
