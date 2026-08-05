@@ -1,4 +1,4 @@
-import { NodeOperationError, type IExecuteFunctions } from 'n8n-workflow';
+import { NodeOperationError, type IExecuteFunctions, type INode } from 'n8n-workflow';
 
 export type SleeperSport = 'nfl';
 export type SleeperBracketType = 'winners' | 'losers';
@@ -10,7 +10,7 @@ const MAX_POSITION_CODE_LENGTH = 16;
 const MAX_SAFE_INTEGER_BIGINT = BigInt(Number.MAX_SAFE_INTEGER);
 
 function invalidParameter(
-	context: IExecuteFunctions,
+	context: Pick<IExecuteFunctions, 'getNode'>,
 	message: string,
 	description: string,
 	itemIndex: number,
@@ -19,6 +19,34 @@ function invalidParameter(
 		description,
 		itemIndex,
 	});
+}
+
+export function validateRequiredTrimmedString(
+	context: { getNode(): INode },
+	value: unknown,
+	displayName: string,
+	itemIndex: number,
+): string {
+	if (typeof value !== 'string') {
+		throw invalidParameter(
+			context,
+			`${displayName} must be a string`,
+			`Provide ${displayName} as text so its exact value is preserved.`,
+			itemIndex,
+		);
+	}
+
+	const trimmedValue = value.trim();
+	if (trimmedValue.length === 0) {
+		throw invalidParameter(
+			context,
+			`${displayName} is required`,
+			`Enter a non-empty value for ${displayName}.`,
+			itemIndex,
+		);
+	}
+
+	return trimmedValue;
 }
 
 function containsControlCharacter(value: string): boolean {
@@ -40,26 +68,7 @@ export function getRequiredTrimmedString(
 ): string {
 	const value = context.getNodeParameter(parameterName, itemIndex, '');
 
-	if (typeof value !== 'string') {
-		throw invalidParameter(
-			context,
-			`${displayName} must be a string`,
-			`Provide ${displayName} as text so its exact value is preserved.`,
-			itemIndex,
-		);
-	}
-
-	const trimmedValue = value.trim();
-	if (trimmedValue.length === 0) {
-		throw invalidParameter(
-			context,
-			`${displayName} is required`,
-			`Enter a non-empty value for ${displayName}.`,
-			itemIndex,
-		);
-	}
-
-	return trimmedValue;
+	return validateRequiredTrimmedString(context, value, displayName, itemIndex);
 }
 
 export function getSleeperId(

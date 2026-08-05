@@ -14,7 +14,10 @@ const projectRoot = path.resolve(__dirname, '..');
 test('registers the version 1 Sleeper node without credentials', () => {
 	assert.equal(packageMetadata.name, 'n8n-nodes-sleeper');
 	assert.deepEqual(packageMetadata.n8n.credentials, []);
-	assert.deepEqual(packageMetadata.n8n.nodes, ['dist/nodes/Sleeper/Sleeper.node.js']);
+	assert.deepEqual(packageMetadata.n8n.nodes, [
+		'dist/nodes/Sleeper/Sleeper.node.js',
+		'dist/nodes/SleeperTrigger/SleeperTrigger.node.js',
+	]);
 	assert.equal(nodeMetadata.node, 'n8n-nodes-sleeper.sleeper');
 	assert.equal(nodeMetadata.nodeVersion, '1.0');
 	assert.deepEqual(nodeMetadata.categories, ['Development']);

@@ -58,7 +58,8 @@
 		"strict": true,
 		"credentials": [],
 		"nodes": [
-			"dist/nodes/Sleeper/Sleeper.node.js"
+			"dist/nodes/Sleeper/Sleeper.node.js",
+			"dist/nodes/SleeperTrigger/SleeperTrigger.node.js"
 		]
 	},
 	"devDependencies": {

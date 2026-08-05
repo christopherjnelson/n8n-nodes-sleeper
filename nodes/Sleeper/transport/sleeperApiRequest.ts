@@ -1,8 +1,9 @@
 import {
 	NodeApiError,
 	type IDataObject,
-	type IExecuteFunctions,
+	type INode,
 	type JsonObject,
+	type RequestHelperFunctions,
 } from 'n8n-workflow';
 
 export const SLEEPER_API_BASE_URL = 'https://api.sleeper.app/v1';
@@ -15,6 +16,11 @@ export interface SleeperApiRequestOptions {
 	query?: Readonly<Record<string, SleeperQueryValue>>;
 	itemIndex: number;
 	operation: string;
+}
+
+export interface SleeperApiRequestContext {
+	getNode(): INode;
+	helpers: Pick<RequestHelperFunctions, 'httpRequest'>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -200,7 +206,7 @@ export function buildQueryParameters(
 }
 
 export async function sleeperApiRequest(
-	this: IExecuteFunctions,
+	this: SleeperApiRequestContext,
 	options: SleeperApiRequestOptions,
 ): Promise<unknown> {
 	const query = buildQueryParameters(options.query);

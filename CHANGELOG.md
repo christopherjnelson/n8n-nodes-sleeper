@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- No changes yet.
+- Add the Sleeper Trigger framework and Draft Pick Made polling.
+- Establish the current draft-pick baseline on first activation so historical picks do not fire.
+- Preserve all existing action-node behavior.
 
 ## [0.1.1] - 2026-08-03
 
