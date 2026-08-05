@@ -88,7 +88,7 @@ test('all committed example workflows are inactive, credential-free, and use kno
 	);
 });
 
-test('README has prerelease sections and every relative link resolves', () => {
+test('README has current release-status sections and every relative link resolves', () => {
 	const readme = read('README.md');
 	for (const heading of [
 		'Status',
@@ -115,14 +115,15 @@ test('README has prerelease sections and every relative link resolves', () => {
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.match(readme, /Version `0\.1\.1` is the current public prerelease for community testing/i);
-	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
+	assert.match(readme, /Version `0\.1\.1` is the current published npm\s+release/i);
+	assert.match(readme, /npm install n8n-nodes-sleeper$/m);
+	assert.match(readme, /npm install n8n-nodes-sleeper@0\.1\.1/);
+	assert.doesNotMatch(readme, /npm install n8n-nodes-sleeper@next/);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(
-		readme,
-		/npm's `next` tag resolves to\s+`0\.1\.1`, while `latest` intentionally remains at `0\.1\.0`/i,
-	);
-	assert.match(readme, /is not n8n verified/i);
+	assert.match(readme, /both npm's `latest` and `next` tags resolve to `0\.1\.1`/i);
+	assert.match(readme, /is a verified n8n community node/i);
+	assert.match(readme, /available\s+directly in n8n Cloud/i);
+	assert.match(readme, /Sleeper Trigger[\s\S]*unreleased development/i);
 	assert.match(readme, /docs\/community-testing\.md/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
