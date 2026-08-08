@@ -195,6 +195,7 @@ function replaceState(
 	statusById: ReadonlyMap<string, number>,
 ): void {
 	delete staticData.highestObservedPickNo;
+	delete staticData.highestObservedLeagueStatus;
 	staticData.configurationFingerprint = configurationFingerprint;
 	staticData.transactionStatusById = serializeStatusById(statusById);
 }

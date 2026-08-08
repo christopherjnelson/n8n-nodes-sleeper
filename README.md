@@ -19,10 +19,10 @@ release, and both npm's `latest` and `next` tags resolve to `0.1.1`. The verifie
 directly in n8n Cloud, while self-hosted users can install it through Community Nodes. Future npm
 updates are subject to n8n's update review process.
 
-Development of `0.2.0` is underway on `main`, including a new Sleeper Trigger with Draft Pick Made
-and Transaction Created or Updated polling. Both events are unreleased development and are not
-included in the published npm `0.1.1` package, which contains the existing action node and its 18
-read operations.
+Development of `0.2.0` is underway on `main`, including a new Sleeper Trigger with Draft Pick Made,
+Transaction Created or Updated, and League Status Changed polling. All three events are unreleased
+development and are not included in the published npm `0.1.1` package, which contains only the
+existing action node and its 18 read operations.
 
 ## Features
 
@@ -196,9 +196,9 @@ authentication, lineup changes, adds/drops, trades, draft actions, league-settin
 Sleeper Picks, paid contests, triggers, player search, single-player lookup, composite standings,
 scoreboards, roster resolution, activity feeds, enrichment, and hidden caching.
 
-Polling-trigger development is underway for `0.2.0`, currently including Draft Pick Made and
-Transaction Created or Updated. The published `0.1.1` package does not include the Sleeper Trigger
-or either event.
+Polling-trigger development is underway for `0.2.0`, currently including Draft Pick Made,
+Transaction Created or Updated, and League Status Changed. The published `0.1.1` package does not
+include the Sleeper Trigger or any of these events.
 
 **Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
 does not verify that the image exists, and emits no binary data.

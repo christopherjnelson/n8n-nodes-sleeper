@@ -123,9 +123,12 @@ test('README has current release-status sections and every relative link resolve
 	assert.match(readme, /both npm's `latest` and `next` tags resolve to `0\.1\.1`/i);
 	assert.match(readme, /is a verified n8n community node/i);
 	assert.match(readme, /available\s+directly in n8n Cloud/i);
-	assert.match(readme, /Sleeper Trigger[\s\S]*unreleased development/i);
-	assert.match(readme, /Draft Pick Made[\s\S]*Transaction Created or Updated/);
-	assert.match(readme, /published `0\.1\.1` package does not include the Sleeper Trigger/i);
+	assert.match(readme, /Sleeper Trigger[\s\S]*unreleased\s+development/i);
+	assert.match(
+		readme,
+		/Draft Pick Made[\s\S]*Transaction Created or Updated[\s\S]*League Status Changed/,
+	);
+	assert.match(readme, /published `0\.1\.1` package does not\s+include the Sleeper Trigger/i);
 	assert.match(readme, /docs\/community-testing\.md/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -215,6 +218,12 @@ test('trigger and release guidance distinguish current status from historical ev
 	for (const statement of [
 		/Transaction Created or Updated/,
 		/GET \/league\/\{league_id\}\/transactions\/\{round\}/,
+		/League Status Changed/,
+		/GET \/league\/\{league_id\}/,
+		/pre_draft[\s\S]*drafting[\s\S]*in_season[\s\S]*complete/,
+		/highestObservedLeagueStatus/,
+		/lower statuses are treated as stale or out of order/i,
+		/exactly one\s+request per poll/,
 		/first production poll establishes/,
 		/status_updated/,
 		/1,000 tracked IDs/,
@@ -226,7 +235,8 @@ test('trigger and release guidance distinguish current status from historical ev
 	}
 
 	const plan = read('docs/0.2.0-plan.md');
-	assert.match(plan, /Phase 1B \(\*\*Transaction Created or Updated\*\*\) are complete/);
+	assert.match(plan, /Phase 1C\s+\(\*\*League Status Changed\*\*\) are complete/);
+	assert.match(plan, /NFL Week Changed — future Phase 1D/);
 	assert.match(plan, /unreleased 0\.2\.0 development/);
 	assert.match(plan, /does not add current-week lookup, filters,\s+backend webhooks/);
 
