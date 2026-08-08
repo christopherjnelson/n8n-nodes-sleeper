@@ -3,22 +3,21 @@
 ## Release under test
 
 - Package: `n8n-nodes-sleeper`
-- Version: `0.1.1`
-- Status: verified by n8n, published on npm, and available directly in n8n Cloud
-- Coverage: 18 direct operations across 14 resources
+- Candidate version: `0.2.0`
+- Candidate selector: `n8n-nodes-sleeper@next`
+- Exact selector: `n8n-nodes-sleeper@0.2.0`
+- Status: publicly published on npm for self-hosted candidate testing
+- Coverage: 18 direct operations across 14 resources and four Phase 1 trigger events
 - Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
-- Published-package exclusions: trigger nodes, writes, joins, enrichment, and composite convenience
-  operations. Source `0.2.0` is a prepared candidate with four trigger events, but it has not been
-  published to npm or submitted as an n8n update. The trigger is not in npm `0.1.1` or n8n Cloud.
+- Distribution: npm `next → 0.2.0`; npm `latest → 0.1.1`. The default installer still receives
+  `0.1.1`, and the currently approved n8n Cloud version has not yet been updated to `0.2.0`.
 
 ## 0.2.0 candidate
 
 Phase 1 implementation is complete for Draft Pick Made, Transaction Created or Updated, League
-Status Changed, and NFL Week Changed. The source version is `0.2.0`, but it is not yet installable
-from npm. After owner-approved staged publication, the immutable candidate will be tested through
-`n8n-nodes-sleeper@next`. Until that publication occurs, `next`, `latest`, the normal Community
-Nodes installer, and the exact public-version instructions below all continue to resolve to or use
-`0.1.1`.
+Status Changed, and NFL Week Changed. The immutable `0.2.0` package is available now through
+`n8n-nodes-sleeper@next` or `n8n-nodes-sleeper@0.2.0`. Stable/default promotion will occur only
+after owner real-instance evaluation.
 
 ## Installation methods
 
@@ -37,7 +36,8 @@ points to `0.1.1`.
 ### n8n Cloud
 
 Search for **Sleeper** in the node picker or canvas. The verified published action node is
-available directly in n8n Cloud. The unreleased Sleeper Trigger is not yet available there.
+available directly in n8n Cloud. The currently approved Cloud version has not yet been updated to
+`0.2.0`, so the Sleeper Trigger is not yet available there.
 
 ### npm testing
 
@@ -47,15 +47,14 @@ Use the prerelease testing tag:
 npm install n8n-nodes-sleeper@next
 ```
 
-This selector currently resolves to `0.1.1`, as does `latest`. Version `0.1.1` remains the current
-published community-testing release.
+This selector currently resolves to the active candidate, `0.2.0`. npm `latest` remains `0.1.1`.
 
 ### Exact-version testing
 
-For reproducible testing, pin the public version:
+For reproducible candidate testing, pin the exact public version:
 
 ```bash
-npm install n8n-nodes-sleeper@0.1.1
+npm install n8n-nodes-sleeper@0.2.0
 ```
 
 ## Requested test coverage
@@ -72,6 +71,17 @@ Please include the following in compatibility or bug reports:
 - observed output shape and expected output shape
 - error behavior and, when tested, `continueOnFail()` behavior
 - AI-tool behavior, when tested
+- all four trigger events: Draft Pick Made, Transaction Created or Updated, League Status Changed,
+  and NFL Week Changed
+- workflow activation and deactivation
+- repeated polling and no-change suppression
+- switching event or event-specific configuration and establishing the new baseline
+- persistence across an n8n restart without replay
+- real transaction, draft, NFL week, and league-status transitions where practical
+- regression coverage for existing action operations, especially Sport → Get State
+
+Naturally occurring events are useful evidence where practical, but waiting for one is not a
+condition for installing or beginning candidate testing. Share only sanitized test evidence.
 
 Use the repository's
 [issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose) so reports
@@ -95,15 +105,14 @@ not a public issue.
 ## Known limitations
 
 - The package is read-only and exposes only NFL in its visible sport choices.
-- Published `0.1.1` has no write operations, triggers, joins, enrichment, or composite convenience
-  operations. All four trigger events exist only in the prepared, unpublished source `0.2.0`
-  candidate.
+- The default `0.1.1` package has no trigger. All four trigger events are available in the public
+  `0.2.0` candidate through `next` or the exact-version selector.
 - Sleeper documents no single-player endpoint; the node does not invent one.
 - **Player → Get Many** can return a large map. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
 - One reviewed moderate `uuid` alert remains through upstream n8n development tooling. It is not
   a runtime dependency and is absent from the published tarball.
-- npm `next` and `latest` both resolve to `0.1.1`.
+- npm `next` resolves to `0.2.0`; npm `latest` and the default installer remain on `0.1.1`.
 
 ## Success criteria
 

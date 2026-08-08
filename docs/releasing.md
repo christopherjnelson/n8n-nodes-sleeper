@@ -61,6 +61,15 @@ owner approved it separately with npm 2FA. An earlier environment-field misspell
 that field, the immutable annotated `v0.1.1` tag was safely reused because it still targeted the
 same reviewed commit; the tag was never moved or recreated.
 
+## Proven v0.2.0 trusted stage
+
+Version `0.2.0` proved the unchanged release path again. The dry run succeeded, the immutable
+annotated tag passed the workflow checks, and the protected trusted-stage job used GitHub OIDC to
+create the staged package through the `npm-release` environment. The owner approved that stage
+separately with npm 2FA. After publication, the public registry tarball matched the validated local,
+dry-run, and trusted-stage candidate byte-for-byte. These are version-specific results, not new
+generic release requirements.
+
 ## Tooling requirements
 
 Trusted publishing requires a GitHub-hosted runner, `id-token: write`, Node.js 22.14 or newer,
@@ -71,8 +80,8 @@ stage job, and relies on npm-generated provenance for trusted publication.
 ## Dist-tag policy
 
 Future prerelease and community-testing versions use `next`. Use `latest` only after explicit
-stable-release approval; never promote a prerelease silently. npm currently maps both `next` and
-`latest` to `0.1.1`. No dist-tag should be mutated without an explicitly approved release or
+stable-release approval; never promote a prerelease silently. npm currently maps `next` to `0.2.0`
+and `latest` to `0.1.1`. No dist-tag should be mutated without an explicitly approved release or
 promotion task.
 
 ## Historical note

@@ -14,17 +14,15 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-`n8n-nodes-sleeper` remains a verified n8n community node. Version `0.1.1` is the current published
-npm/default release, and both npm's `latest` and `next` tags resolve to `0.1.1`. That verified
-release is available directly in n8n Cloud, while self-hosted users can install it through
-Community Nodes. Future npm updates are subject to n8n's update review process.
+`n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.0` is publicly published and
+contains the complete Phase 1 Sleeper Trigger: Draft Pick Made, Transaction Created or Updated,
+League Status Changed, and NFL Week Changed. npm's `next` tag resolves to `0.2.0`, while `latest`
+remains on `0.1.1`; an unqualified/default npm install therefore still receives `0.1.1`.
 
-Source version `0.2.0` is being prepared as a release candidate containing the complete Phase 1
-Sleeper Trigger: Draft Pick Made, Transaction Created or Updated, League Status Changed, and NFL
-Week Changed. The candidate has not been published to npm, promoted, or submitted as an n8n
-update, and it is not available in n8n Cloud. After an owner-approved staged publication, candidate
-testing will use npm `next`; `latest` will remain on `0.1.1` until explicit promotion approval. The
-published `0.1.1` package still contains only the existing action node and its 18 read operations.
+Self-hosted testers can install the candidate through `next` or its exact version. The currently
+approved n8n Cloud version has not yet been updated to `0.2.0` and does not include the Sleeper
+Trigger. The same immutable `0.2.0` package will be promoted to the stable/default channel only
+after owner real-instance evaluation; the n8n verified-node update remains a later step.
 
 ## Features
 
@@ -32,14 +30,16 @@ published `0.1.1` package still contains only the existing action node and its 1
 - Exact opaque string IDs, per-input execution, paired-item metadata, and `continueOnFail()`
 - Raw Sleeper response fields without hidden joins, enrichment, caching, or truncation
 - NFL-only documented public API scope with zero credentials and zero runtime dependencies
+- Four Phase 1 polling triggers with first-run baselines and monotonic anti-replay state
 - `usableAsTool: true` for n8n AI agents without bundling an AI dependency
 
 ## Installation
 
 ### n8n Cloud
 
-Search for **Sleeper** from the node picker or canvas. The verified node is available directly in
-n8n Cloud.
+Search for **Sleeper** from the node picker or canvas. The verified action node is available
+directly in n8n Cloud, but the currently approved Cloud version has not yet been updated to `0.2.0`
+and does not include the Sleeper Trigger.
 
 ### Self-hosted n8n
 
@@ -49,6 +49,8 @@ Where Community Nodes are supported, open **Settings → Community Nodes** and e
 n8n-nodes-sleeper
 ```
 
+This ordinary/default selector currently follows npm `latest` and installs `0.1.1`.
+
 ### npm
 
 The default package selector resolves to the current published release, `0.1.1`:
@@ -57,10 +59,16 @@ The default package selector resolves to the current published release, `0.1.1`:
 npm install n8n-nodes-sleeper
 ```
 
-For an exact-version install:
+To test the public `0.2.0` candidate through its temporary prerelease channel:
 
 ```bash
-npm install n8n-nodes-sleeper@0.1.1
+npm install n8n-nodes-sleeper@next
+```
+
+For a reproducible exact-version candidate install:
+
+```bash
+npm install n8n-nodes-sleeper@0.2.0
 ```
 
 See the [community-testing guide](docs/community-testing.md) for requested test evidence and
@@ -168,7 +176,7 @@ handling and retention.
 
 ## Community testing
 
-Version `0.1.1` needs feedback from clean, supported self-hosted n8n environments. Follow the
+Version `0.2.0` needs feedback from clean, supported self-hosted n8n environments. Follow the
 [community-testing guide](docs/community-testing.md), then use the
 [structured issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose)
 for compatibility results, reproducible bugs, or feature requests. Report suspected security
@@ -193,15 +201,14 @@ peer dependency range.
 
 ## Limitations
 
-The published `0.1.1` node supports only NFL in its visible interface. It intentionally omits
-authentication, lineup changes, adds/drops, trades, draft actions, league-setting changes, chat,
-Sleeper Picks, paid contests, triggers, player search, single-player lookup, composite standings,
-scoreboards, roster resolution, activity feeds, enrichment, and hidden caching.
+The package supports only NFL in its visible interface. It intentionally omits authentication,
+lineup changes, adds/drops, trades, draft actions, league-setting changes, chat, Sleeper Picks,
+paid contests, player search, single-player lookup, composite standings, scoreboards, roster
+resolution, activity feeds, enrichment, and hidden caching.
 
-Phase 1 polling-trigger implementation is complete in the source `0.2.0` release candidate: Draft
-Pick Made, Transaction Created or Updated, League Status Changed, and NFL Week Changed. Candidate
-publication and n8n update review are still pending. The published `0.1.1` package does not include
-the Sleeper Trigger or any of these events.
+Phase 1 polling-trigger implementation is complete and publicly available in npm `0.2.0` through
+`next`. Default/`latest` promotion and the n8n Cloud update remain pending. Phase 2, Phase 3, and
+Phase 4 have not begun.
 
 **Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
 does not verify that the image exists, and emits no binary data.
@@ -224,10 +231,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
 
 ## Release and provenance
 
-Releases are manual, tag-gated GitHub Actions runs. Version `0.1.1` proved the trusted-stage path
-end to end: GitHub OIDC created the staged package and the owner approved it separately with 2FA.
-The workflow has no direct-publish or token fallback, and developer machines do not publish.
-See [docs/releasing.md](docs/releasing.md).
+Releases are manual, tag-gated GitHub Actions runs. Versions `0.1.1` and `0.2.0` proved the
+trusted-stage path end to end: GitHub OIDC created each staged package and the owner approved it
+separately with npm 2FA. The workflow has no direct-publish or token fallback, and developer
+machines do not publish. See [docs/releasing.md](docs/releasing.md).
 
 ## Contributing
 
