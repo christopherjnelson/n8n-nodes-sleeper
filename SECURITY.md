@@ -2,9 +2,8 @@
 
 ## Supported versions
 
-Until the first public release, only the latest reviewed `0.1.x` prerelease line is intended to
-receive security fixes. No unpublished commit should be treated as a supported production
-release.
+Stable `0.2.x` is the supported release line and is intended to receive security fixes. No
+unpublished commit should be treated as a supported production release.
 
 ## Reporting a vulnerability
 

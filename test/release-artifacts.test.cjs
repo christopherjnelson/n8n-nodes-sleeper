@@ -120,13 +120,15 @@ test('README has current release-status sections and every relative link resolve
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
 	assert.match(readme, /npm install n8n-nodes-sleeper@0\.2\.0/);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(readme, /npm's `next` tag resolves to `0\.2\.0`/i);
-	assert.match(readme, /`latest`\s+remains on `0\.1\.1`/i);
-	assert.match(readme, /default npm install therefore still receives `0\.1\.1`/i);
+	assert.match(
+		readme,
+		/npm's `latest` and `next` tags both resolve to the\s+same immutable `0\.2\.0`/i,
+	);
+	assert.match(readme, /default npm install receives `0\.2\.0`/i);
 	assert.match(readme, /remains a verified n8n community node/i);
 	assert.match(
 		readme,
-		/currently\s+approved n8n Cloud version has not yet been updated to `0\.2\.0`/i,
+		/currently\s+approved n8n Cloud version has not yet been\s+updated to `0\.2\.0`/i,
 	);
 	assert.doesNotMatch(readme, /`0\.2\.0` is available directly in n8n Cloud/i);
 	assert.match(readme, /npm `0\.2\.0` is publicly published/i);
@@ -161,11 +163,14 @@ test('community-testing documentation and structured issue forms remain complete
 	assert.match(guide, /n8n-nodes-sleeper@next/);
 	assert.match(guide, /n8n-nodes-sleeper@0\.2\.0/);
 	assert.match(guide, /private vulnerability reporting/);
-	assert.match(guide, /Status: publicly published on npm/);
+	assert.match(guide, /Status: stable\/default release on npm/);
 	assert.match(guide, /currently approved Cloud version has not yet been updated to\s+`0\.2\.0`/);
-	assert.match(guide, /npm `next` resolves to `0\.2\.0`/);
-	assert.match(guide, /npm `latest` and the default installer remain on `0\.1\.1`/);
-	assert.match(guide, /^## 0\.2\.0 candidate$/m);
+	assert.match(guide, /npm `latest → 0\.2\.0` and `next → 0\.2\.0`/);
+	assert.match(
+		guide,
+		/npm `latest`, npm `next`, and the default installer all resolve to `0\.2\.0`/,
+	);
+	assert.match(guide, /^## 0\.2\.0 stable release$/m);
 	assert.match(guide, /Naturally occurring events[\s\S]*not a\s+condition for installing/i);
 
 	const templateDirectory = path.join(projectRoot, '.github', 'ISSUE_TEMPLATE');
@@ -256,7 +261,7 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(plan, /Phase 1D — NFL Week Changed ✅ implementation complete/);
 	assert.match(plan, /All four Phase 1 events are implementation-complete/);
 	assert.match(plan, /Phase 2,\s+Phase 3, and Phase 4 remain future work/);
-	assert.match(plan, /publicly available in npm `0\.2\.0` through\s+the `next` dist-tag/);
+	assert.match(plan, /publicly available in stable npm `0\.2\.0`/);
 	assert.match(plan, /does not add current-week lookup, filters,\s+backend webhooks/);
 
 	const readiness = read('docs/release-readiness.md');
@@ -265,13 +270,15 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(readiness, /fe410fd6e5d87a29a15978ef051d0f6c7ed855fa/);
 	assert.match(readiness, /passed 182 tests/);
 	assert.match(readiness, /`next → 0\.2\.0`/);
-	assert.match(readiness, /`latest → 0\.1\.1`/);
+	assert.match(readiness, /`latest → 0\.2\.0`/);
+	assert.match(readiness, /^## 0\.2\.0 stable-promotion checkpoint — 2026-08-08$/m);
+	assert.match(readiness, /release ID `367310296`/);
 	assert.match(readiness, /19977e8a69f5dcd5d655bb201caa9d48e00dd74bd7d652428bc1311536018c16/);
 	assert.match(readiness, /dated sections below are preserved as historical checkpoint evidence/);
 	assert.match(readiness, /Historical checkpoint: Phase 2B-4/);
 
 	const releasing = read('docs/releasing.md');
-	assert.match(releasing, /npm currently maps `next` to `0\.2\.0`\s+and `latest` to `0\.1\.1`/);
+	assert.match(releasing, /npm currently maps `next` to `0\.2\.0`\s+and `latest` to `0\.2\.0`/);
 });
 
 test('package files intentionally exclude source, tests, examples, and release documentation', () => {
