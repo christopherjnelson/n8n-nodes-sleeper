@@ -196,6 +196,7 @@ function replaceState(
 ): void {
 	delete staticData.highestObservedPickNo;
 	delete staticData.highestObservedLeagueStatus;
+	delete staticData.highestObservedNflWeekCursor;
 	staticData.configurationFingerprint = configurationFingerprint;
 	staticData.transactionStatusById = serializeStatusById(statusById);
 }

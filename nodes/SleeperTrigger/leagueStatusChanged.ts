@@ -101,6 +101,7 @@ function replaceState(
 ): void {
 	delete staticData.highestObservedPickNo;
 	delete staticData.transactionStatusById;
+	delete staticData.highestObservedNflWeekCursor;
 	staticData.configurationFingerprint = configurationFingerprint;
 	staticData.highestObservedLeagueStatus = status;
 }

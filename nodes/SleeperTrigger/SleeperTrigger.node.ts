@@ -11,6 +11,7 @@ import {
 import { sleeperApiRequest } from '../Sleeper/transport/sleeperApiRequest';
 import { validateRequiredTrimmedString } from '../Sleeper/utils/validation';
 import { LEAGUE_STATUS_CHANGED_EVENT, pollLeagueStatusChanged } from './leagueStatusChanged';
+import { NFL_WEEK_CHANGED_EVENT, pollNflWeekChanged } from './nflWeekChanged';
 import { pollTransactionChanged, TRANSACTION_CHANGED_EVENT } from './transactionChanged';
 
 const DRAFT_PICK_MADE_EVENT = 'draftPickMade';
@@ -129,6 +130,11 @@ export class SleeperTrigger implements INodeType {
 						value: LEAGUE_STATUS_CHANGED_EVENT,
 						description: 'When a league advances to a later documented lifecycle status',
 					},
+					{
+						name: 'NFL Week Changed',
+						value: NFL_WEEK_CHANGED_EVENT,
+						description: "When Sleeper's global NFL week context advances",
+					},
 				],
 			},
 			{
@@ -191,6 +197,9 @@ export class SleeperTrigger implements INodeType {
 		if (event === LEAGUE_STATUS_CHANGED_EVENT) {
 			return await pollLeagueStatusChanged(this);
 		}
+		if (event === NFL_WEEK_CHANGED_EVENT) {
+			return await pollNflWeekChanged(this);
+		}
 
 		if (event !== DRAFT_PICK_MADE_EVENT) {
 			throw new NodeOperationError(this.getNode(), 'Unsupported Sleeper trigger event', {
@@ -225,6 +234,7 @@ export class SleeperTrigger implements INodeType {
 		if (!hasCompatibleState(staticData, configurationFingerprint)) {
 			delete staticData.transactionStatusById;
 			delete staticData.highestObservedLeagueStatus;
+			delete staticData.highestObservedNflWeekCursor;
 			staticData.configurationFingerprint = configurationFingerprint;
 			staticData.highestObservedPickNo = currentMaximum;
 			return null;

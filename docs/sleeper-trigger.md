@@ -3,8 +3,8 @@
 The Sleeper Trigger polls Sleeper's documented public HTTP API. Sleeper does not document webhook
 subscriptions for these events, so this is not instant backend delivery and polling frequency
 should remain comfortably below Sleeper's published rate guidance. Draft Pick Made, Transaction
-Created or Updated, and League Status Changed are unreleased 0.2.0 development; none of these
-events is in npm `0.1.1` or the current n8n Cloud package.
+Created or Updated, League Status Changed, and NFL Week Changed are unreleased 0.2.0 development;
+none of these events is in npm `0.1.1` or the current n8n Cloud package.
 
 ## Draft Pick Made
 
@@ -107,3 +107,45 @@ To watch a genuine new backward lifecycle under that ID, reset trigger state by 
 recreating the trigger configuration. Phase 1C adds no UI reset, current NFL-state lookup, webhook
 delivery, filters, or player, roster, owner, team, or other enrichment. It always uses exactly one
 request per poll.
+
+## NFL Week Changed
+
+This event has no event-specific parameters. It always watches Sleeper's global NFL state and uses
+only n8n's **Poll Times** configuration. Each manual or production poll makes exactly one
+documented `GET /state/nfl` request. It makes no league, player, roster, transaction, draft,
+schedule, or enrichment request and does not use webhook delivery.
+
+The complete response must be a plain object with these cursor fields:
+
+- `season`: a non-empty decimal-digit string representing a non-negative integer. It is compared
+  numerically without precision loss but remains an unchanged string in raw output and static
+  state.
+- `season_type`: exactly `pre`, `regular`, or `post`.
+- `week`: a non-negative safe integer. Week 0 is valid.
+
+The explicit season-type ranks are `pre = 0`, `regular = 1`, and `post = 2`. The constant-size
+cursor is `{ season, seasonType, week }` and compares in this precedence: numeric season, season
+type rank, then week. This permits a week-number reset when `pre` advances to `regular`, `regular`
+advances to `post`, or a newer season begins. A skipped week or phase emits exactly one current
+state item; the node never synthesizes missing intermediate events.
+
+- A manual test validates and returns exactly one current raw NFL-state preview. It does not read,
+  establish, or change production static data, and the preview does not claim that a transition
+  occurred.
+- The first production poll validates the complete response, stores the configuration fingerprint
+  `["nflWeekChanged","nfl"]` and current cursor as a baseline, and emits nothing.
+- Later production polls emit once only when the cursor advances. Equal cursors emit nothing.
+  Lower weeks in the same phase, lower season types in the same season, and lower seasons are
+  stale or backward: they emit nothing and never lower the saved cursor. Returning to the saved
+  cursor cannot replay; later true forward movement emits normally.
+- Every output preserves the complete raw NFL-state object at the top level and adds only
+  `event: nfl.week_changed` and one ISO-8601 UTC `observed_at`. No prior values, cursor metadata,
+  deltas, inferred league week, wrapper, paired-item metadata, or enrichment are added.
+- Failed requests, malformed state, unknown future season types, and invalid saved state never
+  produce partial output. A malformed compatible saved cursor is replaced with a fresh baseline
+  only after the current API response validates.
+
+Sleeper documents `week` as the week value, `leg` separately as the week of the regular season,
+and `display_week` as a UI/display field that can differ from `week`. NFL Week Changed therefore
+tracks the season-aware `week` field. Changes to `leg` or `display_week` alone do not emit; both
+fields remain untouched raw output fields.
