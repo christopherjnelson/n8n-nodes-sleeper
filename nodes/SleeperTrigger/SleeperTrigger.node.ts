@@ -10,6 +10,7 @@ import {
 
 import { sleeperApiRequest } from '../Sleeper/transport/sleeperApiRequest';
 import { validateRequiredTrimmedString } from '../Sleeper/utils/validation';
+import { pollTransactionChanged, TRANSACTION_CHANGED_EVENT } from './transactionChanged';
 
 const DRAFT_PICK_MADE_EVENT = 'draftPickMade';
 const DRAFT_PICK_EVENT_NAME = 'draft.pick_made';
@@ -117,6 +118,11 @@ export class SleeperTrigger implements INodeType {
 						value: DRAFT_PICK_MADE_EVENT,
 						description: 'When a new pick appears in a draft',
 					},
+					{
+						name: 'Transaction Created or Updated',
+						value: TRANSACTION_CHANGED_EVENT,
+						description: 'When a transaction ID appears or its status_updated timestamp increases',
+					},
 				],
 			},
 			{
@@ -126,6 +132,42 @@ export class SleeperTrigger implements INodeType {
 				required: true,
 				default: '',
 				description: 'Sleeper draft ID to watch, preserved as an exact string',
+				displayOptions: {
+					show: {
+						event: [DRAFT_PICK_MADE_EVENT],
+					},
+				},
+			},
+			{
+				displayName: 'League ID',
+				name: 'leagueId',
+				type: 'string',
+				required: true,
+				default: '',
+				description: 'The exact opaque Sleeper league ID, handled as text to preserve every digit',
+				displayOptions: {
+					show: {
+						event: [TRANSACTION_CHANGED_EVENT],
+					},
+				},
+			},
+			{
+				displayName: 'Round or Week',
+				name: 'round',
+				type: 'number',
+				required: true,
+				default: 1,
+				typeOptions: {
+					minValue: 1,
+					numberStepSize: 1,
+				},
+				description:
+					"Sleeper's round path parameter. For NFL leagues this commonly corresponds to the week; the current week is not selected automatically.",
+				displayOptions: {
+					show: {
+						event: [TRANSACTION_CHANGED_EVENT],
+					},
+				},
 			},
 		],
 	};
@@ -137,9 +179,13 @@ export class SleeperTrigger implements INodeType {
 			'Event',
 			0,
 		);
+		if (event === TRANSACTION_CHANGED_EVENT) {
+			return await pollTransactionChanged(this);
+		}
+
 		if (event !== DRAFT_PICK_MADE_EVENT) {
 			throw new NodeOperationError(this.getNode(), 'Unsupported Sleeper trigger event', {
-				description: 'Draft Pick Made is the only event supported by this node version.',
+				description: 'Choose a supported Sleeper trigger event.',
 			});
 		}
 
@@ -168,6 +214,7 @@ export class SleeperTrigger implements INodeType {
 
 		const staticData = this.getWorkflowStaticData('node');
 		if (!hasCompatibleState(staticData, configurationFingerprint)) {
+			delete staticData.transactionStatusById;
 			staticData.configurationFingerprint = configurationFingerprint;
 			staticData.highestObservedPickNo = currentMaximum;
 			return null;
