@@ -8,6 +8,11 @@
 - Add League Status Changed polling with an explicit League ID, exactly one league request per
   poll, a first-run baseline, forward-only monotonic lifecycle state, and backward or stale
   response suppression.
+- Add NFL Week Changed polling with exactly one `GET /state/nfl` request per poll, a first-run
+  baseline, and a season-aware `season` → `season_type` → `week` cursor. Forward-only
+  anti-replay handling safely supports season-type and season rollover while suppressing equal,
+  stale, and backward responses. Detection uses Sleeper's documented `week` field; `leg` and
+  `display_week` remain unchanged raw output fields.
 - Establish the current draft-pick baseline on first activation so historical picks do not fire.
 - Preserve all existing action-node behavior.
 - No published package version has changed; all trigger work remains unreleased 0.2.0 development.
