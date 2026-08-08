@@ -96,7 +96,7 @@ test('describes a credential-free polling trigger with the exact identity', () =
 	});
 });
 
-test('exposes both trigger events with event-specific required parameters', () => {
+test('exposes all three trigger events with event-specific required parameters', () => {
 	const { description } = new SleeperTrigger();
 	assert.deepEqual(
 		description.properties.map((property) => property.name),
@@ -107,17 +107,22 @@ test('exposes both trigger events with event-specific required parameters', () =
 	assert.equal(event.required, true);
 	assert.deepEqual(
 		event.options.map((option) => option.value),
-		['draftPickMade', 'transactionChanged'],
+		['draftPickMade', 'transactionChanged', 'leagueStatusChanged'],
 	);
 	assert.equal(event.options[1].name, 'Transaction Created or Updated');
+	assert.equal(event.options[2].name, 'League Status Changed');
 	const draftId = description.properties[1];
 	assert.equal(draftId.type, 'string');
 	assert.equal(draftId.required, true);
 	assert.equal(draftId.default, '');
 	assert.deepEqual(draftId.displayOptions.show.event, ['draftPickMade']);
-	for (const parameter of description.properties.slice(2)) {
-		assert.deepEqual(parameter.displayOptions.show.event, ['transactionChanged']);
-	}
+	const leagueId = description.properties[2];
+	assert.deepEqual(leagueId.displayOptions.show.event, [
+		'transactionChanged',
+		'leagueStatusChanged',
+	]);
+	const round = description.properties[3];
+	assert.deepEqual(round.displayOptions.show.event, ['transactionChanged']);
 });
 
 test('trims Draft ID for the documented encoded GET without numeric coercion', async () => {
@@ -514,6 +519,7 @@ test('packed artifact contains both nodes and icons without development or sensi
 		'dist/nodes/Sleeper/sleeper.dark.svg',
 		'dist/nodes/SleeperTrigger/SleeperTrigger.node.js',
 		'dist/nodes/SleeperTrigger/SleeperTrigger.node.json',
+		'dist/nodes/SleeperTrigger/leagueStatusChanged.js',
 		'dist/nodes/SleeperTrigger/transactionChanged.js',
 		'dist/nodes/SleeperTrigger/sleeper.svg',
 		'dist/nodes/SleeperTrigger/sleeper.dark.svg',

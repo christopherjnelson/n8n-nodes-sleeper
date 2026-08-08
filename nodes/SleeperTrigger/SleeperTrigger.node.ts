@@ -10,6 +10,7 @@ import {
 
 import { sleeperApiRequest } from '../Sleeper/transport/sleeperApiRequest';
 import { validateRequiredTrimmedString } from '../Sleeper/utils/validation';
+import { LEAGUE_STATUS_CHANGED_EVENT, pollLeagueStatusChanged } from './leagueStatusChanged';
 import { pollTransactionChanged, TRANSACTION_CHANGED_EVENT } from './transactionChanged';
 
 const DRAFT_PICK_MADE_EVENT = 'draftPickMade';
@@ -123,6 +124,11 @@ export class SleeperTrigger implements INodeType {
 						value: TRANSACTION_CHANGED_EVENT,
 						description: 'When a transaction ID appears or its status_updated timestamp increases',
 					},
+					{
+						name: 'League Status Changed',
+						value: LEAGUE_STATUS_CHANGED_EVENT,
+						description: 'When a league advances to a later documented lifecycle status',
+					},
 				],
 			},
 			{
@@ -147,7 +153,7 @@ export class SleeperTrigger implements INodeType {
 				description: 'The exact opaque Sleeper league ID, handled as text to preserve every digit',
 				displayOptions: {
 					show: {
-						event: [TRANSACTION_CHANGED_EVENT],
+						event: [TRANSACTION_CHANGED_EVENT, LEAGUE_STATUS_CHANGED_EVENT],
 					},
 				},
 			},
@@ -182,6 +188,9 @@ export class SleeperTrigger implements INodeType {
 		if (event === TRANSACTION_CHANGED_EVENT) {
 			return await pollTransactionChanged(this);
 		}
+		if (event === LEAGUE_STATUS_CHANGED_EVENT) {
+			return await pollLeagueStatusChanged(this);
+		}
 
 		if (event !== DRAFT_PICK_MADE_EVENT) {
 			throw new NodeOperationError(this.getNode(), 'Unsupported Sleeper trigger event', {
@@ -215,6 +224,7 @@ export class SleeperTrigger implements INodeType {
 		const staticData = this.getWorkflowStaticData('node');
 		if (!hasCompatibleState(staticData, configurationFingerprint)) {
 			delete staticData.transactionStatusById;
+			delete staticData.highestObservedLeagueStatus;
 			staticData.configurationFingerprint = configurationFingerprint;
 			staticData.highestObservedPickNo = currentMaximum;
 			return null;
