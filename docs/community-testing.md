@@ -3,21 +3,22 @@
 ## Release under test
 
 - Package: `n8n-nodes-sleeper`
-- Candidate version: `0.2.0`
-- Candidate selector: `n8n-nodes-sleeper@next`
+- Stable version: `0.2.0`
+- Default selector: `n8n-nodes-sleeper`
+- Secondary selector: `n8n-nodes-sleeper@next`
 - Exact selector: `n8n-nodes-sleeper@0.2.0`
-- Status: publicly published on npm for self-hosted candidate testing
+- Status: stable/default release on npm; ongoing self-hosted compatibility testing is welcome
 - Coverage: 18 direct operations across 14 resources and four Phase 1 trigger events
 - Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
-- Distribution: npm `next → 0.2.0`; npm `latest → 0.1.1`. The default installer still receives
-  `0.1.1`, and the currently approved n8n Cloud version has not yet been updated to `0.2.0`.
+- Distribution: npm `latest → 0.2.0` and `next → 0.2.0`; the default installer receives `0.2.0`.
+  The currently approved n8n Cloud version has not yet been updated to `0.2.0`.
 
-## 0.2.0 candidate
+## 0.2.0 stable release
 
 Phase 1 implementation is complete for Draft Pick Made, Transaction Created or Updated, League
-Status Changed, and NFL Week Changed. The immutable `0.2.0` package is available now through
-`n8n-nodes-sleeper@next` or `n8n-nodes-sleeper@0.2.0`. Stable/default promotion will occur only
-after owner real-instance evaluation.
+Status Changed, and NFL Week Changed. Owner real-instance evaluation is complete. The same
+immutable `0.2.0` package is available through the default selector, `n8n-nodes-sleeper@next`, or
+`n8n-nodes-sleeper@0.2.0`; it was promoted without rebuilding or republishing the package.
 
 ## Installation methods
 
@@ -30,8 +31,7 @@ install a community node, and enter:
 n8n-nodes-sleeper
 ```
 
-The normal installer resolves the current published version, `0.1.1`, because npm's `latest` tag
-points to `0.1.1`.
+The normal installer resolves stable version `0.2.0` because npm's `latest` tag points to `0.2.0`.
 
 ### n8n Cloud
 
@@ -41,17 +41,17 @@ available directly in n8n Cloud. The currently approved Cloud version has not ye
 
 ### npm testing
 
-Use the prerelease testing tag:
+The retained secondary tag resolves to the same stable artifact:
 
 ```bash
 npm install n8n-nodes-sleeper@next
 ```
 
-This selector currently resolves to the active candidate, `0.2.0`. npm `latest` remains `0.1.1`.
+This selector and npm `latest` both resolve to `0.2.0`.
 
 ### Exact-version testing
 
-For reproducible candidate testing, pin the exact public version:
+For reproducible testing, pin the exact public version:
 
 ```bash
 npm install n8n-nodes-sleeper@0.2.0
@@ -81,7 +81,7 @@ Please include the following in compatibility or bug reports:
 - regression coverage for existing action operations, especially Sport → Get State
 
 Naturally occurring events are useful evidence where practical, but waiting for one is not a
-condition for installing or beginning candidate testing. Share only sanitized test evidence.
+condition for installing or beginning compatibility testing. Share only sanitized test evidence.
 
 Use the repository's
 [issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose) so reports
@@ -105,18 +105,17 @@ not a public issue.
 ## Known limitations
 
 - The package is read-only and exposes only NFL in its visible sport choices.
-- The default `0.1.1` package has no trigger. All four trigger events are available in the public
-  `0.2.0` candidate through `next` or the exact-version selector.
+- Stable/default `0.2.0` includes all four trigger events.
 - Sleeper documents no single-player endpoint; the node does not invent one.
 - **Player → Get Many** can return a large map. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
 - One reviewed moderate `uuid` alert remains through upstream n8n development tooling. It is not
   a runtime dependency and is absent from the published tarball.
-- npm `next` resolves to `0.2.0`; npm `latest` and the default installer remain on `0.1.1`.
+- npm `latest`, npm `next`, and the default installer all resolve to `0.2.0`.
 
 ## Success criteria
 
-The prerelease can advance after feedback demonstrates:
+Ongoing compatibility confidence benefits from feedback demonstrating:
 
 - multiple clean installations
 - successful loading in more than one supported n8n environment
@@ -124,4 +123,5 @@ The prerelease can advance after feedback demonstrates:
 - no security regression
 - no unresolved high-severity release blocker
 
-These are goals for community testing, not claims about tester counts already achieved.
+These are ongoing testing goals, not claims about tester counts already achieved or gates on the
+completed stable promotion.

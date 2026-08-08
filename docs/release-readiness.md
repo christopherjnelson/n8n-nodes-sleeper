@@ -4,15 +4,30 @@
 
 - `n8n-nodes-sleeper` remains verified by n8n; the currently approved n8n Cloud version has not yet
   been updated to `0.2.0`.
-- npm `0.2.0` is public and `next → 0.2.0`; `latest → 0.1.1`, so default installs remain on `0.1.1`.
+- npm `0.2.0` is public and stable; both `latest → 0.2.0` and `next → 0.2.0`, so default installs
+  receive `0.2.0`.
 - Public `0.2.0` contains the complete Phase 1 Sleeper Trigger and preserves all 18 action
   operations. Self-hosted testing is available through `@next` or `@0.2.0`.
-- Owner real-instance evaluation, `latest` promotion, the GitHub prerelease-to-normal-release
-  transition, and the n8n verified-node update/Creator Portal process remain pending gates, not
-  failures.
+- Owner real-instance evaluation, `latest` promotion, and the GitHub prerelease-to-normal-release
+  transition are complete. The n8n verified-node update process remains pending and `0.2.0` must
+  not be described as available in n8n Cloud until n8n confirms it.
 - The dated sections below are preserved as historical checkpoint evidence. Their npm tags,
   verification state, and outstanding actions describe those checkpoints rather than current
   project status.
+
+## 0.2.0 stable-promotion checkpoint — 2026-08-08
+
+- The owner completed real-instance evaluation and approved stable promotion of the existing
+  immutable `n8n-nodes-sleeper@0.2.0` artifact.
+- npm `latest` was moved from `0.1.1` to `0.2.0`; `next` remained on `0.2.0`. The package was not
+  rebuilt, republished, or versioned again. Registry SHA-1 remains
+  `d7e0695de6e53c75ba6bdf6df25d9b3cd6437094`, and integrity remains
+  `sha512-5VnXGc5thL9UMiUGOxtrM5XDdCevw6/+0TurWyL3QLARWJIrEvOfE/63Zx4QWhyATYrtu6WkPJldXxwyoyxigA==`.
+- Existing GitHub release ID `367310296` for `v0.2.0` was converted from prerelease to a normal,
+  non-draft release. Annotated tag object `16e437daf302c8d12fdb0529e8a5556271fe0359`
+  still targets `b29d5cdb30cc78ca1a3a0cec283684cbb26e9752`.
+- The n8n verified-node update remains a separate pending step; no n8n Cloud `0.2.0` availability
+  is claimed.
 
 ## 0.2.0 post-publication checkpoint — 2026-08-08
 

@@ -16,13 +16,13 @@ The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
 `n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.0` is publicly published and
 contains the complete Phase 1 Sleeper Trigger: Draft Pick Made, Transaction Created or Updated,
-League Status Changed, and NFL Week Changed. npm's `next` tag resolves to `0.2.0`, while `latest`
-remains on `0.1.1`; an unqualified/default npm install therefore still receives `0.1.1`.
+League Status Changed, and NFL Week Changed. npm's `latest` and `next` tags both resolve to the
+same immutable `0.2.0` package, so an unqualified/default npm install receives `0.2.0`.
 
-Self-hosted testers can install the candidate through `next` or its exact version. The currently
-approved n8n Cloud version has not yet been updated to `0.2.0` and does not include the Sleeper
-Trigger. The same immutable `0.2.0` package will be promoted to the stable/default channel only
-after owner real-instance evaluation; the n8n verified-node update remains a later step.
+Owner real-instance evaluation is complete, npm `0.2.0` is the stable/default release, and GitHub
+release `v0.2.0` is a normal release. The currently approved n8n Cloud version has not yet been
+updated to `0.2.0` and does not include the Sleeper Trigger; the n8n verified-node update remains
+pending.
 
 ## Features
 
@@ -49,23 +49,23 @@ Where Community Nodes are supported, open **Settings → Community Nodes** and e
 n8n-nodes-sleeper
 ```
 
-This ordinary/default selector currently follows npm `latest` and installs `0.1.1`.
+This ordinary/default selector follows npm `latest` and installs stable version `0.2.0`.
 
 ### npm
 
-The default package selector resolves to the current published release, `0.1.1`:
+The default package selector resolves to the current stable release, `0.2.0`:
 
 ```bash
 npm install n8n-nodes-sleeper
 ```
 
-To test the public `0.2.0` candidate through its temporary prerelease channel:
+The retained `next` selector also resolves to the same immutable `0.2.0` package:
 
 ```bash
 npm install n8n-nodes-sleeper@next
 ```
 
-For a reproducible exact-version candidate install:
+For a reproducible exact-version install:
 
 ```bash
 npm install n8n-nodes-sleeper@0.2.0
@@ -176,7 +176,7 @@ handling and retention.
 
 ## Community testing
 
-Version `0.2.0` needs feedback from clean, supported self-hosted n8n environments. Follow the
+Version `0.2.0` remains open to feedback from clean, supported self-hosted n8n environments. Follow the
 [community-testing guide](docs/community-testing.md), then use the
 [structured issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose)
 for compatibility results, reproducible bugs, or feature requests. Report suspected security
@@ -206,9 +206,8 @@ lineup changes, adds/drops, trades, draft actions, league-setting changes, chat,
 paid contests, player search, single-player lookup, composite standings, scoreboards, roster
 resolution, activity feeds, enrichment, and hidden caching.
 
-Phase 1 polling-trigger implementation is complete and publicly available in npm `0.2.0` through
-`next`. Default/`latest` promotion and the n8n Cloud update remain pending. Phase 2, Phase 3, and
-Phase 4 have not begun.
+Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.0`.
+The n8n Cloud update remains pending. Phase 2, Phase 3, and Phase 4 have not begun.
 
 **Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
 does not verify that the image exists, and emits no binary data.
