@@ -2,18 +2,43 @@
 
 ## Current project status — 2026-08-08
 
-- `n8n-nodes-sleeper` is verified by n8n and available directly in n8n Cloud.
-- npm `0.1.1` is the current published version; both `latest` and `next` resolve to `0.1.1`.
-- Published `0.1.1` contains the action node and 18 read operations, not the Sleeper Trigger.
-- Phase 1 implementation is complete for Draft Pick Made, Transaction Created or Updated, League
-  Status Changed, and NFL Week Changed. Source `0.2.0` is being prepared as the candidate; its
-  trigger is not currently available from npm or n8n Cloud.
-- Creator Portal verification is complete; no additional submission is described as pending.
+- `n8n-nodes-sleeper` remains verified by n8n; the currently approved n8n Cloud version has not yet
+  been updated to `0.2.0`.
+- npm `0.2.0` is public and `next → 0.2.0`; `latest → 0.1.1`, so default installs remain on `0.1.1`.
+- Public `0.2.0` contains the complete Phase 1 Sleeper Trigger and preserves all 18 action
+  operations. Self-hosted testing is available through `@next` or `@0.2.0`.
+- Owner real-instance evaluation, `latest` promotion, the GitHub prerelease-to-normal-release
+  transition, and the n8n verified-node update/Creator Portal process remain pending gates, not
+  failures.
 - The dated sections below are preserved as historical checkpoint evidence. Their npm tags,
   verification state, and outstanding actions describe those checkpoints rather than current
   project status.
 
-## 0.2.0 release-candidate preparation checkpoint — 2026-08-08
+## 0.2.0 post-publication checkpoint — 2026-08-08
+
+- Release-preparation PR [#7](https://github.com/christopherjnelson/n8n-nodes-sleeper/pull/7)
+  merged as release commit `b29d5cdb30cc78ca1a3a0cec283684cbb26e9752`.
+- Immutable annotated tag `v0.2.0` has tag object
+  `16e437daf302c8d12fdb0529e8a5556271fe0359` and targets that exact release commit.
+- Release dry-run `31277532987` succeeded on the release commit. Trusted-stage run `31278388675`
+  succeeded from `v0.2.0` using GitHub OIDC and the `npm-release` environment, with no npm token or
+  direct publish fallback.
+- The trusted stage created package `884be48d-7812-4fc6-ab05-0d8a0a5a7fa7`; the owner separately
+  approved it with npm 2FA. npm `0.2.0` is public with provenance transparency-log index
+  `2386973219`, `next → 0.2.0`, and `latest → 0.1.1`.
+- The 35-file public registry tarball independently matched the local candidate, GitHub dry-run,
+  and trusted-stage artifact byte-for-byte. Its SHA-256 is
+  `19977e8a69f5dcd5d655bb201caa9d48e00dd74bd7d652428bc1311536018c16`.
+- All 182 automated tests and the repository gates passed. A clean public-registry install loaded
+  in stock n8n `2.33.7` as 2 nodes and 0 credentials, exposing 18 actions and 4 triggers.
+- Sport → Get State succeeded against the live public API. Scheduled trigger polling activated and
+  repeated normally; unchanged state created no executions.
+- Reusing the same n8n user folder after restart restored and reactivated the workflow. Persisted
+  static state survived, unchanged state did not replay, and the execution count stayed unchanged.
+- Still pending: owner real-instance evaluation, `latest` promotion, the GitHub prerelease-to-normal
+  release transition, and the n8n verified-node update/Creator Portal process.
+
+## Historical 0.2.0 release-candidate preparation checkpoint — 2026-08-08
 
 - Phase 1 is implementation-complete with all four polling events and no changes to the existing
   18 action operations.

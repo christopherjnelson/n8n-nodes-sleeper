@@ -3,9 +3,10 @@
 The Sleeper Trigger polls Sleeper's documented public HTTP API. Sleeper does not document webhook
 subscriptions for these events, so this is not instant backend delivery and polling frequency
 should remain comfortably below Sleeper's published rate guidance. Draft Pick Made, Transaction
-Created or Updated, League Status Changed, and NFL Week Changed are implementation-complete in the
-prepared source `0.2.0` candidate. Version `0.2.0` is not yet published or submitted as an n8n
-update; none of these events is in npm `0.1.1` or the current n8n Cloud package.
+Created or Updated, League Status Changed, and NFL Week Changed are implementation-complete and
+publicly available in npm `0.2.0` through `next`. Default/`latest` installs remain on `0.1.1`, and
+the currently approved n8n Cloud version has not yet been updated to `0.2.0`. Phase 2, Phase 3, and
+Phase 4 have not begun.
 
 ## Draft Pick Made
 
