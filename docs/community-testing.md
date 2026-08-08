@@ -8,8 +8,17 @@
 - Coverage: 18 direct operations across 14 resources
 - Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
 - Published-package exclusions: trigger nodes, writes, joins, enrichment, and composite convenience
-  operations. Main contains unreleased 0.2.0 development for Draft Pick Made and Transaction
-  Created or Updated polling; neither event is in npm `0.1.1` or n8n Cloud.
+  operations. Source `0.2.0` is a prepared candidate with four trigger events, but it has not been
+  published to npm or submitted as an n8n update. The trigger is not in npm `0.1.1` or n8n Cloud.
+
+## 0.2.0 candidate
+
+Phase 1 implementation is complete for Draft Pick Made, Transaction Created or Updated, League
+Status Changed, and NFL Week Changed. The source version is `0.2.0`, but it is not yet installable
+from npm. After owner-approved staged publication, the immutable candidate will be tested through
+`n8n-nodes-sleeper@next`. Until that publication occurs, `next`, `latest`, the normal Community
+Nodes installer, and the exact public-version instructions below all continue to resolve to or use
+`0.1.1`.
 
 ## Installation methods
 
@@ -87,7 +96,8 @@ not a public issue.
 
 - The package is read-only and exposes only NFL in its visible sport choices.
 - Published `0.1.1` has no write operations, triggers, joins, enrichment, or composite convenience
-  operations. The two trigger events on `main` remain unreleased 0.2.0 development.
+  operations. All four trigger events exist only in the prepared, unpublished source `0.2.0`
+  candidate.
 - Sleeper documents no single-player endpoint; the node does not invent one.
 - **Player → Get Many** can return a large map. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.

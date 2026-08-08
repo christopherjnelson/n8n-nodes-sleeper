@@ -14,15 +14,17 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-`n8n-nodes-sleeper` is a verified n8n community node. Version `0.1.1` is the current published npm
-release, and both npm's `latest` and `next` tags resolve to `0.1.1`. The verified node is available
-directly in n8n Cloud, while self-hosted users can install it through Community Nodes. Future npm
-updates are subject to n8n's update review process.
+`n8n-nodes-sleeper` remains a verified n8n community node. Version `0.1.1` is the current published
+npm/default release, and both npm's `latest` and `next` tags resolve to `0.1.1`. That verified
+release is available directly in n8n Cloud, while self-hosted users can install it through
+Community Nodes. Future npm updates are subject to n8n's update review process.
 
-Development of `0.2.0` is underway on `main`, including the complete Phase 1 Sleeper Trigger set:
-Draft Pick Made, Transaction Created or Updated, League Status Changed, and NFL Week Changed. All
-four events are unreleased development and are not included in the published npm `0.1.1` package,
-which contains only the existing action node and its 18 read operations.
+Source version `0.2.0` is being prepared as a release candidate containing the complete Phase 1
+Sleeper Trigger: Draft Pick Made, Transaction Created or Updated, League Status Changed, and NFL
+Week Changed. The candidate has not been published to npm, promoted, or submitted as an n8n
+update, and it is not available in n8n Cloud. After an owner-approved staged publication, candidate
+testing will use npm `next`; `latest` will remain on `0.1.1` until explicit promotion approval. The
+published `0.1.1` package still contains only the existing action node and its 18 read operations.
 
 ## Features
 
@@ -196,9 +198,10 @@ authentication, lineup changes, adds/drops, trades, draft actions, league-settin
 Sleeper Picks, paid contests, triggers, player search, single-player lookup, composite standings,
 scoreboards, roster resolution, activity feeds, enrichment, and hidden caching.
 
-Phase 1 polling-trigger development is complete on unreleased `main` for `0.2.0`: Draft Pick Made,
-Transaction Created or Updated, League Status Changed, and NFL Week Changed. The published `0.1.1`
-package does not include the Sleeper Trigger or any of these events.
+Phase 1 polling-trigger implementation is complete in the source `0.2.0` release candidate: Draft
+Pick Made, Transaction Created or Updated, League Status Changed, and NFL Week Changed. Candidate
+publication and n8n update review are still pending. The published `0.1.1` package does not include
+the Sleeper Trigger or any of these events.
 
 **Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
 does not verify that the image exists, and emits no binary data.

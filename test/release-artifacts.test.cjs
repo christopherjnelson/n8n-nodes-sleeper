@@ -115,20 +115,21 @@ test('README has current release-status sections and every relative link resolve
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.match(readme, /Version `0\.1\.1` is the current published npm\s+release/i);
+	assert.match(readme, /Version `0\.1\.1` is the current published\s+npm\/default release/i);
 	assert.match(readme, /npm install n8n-nodes-sleeper$/m);
 	assert.match(readme, /npm install n8n-nodes-sleeper@0\.1\.1/);
 	assert.doesNotMatch(readme, /npm install n8n-nodes-sleeper@next/);
 	assert.match(readme, /Settings → Community Nodes/);
 	assert.match(readme, /both npm's `latest` and `next` tags resolve to `0\.1\.1`/i);
-	assert.match(readme, /is a verified n8n community node/i);
+	assert.match(readme, /remains a verified n8n community node/i);
 	assert.match(readme, /available\s+directly in n8n Cloud/i);
-	assert.match(readme, /Sleeper Trigger[\s\S]*unreleased\s+development/i);
+	assert.match(readme, /Source version `0\.2\.0` is being prepared as a release candidate/i);
+	assert.match(readme, /candidate has not been published to npm, promoted, or submitted/i);
 	assert.match(
 		readme,
 		/Draft Pick Made[\s\S]*Transaction Created or Updated[\s\S]*League Status Changed[\s\S]*NFL Week Changed/,
 	);
-	assert.match(readme, /published `0\.1\.1`\s+package does not\s+include the Sleeper Trigger/i);
+	assert.match(readme, /published `0\.1\.1`\s+package does not\s+include\s+the Sleeper Trigger/i);
 	assert.match(readme, /docs\/community-testing\.md/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -158,7 +159,8 @@ test('community-testing documentation and structured issue forms remain complete
 	assert.match(guide, /Status: verified by n8n/);
 	assert.match(guide, /available directly in n8n Cloud/);
 	assert.match(guide, /npm `next` and `latest` both resolve to `0\.1\.1`/);
-	assert.match(guide, /unreleased 0\.2\.0 development/);
+	assert.match(guide, /^## 0\.2\.0 candidate$/m);
+	assert.match(guide, /not yet installable\s+from npm/);
 
 	const templateDirectory = path.join(projectRoot, '.github', 'ISSUE_TEMPLATE');
 	assert.deepEqual(fs.readdirSync(templateDirectory).sort(), [
@@ -242,17 +244,20 @@ test('trigger and release guidance distinguish current status from historical ev
 	}
 
 	const plan = read('docs/0.2.0-plan.md');
-	assert.match(plan, /Phase 1A — Draft Pick Made ✅ complete/);
-	assert.match(plan, /Phase 1B — Transaction Created or Updated ✅ complete/);
-	assert.match(plan, /Phase 1C — League Status Changed ✅ complete/);
-	assert.match(plan, /Phase 1D — NFL Week Changed ✅ complete/);
-	assert.match(plan, /All four Phase 1 events are complete/);
-	assert.match(plan, /Phase 2, Phase 3, and Phase 4 remain future work/);
-	assert.match(plan, /unreleased 0\.2\.0 development/);
+	assert.match(plan, /Phase 1A — Draft Pick Made ✅ implementation complete/);
+	assert.match(plan, /Phase 1B — Transaction Created or Updated ✅ implementation complete/);
+	assert.match(plan, /Phase 1C — League Status Changed ✅ implementation complete/);
+	assert.match(plan, /Phase 1D — NFL Week Changed ✅ implementation complete/);
+	assert.match(plan, /All four Phase 1 events are implementation-complete/);
+	assert.match(plan, /Phase 2,\s+Phase 3, and Phase 4 remain future work/);
+	assert.match(plan, /Version `0\.2\.0` has not yet been published to npm/);
 	assert.match(plan, /does not add current-week lookup, filters,\s+backend webhooks/);
 
 	const readiness = read('docs/release-readiness.md');
-	assert.match(readiness, /^## Current project status — 2026-08-05$/m);
+	assert.match(readiness, /^## Current project status — 2026-08-08$/m);
+	assert.match(readiness, /^## 0\.2\.0 release-candidate preparation checkpoint — 2026-08-08$/m);
+	assert.match(readiness, /fe410fd6e5d87a29a15978ef051d0f6c7ed855fa/);
+	assert.match(readiness, /passed 182 tests/);
 	assert.match(readiness, /both `latest` and `next` resolve to `0\.1\.1`/);
 	assert.match(readiness, /dated sections below are preserved as historical checkpoint evidence/);
 	assert.match(readiness, /Historical checkpoint: Phase 2B-4/);
