@@ -96,7 +96,7 @@ test('describes a credential-free polling trigger with the exact identity', () =
 	});
 });
 
-test('exposes all three trigger events with event-specific required parameters', () => {
+test('exposes all four trigger events with event-specific required parameters', () => {
 	const { description } = new SleeperTrigger();
 	assert.deepEqual(
 		description.properties.map((property) => property.name),
@@ -107,10 +107,11 @@ test('exposes all three trigger events with event-specific required parameters',
 	assert.equal(event.required, true);
 	assert.deepEqual(
 		event.options.map((option) => option.value),
-		['draftPickMade', 'transactionChanged', 'leagueStatusChanged'],
+		['draftPickMade', 'transactionChanged', 'leagueStatusChanged', 'nflWeekChanged'],
 	);
 	assert.equal(event.options[1].name, 'Transaction Created or Updated');
 	assert.equal(event.options[2].name, 'League Status Changed');
+	assert.equal(event.options[3].name, 'NFL Week Changed');
 	const draftId = description.properties[1];
 	assert.equal(draftId.type, 'string');
 	assert.equal(draftId.required, true);
@@ -520,6 +521,7 @@ test('packed artifact contains both nodes and icons without development or sensi
 		'dist/nodes/SleeperTrigger/SleeperTrigger.node.js',
 		'dist/nodes/SleeperTrigger/SleeperTrigger.node.json',
 		'dist/nodes/SleeperTrigger/leagueStatusChanged.js',
+		'dist/nodes/SleeperTrigger/nflWeekChanged.js',
 		'dist/nodes/SleeperTrigger/transactionChanged.js',
 		'dist/nodes/SleeperTrigger/sleeper.svg',
 		'dist/nodes/SleeperTrigger/sleeper.dark.svg',
