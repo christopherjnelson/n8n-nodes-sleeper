@@ -5,6 +5,9 @@
 - Add the Sleeper Trigger framework and Draft Pick Made polling.
 - Add Transaction Created or Updated polling for new transaction IDs and increased
   `status_updated` values, with a first-run baseline and monotonic anti-replay state.
+- Add League Status Changed polling with an explicit League ID, exactly one league request per
+  poll, a first-run baseline, forward-only monotonic lifecycle state, and backward or stale
+  response suppression.
 - Establish the current draft-pick baseline on first activation so historical picks do not fire.
 - Preserve all existing action-node behavior.
 - No published package version has changed; all trigger work remains unreleased 0.2.0 development.

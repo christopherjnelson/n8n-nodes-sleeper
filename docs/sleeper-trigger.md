@@ -2,9 +2,9 @@
 
 The Sleeper Trigger polls Sleeper's documented public HTTP API. Sleeper does not document webhook
 subscriptions for these events, so this is not instant backend delivery and polling frequency
-should remain comfortably below Sleeper's published rate guidance. Draft Pick Made and Transaction
-Created or Updated are unreleased 0.2.0 development; neither event is in npm `0.1.1` or the current
-n8n Cloud package.
+should remain comfortably below Sleeper's published rate guidance. Draft Pick Made, Transaction
+Created or Updated, and League Status Changed are unreleased 0.2.0 development; none of these
+events is in npm `0.1.1` or the current n8n Cloud package.
 
 ## Draft Pick Made
 
@@ -65,3 +65,45 @@ Every changed item keeps the raw transaction fields at the top level and adds on
 `event: transaction.changed` and a batch-level `observed_at` timestamp. All items from one poll
 share that timestamp. The trigger performs no player, roster, owner, or team enrichment and has no
 transaction, status, roster, or owner filters.
+
+## League Status Changed
+
+Configure an explicit **League ID**. The node trims surrounding whitespace, rejects empty values
+and control characters, and preserves the ID as opaque text without numeric conversion. Each poll
+makes exactly one documented request: `GET /league/{league_id}`. It does not query
+`GET /state/nfl` or any roster, user, draft, transaction, or player endpoint.
+
+The complete response must be a plain league object whose raw `status` field is exactly one of
+Sleeper's four documented values:
+
+1. `pre_draft`
+2. `drafting`
+3. `in_season`
+4. `complete`
+
+That order is the node's explicit lifecycle ranking and anti-replay policy. Unknown future status
+values and malformed responses fail with an n8n-native error before production state is read or
+changed. The complete raw league object is preserved at the top level, including `league_id` as
+returned, and the node adds only `event: league.status_changed` and `observed_at`.
+
+- A manual test fetches once and returns exactly one preview of the current league status. It does
+  not read, establish, or change production static data. The metadata describes the selected
+  trigger event; a manual preview is not proof that a production transition occurred.
+- The first production poll validates the response, stores the current status as a baseline, and
+  emits nothing, so an already-established lifecycle state does not fire on activation.
+- Later polls emit one item only when the current status has a greater lifecycle rank than the
+  saved status. Skipped intermediate states are allowed, such as `pre_draft` to `in_season`.
+- Equal statuses emit nothing. Lower statuses are treated as stale or out of order: they emit
+  nothing and never lower the saved watermark. A later return to the already-saved higher status
+  therefore cannot replay.
+- Static data is constant-size and stores only the configuration fingerprint (event plus trimmed
+  League ID) and `highestObservedLeagueStatus`. Full league objects, histories, and timestamps are
+  never stored.
+- Failed requests, malformed responses, and unknown statuses emit nothing and leave state
+  unchanged.
+
+The node does not attempt to detect an intentional lifecycle regression under the same League ID.
+To watch a genuine new backward lifecycle under that ID, reset trigger state by changing or
+recreating the trigger configuration. Phase 1C adds no UI reset, current NFL-state lookup, webhook
+delivery, filters, or player, roster, owner, team, or other enrichment. It always uses exactly one
+request per poll.
