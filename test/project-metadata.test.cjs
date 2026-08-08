@@ -153,7 +153,7 @@ test('includes the Tabler football icon attribution and MIT license', () => {
 });
 
 test('keeps prerelease package metadata publishable without runtime dependencies', () => {
-	assert.equal(packageMetadata.version, '0.1.1');
+	assert.equal(packageMetadata.version, '0.2.0');
 	assert.equal(packageMetadata.private, undefined);
 	assert.deepEqual(packageMetadata.dependencies ?? {}, {});
 	assert.deepEqual(packageMetadata.publishConfig, { access: 'public' });

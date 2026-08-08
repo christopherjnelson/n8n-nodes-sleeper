@@ -1,16 +1,31 @@
 # Release readiness
 
-## Current project status — 2026-08-05
+## Current project status — 2026-08-08
 
 - `n8n-nodes-sleeper` is verified by n8n and available directly in n8n Cloud.
 - npm `0.1.1` is the current published version; both `latest` and `next` resolve to `0.1.1`.
 - Published `0.1.1` contains the action node and 18 read operations, not the Sleeper Trigger.
-- Main contains unreleased 0.2.0 development for Draft Pick Made and Transaction Created or
-  Updated polling. Neither event is currently available from npm or n8n Cloud.
+- Phase 1 implementation is complete for Draft Pick Made, Transaction Created or Updated, League
+  Status Changed, and NFL Week Changed. Source `0.2.0` is being prepared as the candidate; its
+  trigger is not currently available from npm or n8n Cloud.
 - Creator Portal verification is complete; no additional submission is described as pending.
 - The dated sections below are preserved as historical checkpoint evidence. Their npm tags,
   verification state, and outstanding actions describe those checkpoints rather than current
   project status.
+
+## 0.2.0 release-candidate preparation checkpoint — 2026-08-08
+
+- Phase 1 is implementation-complete with all four polling events and no changes to the existing
+  18 action operations.
+- Main source commit before version preparation:
+  `fe410fd6e5d87a29a15978ef051d0f6c7ed855fa`.
+- The synchronized pre-bump baseline passed 182 tests plus n8n validation, typecheck, lint,
+  formatting, build, package inspection, and `git diff --check`.
+- Public npm `0.1.1` remains the verified version available in n8n Cloud. Source `0.2.0` is not yet
+  published to npm or submitted as an n8n update.
+- No `v0.2.0` tag or GitHub release exists. No npm stage has been created, and no npm dist-tag has
+  changed: `latest → 0.1.1` and `next → 0.1.1`.
+- No Creator Portal update has been made for `0.2.0`.
 
 ## Historical release ledger
 
