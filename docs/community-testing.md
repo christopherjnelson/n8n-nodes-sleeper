@@ -3,22 +3,29 @@
 ## Release under test
 
 - Package: `n8n-nodes-sleeper`
-- Stable version: `0.2.0`
+- Stable version: `0.2.1`
 - Default selector: `n8n-nodes-sleeper`
 - Secondary selector: `n8n-nodes-sleeper@next`
-- Exact selector: `n8n-nodes-sleeper@0.2.0`
+- Exact selector: `n8n-nodes-sleeper@0.2.1`
 - Status: stable/default release on npm; ongoing self-hosted compatibility testing is welcome
 - Coverage: 18 direct operations across 14 resources and four Phase 1 trigger events
 - Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
-- Distribution: npm `latest → 0.2.0` and `next → 0.2.0`; the default installer receives `0.2.0`.
-  The currently approved n8n Cloud version has not yet been updated to `0.2.0`.
+- Distribution: npm `latest → 0.2.1` and `next → 0.2.0`; the default installer receives `0.2.1`.
+  Creator Portal and n8n Cloud updates for `0.2.1` remain separate owner-managed steps and are not
+  claimed complete.
+
+## 0.2.1 stable release
+
+The stable release migrates all 18 action operations to declarative routing, retains the stateful
+polling trigger as a documented programmatic exception, and packages the current Sleeper robot
+favicon. Owner manual editor smoke testing completed on 2026-09-08.
 
 ## 0.2.0 stable release
 
-Phase 1 implementation is complete for Draft Pick Made, Transaction Created or Updated, League
-Status Changed, and NFL Week Changed. Owner real-instance evaluation is complete. The same
-immutable `0.2.0` package is available through the default selector, `n8n-nodes-sleeper@next`, or
-`n8n-nodes-sleeper@0.2.0`; it was promoted without rebuilding or republishing the package.
+Version `0.2.0` introduced the complete Phase 1 implementation for Draft Pick Made, Transaction
+Created or Updated, League Status Changed, and NFL Week Changed. Owner real-instance evaluation
+is complete. That immutable package remains available through `n8n-nodes-sleeper@next` or its
+exact `0.2.0` selector; it was promoted without rebuilding or republishing the package.
 
 ## Installation methods
 
@@ -31,30 +38,30 @@ install a community node, and enter:
 n8n-nodes-sleeper
 ```
 
-The normal installer resolves stable version `0.2.0` because npm's `latest` tag points to `0.2.0`.
+The normal installer resolves stable version `0.2.1` because npm's `latest` tag points to `0.2.1`.
 
 ### n8n Cloud
 
-Search for **Sleeper** in the node picker or canvas. The verified published action node is
-available directly in n8n Cloud. The currently approved Cloud version has not yet been updated to
-`0.2.0`, so the Sleeper Trigger is not yet available there.
+Search for **Sleeper** in the node picker or canvas. Creator Portal submission and n8n Cloud
+availability for `0.2.1` have not been verified and remain separate owner-managed steps. Confirm
+the installed version before relying on current action or trigger behavior.
 
 ### npm testing
 
-The retained secondary tag resolves to the same stable artifact:
+The retained secondary tag remains on the earlier testing artifact:
 
 ```bash
 npm install n8n-nodes-sleeper@next
 ```
 
-This selector and npm `latest` both resolve to `0.2.0`.
+This selector resolves to `0.2.0`; npm `latest` resolves to stable `0.2.1`.
 
 ### Exact-version testing
 
 For reproducible testing, pin the exact public version:
 
 ```bash
-npm install n8n-nodes-sleeper@0.2.0
+npm install n8n-nodes-sleeper@0.2.1
 ```
 
 ## Requested test coverage
@@ -105,13 +112,13 @@ not a public issue.
 ## Known limitations
 
 - The package is read-only and exposes only NFL in its visible sport choices.
-- Stable/default `0.2.0` includes all four trigger events.
+- Stable/default `0.2.1` includes all four trigger events.
 - Sleeper documents no single-player endpoint; the node does not invent one.
 - **Player → Get Many** can return a large map. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
-- One reviewed moderate `uuid` alert remains through upstream n8n development tooling. It is not
-  a runtime dependency and is absent from the published tarball.
-- npm `latest`, npm `next`, and the default installer all resolve to `0.2.0`.
+- Two reviewed moderate development-only alerts remain through upstream n8n tooling (`uuid` and
+  `stream-json`). Neither is a runtime dependency or enters the published tarball.
+- npm `latest` and the default installer resolve to `0.2.1`; npm `next` remains on `0.2.0`.
 
 ## Success criteria
 

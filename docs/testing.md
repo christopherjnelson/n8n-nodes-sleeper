@@ -8,7 +8,7 @@ Run `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build
 
 CI repeats these gates on Node 22.22 and Node 24 with a 20-minute timeout. Live Sleeper calls and editor smoke testing are manual because they depend on external availability and an n8n host. See `docs/community-testing.md` for that checklist.
 
-The owner confirmed completion of the actual n8n manual editor smoke for this Unreleased refresh on 2026-09-08. Future live and editor checks remain manual gates.
+The owner confirmed completion of the actual n8n manual editor smoke for the `0.2.1` refresh on 2026-09-08. Future live and editor checks remain manual gates.
 
 The template 2.1 marker is retained because its development safeguards are present. Intentional divergences are pnpm instead of npm and the existing manual trusted-stage release workflow instead of generic direct publishing.
 

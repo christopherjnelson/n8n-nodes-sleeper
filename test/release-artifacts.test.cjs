@@ -157,15 +157,16 @@ test('community-testing documentation and structured issue forms remain complete
 	}
 	assert.match(guide, /18 direct operations across 14 resources/);
 	assert.match(guide, /n8n-nodes-sleeper@next/);
-	assert.match(guide, /n8n-nodes-sleeper@0\.2\.0/);
+	assert.match(guide, /n8n-nodes-sleeper@0\.2\.1/);
 	assert.match(guide, /private vulnerability reporting/);
 	assert.match(guide, /Status: stable\/default release on npm/);
-	assert.match(guide, /currently approved Cloud version has not yet been updated to\s+`0\.2\.0`/);
-	assert.match(guide, /npm `latest → 0\.2\.0` and `next → 0\.2\.0`/);
+	assert.match(guide, /Creator Portal and n8n Cloud updates for `0\.2\.1` remain separate/);
+	assert.match(guide, /npm `latest → 0\.2\.1` and `next → 0\.2\.0`/);
 	assert.match(
 		guide,
-		/npm `latest`, npm `next`, and the default installer all resolve to `0\.2\.0`/,
+		/npm `latest` and the default installer resolve to `0\.2\.1`; npm `next` remains on `0\.2\.0`/,
 	);
+	assert.match(guide, /^## 0\.2\.1 stable release$/m);
 	assert.match(guide, /^## 0\.2\.0 stable release$/m);
 	assert.match(guide, /Naturally occurring events[\s\S]*not a\s+condition for installing/i);
 
@@ -261,12 +262,15 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(plan, /does not add current-week lookup, filters,\s+backend webhooks/);
 
 	const readiness = read('docs/release-readiness.md');
-	assert.match(readiness, /^## Current project status — 2026-08-08$/m);
+	assert.match(readiness, /^## Current project status — 2026-09-08$/m);
+	assert.match(readiness, /^## 0\.2\.1 post-publication checkpoint — 2026-09-08$/m);
+	assert.match(readiness, /34193865267/);
+	assert.match(readiness, /0aea958390dbcbd31642bef1e8ba8c9b2177db42/);
 	assert.match(readiness, /^## 0\.2\.0 post-publication checkpoint — 2026-08-08$/m);
 	assert.match(readiness, /fe410fd6e5d87a29a15978ef051d0f6c7ed855fa/);
 	assert.match(readiness, /passed 182 tests/);
 	assert.match(readiness, /`next → 0\.2\.0`/);
-	assert.match(readiness, /`latest → 0\.2\.0`/);
+	assert.match(readiness, /`latest → 0\.2\.1`/);
 	assert.match(readiness, /^## 0\.2\.0 stable-promotion checkpoint — 2026-08-08$/m);
 	assert.match(readiness, /release ID `367310296`/);
 	assert.match(readiness, /19977e8a69f5dcd5d655bb201caa9d48e00dd74bd7d652428bc1311536018c16/);
@@ -274,7 +278,10 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(readiness, /Historical checkpoint: Phase 2B-4/);
 
 	const releasing = read('docs/releasing.md');
-	assert.match(releasing, /npm currently maps `next` to `0\.2\.0`\s+and `latest` to `0\.2\.0`/);
+	assert.match(
+		releasing,
+		/npm currently maps `next` to `0\.2\.0`\s+and `latest` to stable `0\.2\.1`/,
+	);
 });
 
 test('package files intentionally exclude source, tests, examples, and release documentation', () => {
