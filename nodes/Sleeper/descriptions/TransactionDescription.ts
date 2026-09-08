@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const transactionDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -17,6 +19,9 @@ export const transactionDescription: INodeProperties[] = [
 				value: 'getMany',
 				action: 'Get many transactions',
 				description: 'Retrieve raw free-agent, waiver, and trade transactions for a Sleeper round',
+				routing: sleeperRoute(
+					'=/league/{{encodeURIComponent(String($parameter.leagueId).trim())}}/transactions/{{$parameter.round}}',
+				),
 			},
 		],
 		default: 'getMany',

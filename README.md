@@ -107,7 +107,7 @@ Do not install development builds into an active n8n service.
 | Player            | Get Many            | Sport, Active Only, Output Mode          | Position        | One keyed map or one item per player-map entry     |
 | Player            | Get Trending        | Sport, Trend Type, Lookback Hours, Limit | —               | One raw player-ID/count item                       |
 | Sport             | Get State           | Sport                                    | —               | One raw NFL state object                           |
-| Avatar            | Get URL             | Avatar ID, Image Size                    | —               | One local `{ avatar_id, size, url }` object        |
+| Avatar            | Get URL             | Avatar ID, Image Size                    | —               | One validated `{ avatar_id, size, url }` object    |
 
 Usernames can change. Save the stable `user_id` returned by **User → Get** for later user
 lookups. League and draft IDs are opaque strings and must not be converted to numbers.
@@ -162,10 +162,9 @@ bounded with Active Only and Position whenever possible.
 
 ## Error behavior
 
-The node validates identifiers and controlled choices before transport, uses a 30-second
-timeout, and reports not-found, rate-limit, service, timeout, and connection failures as
-n8n-native errors. With **Continue On Fail**, it emits a paired error item and continues with
-later input items. Empty array responses emit no fabricated placeholder item.
+The action node validates required and controlled values before transport, then delegates HTTP
+execution and service errors to n8n's declarative request framework. Invalid player-map shapes
+produce a focused node-operation error. Empty array responses emit no fabricated placeholder item.
 
 ## Privacy and public data
 
@@ -193,7 +192,7 @@ and bounded player queries; do not ask an agent to infer private or unknown iden
 
 - Package engine: Node.js 22.22.0 or newer
 - Isolated UI and workflow testing: n8n 2.32.7
-- Development CLI: `@n8n/node-cli` 0.42.0
+- Development CLI: `@n8n/node-cli` 0.46.4
 - Development package manager: pnpm 11.15.0
 
 These are tested versions, not a promise of compatibility with every version admitted by a
@@ -209,8 +208,12 @@ resolution, activity feeds, enrichment, and hidden caching.
 Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.0`.
 The n8n Cloud update remains pending. Phase 2, Phase 3, and Phase 4 have not begun.
 
-**Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
-does not verify that the image exists, and emits no binary data.
+**Avatar → Get URL** makes a `HEAD` request to the documented CDN URL before emitting it. The
+operation therefore fails when the image is missing or the CDN is unavailable; it emits URL
+metadata rather than binary image data.
+
+Ordinary action operations use n8n declarative routing. The Sleeper Trigger remains programmatic
+because polling compares validated responses with persisted state across scheduled invocations.
 
 ## Development
 
@@ -222,7 +225,10 @@ pnpm run lint
 pnpm run format:check
 pnpm run test
 pnpm run build
+pnpm run scan:source
+pnpm run smoke:load
 pnpm run package:check
+pnpm run smoke:install
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
@@ -249,8 +255,8 @@ MIT. See [LICENSE](LICENSE).
 Sleeper API data and names remain the property of their respective owners. Trending-data users
 must provide the attribution required by Sleeper's API documentation.
 
-The node icon incorporates the MIT-licensed `ball-american-football` icon from Tabler Icons,
-adapted and displayed on a custom background. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The node icon is the current Sleeper-controlled robot favicon, extracted without visual changes
+from the multi-size icon served by Sleeper's homepage. See [branding documentation](docs/branding.md).
 
 ## Non-affiliation
 

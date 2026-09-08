@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const matchupDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -18,6 +20,9 @@ export const matchupDescription: INodeProperties[] = [
 				action: 'Get many matchups',
 				description:
 					'Retrieve one raw record per roster side for a league week. Opponents sharing a matchup ID are not paired.',
+				routing: sleeperRoute(
+					'=/league/{{encodeURIComponent(String($parameter.leagueId).trim())}}/matchups/{{$parameter.week}}',
+				),
 			},
 		],
 		default: 'getMany',

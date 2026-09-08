@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const userDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -17,6 +19,9 @@ export const userDescription: INodeProperties[] = [
 				value: 'get',
 				action: 'Get a user',
 				description: 'Retrieve a Sleeper user by username or stable user ID',
+				routing: sleeperRoute(
+					'=/user/{{encodeURIComponent(String($parameter.usernameOrUserId).trim())}}',
+				),
 			},
 		],
 		default: 'get',

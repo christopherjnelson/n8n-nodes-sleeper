@@ -220,7 +220,7 @@ All Phase 2A validation gates passed:
 - The trending attribution notice rendered. Internal `resultLimit` appeared only as **Limit**.
 - The node subtitle rendered as **Read-only public data**. `usableAsTool: true` remained in
   metadata, with no credential or AI runtime dependency.
-- The light and dark football icons rendered in node search and remained recognizable at n8n's
+- The then-current light and dark node icons rendered in node search and remained recognizable at n8n's
   small display size.
 - All three examples imported in n8n 2.32.7 with their Sleeper and core node types resolved.
 
@@ -257,11 +257,9 @@ registry and reported installed version `0.1.0`.
 
 ## Icon review
 
-Both SVGs use a square `0 0 24 24` view box and incorporate the MIT-licensed Tabler Icons
-`ball-american-football` paths on a custom rounded-square background. Temporary renders were
-reviewed at 16, 24, 32, 60, and 128 pixels in light and dark contexts. The files contain no
-scripts, animation, external references, embedded raster data, text/fonts, filters, or metadata.
-Both metadata references resolve and both icons are included by the package allowlist.
+This historical checkpoint reviewed the former SVG assets. They were superseded in Unreleased by
+the exact 48×48 frame extracted from the Sleeper-controlled favicon; current provenance and hashes
+are recorded in `docs/branding.md`.
 
 ## Package contents
 

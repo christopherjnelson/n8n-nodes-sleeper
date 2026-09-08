@@ -17,7 +17,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/christopherjnelson/n8n-nodes-sleeper.git"
+		"url": "https://github.com/christopherjnelson/n8n-nodes-sleeper.git"
 	},
 	"bugs": {
 		"url": "https://github.com/christopherjnelson/n8n-nodes-sleeper/issues"
@@ -33,25 +33,29 @@
 		"build": "n8n-node build",
 		"build:watch": "tsc --watch",
 		"dev": "n8n-node dev",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
 		"lint": "n8n-node lint",
 		"lint:fix": "n8n-node lint --fix",
 		"format:check": "prettier --check .",
 		"format:write": "prettier --write .",
-		"test": "pnpm run build && node --test --experimental-test-isolation=none test/*.test.cjs",
+		"test": "vitest run && pnpm run test:trigger",
+		"test:unit": "vitest run",
+		"test:trigger": "pnpm run build && node --test --experimental-test-isolation=none test/*.test.cjs",
 		"validate": "n8n-node lint",
-		"package:check": "npm pack --dry-run",
+		"scan:source": "node scripts/scan-source.mjs",
+		"smoke:load": "pnpm run build && node scripts/node-load-smoke.mjs",
+		"smoke:install": "pnpm run build && node scripts/package-install-smoke.mjs",
+		"package:check": "pnpm run build && npm pack --dry-run --json | node scripts/validate-pack.mjs",
 		"release": "n8n-node release",
 		"prepublishOnly": "n8n-node prerelease"
 	},
 	"files": [
 		"dist/nodes/**/*.js",
 		"dist/nodes/**/*.json",
-		"dist/nodes/**/*.svg",
+		"dist/nodes/**/*.png",
 		"README.md",
 		"LICENSE",
-		"CHANGELOG.md",
-		"THIRD_PARTY_NOTICES.md"
+		"CHANGELOG.md"
 	],
 	"n8n": {
 		"n8nNodesApiVersion": 1,
@@ -63,12 +67,15 @@
 		]
 	},
 	"devDependencies": {
-		"@n8n/node-cli": "0.42.0",
-		"eslint": "9.32.0",
+		"@n8n/node-cli": "0.46.4",
+		"@n8n/scan-community-package": "0.34.0",
+		"@types/node": "22.19.11",
+		"eslint": "9.39.4",
 		"n8n-workflow": "2.32.1",
-		"prettier": "3.6.2",
+		"prettier": "3.8.3",
 		"release-it": "21.0.1",
-		"typescript": "5.9.2"
+		"typescript": "5.9.3",
+		"vitest": "4.1.11"
 	},
 	"peerDependencies": {
 		"n8n-workflow": "*"

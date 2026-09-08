@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const playoffDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -18,6 +20,9 @@ export const playoffDescription: INodeProperties[] = [
 				action: 'Get a playoff bracket',
 				description:
 					'Retrieve raw playoff matchup records, including source-match winner or loser references when present',
+				routing: sleeperRoute(
+					`=/league/{{encodeURIComponent(String($parameter.leagueId).trim())}}/{{$parameter.bracketType === 'winners' ? 'winners_bracket' : 'losers_bracket'}}`,
+				),
 			},
 		],
 		default: 'getBracket',

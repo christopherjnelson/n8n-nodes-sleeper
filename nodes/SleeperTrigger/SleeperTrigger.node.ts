@@ -90,12 +90,11 @@ function toTriggerItems(picks: readonly DraftPick[], observedAt: string): INodeE
 }
 
 // Polling triggers cannot be invoked as action tools by an AI agent.
-// eslint-disable-next-line @n8n/community-nodes/node-usable-as-tool
 export class SleeperTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sleeper Trigger',
 		name: 'sleeperTrigger',
-		icon: { light: 'file:sleeper.svg', dark: 'file:sleeper.dark.svg' },
+		icon: { light: 'file:sleeper.png', dark: 'file:sleeper.dark.png' },
 		group: ['trigger'],
 		version: 1,
 		subtitle: 'Polling',

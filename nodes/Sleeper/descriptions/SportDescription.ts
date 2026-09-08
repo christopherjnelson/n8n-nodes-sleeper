@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const sportDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -17,6 +19,7 @@ export const sportDescription: INodeProperties[] = [
 				value: 'getState',
 				action: 'Get sport state',
 				description: 'Retrieve the current Sleeper season and week state for a sport',
+				routing: sleeperRoute('=/state/{{$parameter.sport}}'),
 			},
 		],
 		default: 'getState',

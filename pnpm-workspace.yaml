@@ -4,3 +4,5 @@ allowBuilds:
   isolated-vm: true
   ssh2: true
   unrs-resolver: true
+overrides:
+  typescript: 5.9.3

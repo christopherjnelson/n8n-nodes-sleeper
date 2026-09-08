@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const tradedPickDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -18,6 +20,9 @@ export const tradedPickDescription: INodeProperties[] = [
 				action: 'Get many traded picks',
 				description:
 					'Retrieve league-scoped traded-pick records. Use Draft Traded Pick for one draft.',
+				routing: sleeperRoute(
+					'=/league/{{encodeURIComponent(String($parameter.leagueId).trim())}}/traded_picks',
+				),
 			},
 		],
 		default: 'getMany',

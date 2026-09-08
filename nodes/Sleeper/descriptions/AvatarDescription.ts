@@ -1,5 +1,8 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+import { formatAvatarUrl } from './response';
+
 export const avatarDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -17,7 +20,11 @@ export const avatarDescription: INodeProperties[] = [
 				value: 'getUrl',
 				action: 'Get an avatar URL',
 				description:
-					'Construct a fixed Sleeper CDN avatar URL locally without requesting or downloading the image',
+					'Validate and return a documented Sleeper CDN avatar URL without downloading the image body',
+				routing: sleeperRoute(
+					`={{ 'https://sleepercdn.com/avatars/' + ($parameter.imageSize === 'thumbnail' ? 'thumbs/' : '') + encodeURIComponent(String($parameter.avatarId).trim()) }}`,
+					{ method: 'HEAD', postReceive: [formatAvatarUrl] },
+				),
 			},
 		],
 		default: 'getUrl',
@@ -29,7 +36,7 @@ export const avatarDescription: INodeProperties[] = [
 		required: true,
 		default: '',
 		description:
-			'The exact avatar ID from a Sleeper user or league object. The node does not verify that the image exists.',
+			'The exact avatar ID from a Sleeper user or league object. Sleeper is contacted to verify that the image exists.',
 		displayOptions: {
 			show: {
 				resource: ['avatar'],

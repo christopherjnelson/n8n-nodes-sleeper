@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const draftDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -17,18 +19,25 @@ export const draftDescription: INodeProperties[] = [
 				value: 'get',
 				action: 'Get a draft',
 				description: 'Retrieve one public Sleeper draft by its opaque draft ID',
+				routing: sleeperRoute('=/draft/{{encodeURIComponent(String($parameter.draftId).trim())}}'),
 			},
 			{
 				name: 'Get Many for League',
 				value: 'getManyForLeague',
 				action: 'Get many drafts for a league',
 				description: 'Retrieve all public drafts associated with a Sleeper league',
+				routing: sleeperRoute(
+					'=/league/{{encodeURIComponent(String($parameter.leagueId).trim())}}/drafts',
+				),
 			},
 			{
 				name: 'Get Many for User',
 				value: 'getManyForUser',
 				action: 'Get many drafts for a user',
 				description: "Retrieve a user's public drafts for an NFL season using a stable user ID",
+				routing: sleeperRoute(
+					'=/user/{{encodeURIComponent(String($parameter.userId).trim())}}/drafts/{{$parameter.sport}}/{{String($parameter.season).trim()}}',
+				),
 			},
 		],
 		default: 'get',

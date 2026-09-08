@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { createHash } = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -110,46 +111,22 @@ test('keeps the public workflow-facing resource and operation values stable', ()
 	assert.equal(trendingLimit.displayName, 'Limit');
 	assert.equal(trendingLimit.default, 25);
 	assert.equal(description.usableAsTool, true);
-	assert.equal(description.subtitle, 'Read-only public data');
+	assert.equal(
+		description.subtitle,
+		'={{$parameter["operation"] + ": " + $parameter["resource"]}}',
+	);
 });
 
-test('uses safe Tabler football SVG icons for both n8n themes', () => {
+test('uses the exact verified Sleeper favicon frame', () => {
 	const { description } = new Sleeper();
-	assert.deepEqual(description.icon, {
-		light: 'file:sleeper.svg',
-		dark: 'file:sleeper.dark.svg',
-	});
-
-	for (const iconName of ['sleeper.svg', 'sleeper.dark.svg']) {
-		const iconPath = path.join(projectRoot, 'nodes', 'Sleeper', iconName);
-		assert.ok(fs.existsSync(iconPath));
-		const svg = fs.readFileSync(iconPath, 'utf8');
-		assert.match(svg, /^<svg\b/);
-		const viewBox = svg
-			.match(/viewBox="([^"]+)"/)?.[1]
-			.split(/\s+/)
-			.map(Number);
-		assert.ok(viewBox);
-		assert.equal(viewBox[2], viewBox[3]);
-		assert.match(svg, /<rect\b[^>]*\bwidth="24"[^>]*\bheight="24"[^>]*\brx="5"/);
-		assert.match(svg, /<g\b[^>]*\bstroke="#f8fafc"/);
-		assert.doesNotMatch(svg, /<script\b|<animate\b|<foreignObject\b/i);
-		assert.doesNotMatch(svg, /(?:href|src)\s*=|url\s*\(|data:/i);
-		assert.doesNotMatch(svg.replace('http://www.w3.org/2000/svg', ''), /https?:\/\//i);
-		assert.doesNotMatch(svg, /<image\b|<text\b|<metadata\b/i);
-		assert.doesNotMatch(svg, /M42 6C27|#28346a|#b9c9ff|#d9892b|#f0a54b/i);
-	}
-});
-
-test('includes the Tabler football icon attribution and MIT license', () => {
-	const noticePath = path.join(projectRoot, 'THIRD_PARTY_NOTICES.md');
-	assert.ok(fs.existsSync(noticePath));
-	const notice = fs.readFileSync(noticePath, 'utf8');
-	assert.match(notice, /Tabler Icons/);
-	assert.match(notice, /ball-american-football/);
-	assert.match(notice, /MIT License/);
-	assert.match(notice, /github\.com\/tabler\/tabler-icons/);
-	assert.ok(packageMetadata.files.includes('THIRD_PARTY_NOTICES.md'));
+	assert.deepEqual(description.icon, { light: 'file:sleeper.png', dark: 'file:sleeper.dark.png' });
+	const png = fs.readFileSync(path.join(projectRoot, 'nodes', 'Sleeper', 'sleeper.png'));
+	assert.equal(png.readUInt32BE(16), 48);
+	assert.equal(png.readUInt32BE(20), 48);
+	assert.equal(
+		createHash('sha256').update(png).digest('hex'),
+		'6b0012a943317a7cd7abda4bbf4e02ce7c8180ba6a63bef320a40b3ef3103f29',
+	);
 });
 
 test('keeps prerelease package metadata publishable without runtime dependencies', () => {
@@ -159,5 +136,5 @@ test('keeps prerelease package metadata publishable without runtime dependencies
 	assert.deepEqual(packageMetadata.publishConfig, { access: 'public' });
 	assert.equal(packageMetadata.license, 'MIT');
 	assert.match(packageMetadata.repository.url, /n8n-nodes-sleeper\.git$/);
-	assert.ok(packageMetadata.files.includes('dist/nodes/**/*.svg'));
+	assert.ok(packageMetadata.files.includes('dist/nodes/**/*.png'));
 });

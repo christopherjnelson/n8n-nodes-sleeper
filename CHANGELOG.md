@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-- No changes yet.
+- Migrate all 18 ordinary action operations from a programmatic executor to n8n declarative routing, while retaining the polling trigger as a documented programmatic exception.
+- Add shared pre-request validation, encoded path segments, declarative player query parameters, and focused response transforms for player maps and avatar URLs.
+- Change Avatar → Get URL to validate the documented CDN resource with a `HEAD` request before emitting its URL; missing or unavailable images can now fail execution.
+- Add strict TypeScript Vitest contracts, retain the full polling-trigger regression suite, and remove obsolete programmatic action-executor tests.
+- Refresh pinned development tooling, official scanner and package/load/install smoke gates, Node 22.22/24 CI lanes, and template 2.1 migration documentation while preserving pnpm and staged release publishing.
+- Replace the generic football artwork with the exact 48×48 Sleeper robot favicon frame served by Sleeper's current homepage and package it for both nodes.
 
 ## [0.2.0] - 2026-08-08
 
@@ -37,7 +42,7 @@
 - Generate full-size and thumbnail avatar URLs locally without an HTTP request.
 - Preserve raw API data, exact string IDs, per-input pairing, controlled validation, and
   n8n-native error behavior without runtime dependencies.
-- Add light and dark football icons, examples, 94 automated tests, official n8n validation,
+- Add light and dark node icons, examples, 94 automated tests, official n8n validation,
   packaging checks, and manual tag-gated release hardening.
 - Publish the prerelease from GitHub Actions with npm provenance under the `next` dist-tag.
 - Document the project as an unofficial community integration with no affiliation to Sleeper
