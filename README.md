@@ -14,15 +14,15 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-`n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.0` is publicly published and
+`n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.1` is the stable release and
 contains the complete Phase 1 Sleeper Trigger: Draft Pick Made, Transaction Created or Updated,
-League Status Changed, and NFL Week Changed. npm's `latest` and `next` tags both resolve to the
-same immutable `0.2.0` package, so an unqualified/default npm install receives `0.2.0`.
+League Status Changed, and NFL Week Changed. npm's `latest` tag selects stable `0.2.1`; `next`
+remains a separate prerelease/testing channel and may differ. An unqualified/default npm install
+receives stable `0.2.1`.
 
-Owner real-instance evaluation is complete, npm `0.2.0` is the stable/default release, and GitHub
-release `v0.2.0` is a normal release. The currently approved n8n Cloud version has not yet been
-updated to `0.2.0` and does not include the Sleeper Trigger; the n8n verified-node update remains
-pending.
+Owner real-instance evaluation is complete and npm `0.2.1` is the stable/default release. The
+currently approved n8n Cloud version may lag npm and may not include the Sleeper Trigger; confirm
+the installed package version before relying on trigger availability.
 
 ## Features
 
@@ -38,8 +38,8 @@ pending.
 ### n8n Cloud
 
 Search for **Sleeper** from the node picker or canvas. The verified action node is available
-directly in n8n Cloud, but the currently approved Cloud version has not yet been updated to `0.2.0`
-and does not include the Sleeper Trigger.
+directly in n8n Cloud, but the currently approved Cloud version may lag npm and may not include
+the Sleeper Trigger. Confirm the installed version in your environment.
 
 ### Self-hosted n8n
 
@@ -49,17 +49,17 @@ Where Community Nodes are supported, open **Settings → Community Nodes** and e
 n8n-nodes-sleeper
 ```
 
-This ordinary/default selector follows npm `latest` and installs stable version `0.2.0`.
+This ordinary/default selector follows npm `latest` and installs stable version `0.2.1`.
 
 ### npm
 
-The default package selector resolves to the current stable release, `0.2.0`:
+The default package selector resolves to the current stable release, `0.2.1`:
 
 ```bash
 npm install n8n-nodes-sleeper
 ```
 
-The retained `next` selector also resolves to the same immutable `0.2.0` package:
+The retained `next` selector follows the prerelease channel and may differ from stable:
 
 ```bash
 npm install n8n-nodes-sleeper@next
@@ -68,7 +68,7 @@ npm install n8n-nodes-sleeper@next
 For a reproducible exact-version install:
 
 ```bash
-npm install n8n-nodes-sleeper@0.2.0
+npm install n8n-nodes-sleeper@0.2.1
 ```
 
 See the [community-testing guide](docs/community-testing.md) for requested test evidence and
@@ -86,7 +86,11 @@ pnpm run dev --custom-user-folder /tmp/n8n-nodes-sleeper-dev
 
 Do not install development builds into an active n8n service.
 
-## Supported operations
+## Credentials
+
+No credentials are required. The node uses Sleeper's public, read-only API and CDN endpoints.
+
+## Operations
 
 | Resource          | Operation           | Required inputs                          | Optional inputs | Output shape                                       |
 | ----------------- | ------------------- | ---------------------------------------- | --------------- | -------------------------------------------------- |
@@ -107,7 +111,7 @@ Do not install development builds into an active n8n service.
 | Player            | Get Many            | Sport, Active Only, Output Mode          | Position        | One keyed map or one item per player-map entry     |
 | Player            | Get Trending        | Sport, Trend Type, Lookback Hours, Limit | —               | One raw player-ID/count item                       |
 | Sport             | Get State           | Sport                                    | —               | One raw NFL state object                           |
-| Avatar            | Get URL             | Avatar ID, Image Size                    | —               | One local `{ avatar_id, size, url }` object        |
+| Avatar            | Get URL             | Avatar ID, Image Size                    | —               | One validated `{ avatar_id, size, url }` object    |
 
 Usernames can change. Save the stable `user_id` returned by **User → Get** for later user
 lookups. League and draft IDs are opaque strings and must not be converted to numbers.
@@ -162,10 +166,18 @@ bounded with Active Only and Position whenever possible.
 
 ## Error behavior
 
-The node validates identifiers and controlled choices before transport, uses a 30-second
-timeout, and reports not-found, rate-limit, service, timeout, and connection failures as
-n8n-native errors. With **Continue On Fail**, it emits a paired error item and continues with
-later input items. Empty array responses emit no fabricated placeholder item.
+The action node validates required and controlled values before transport, then delegates HTTP
+execution and service errors to n8n's declarative request framework. Invalid player-map shapes
+produce a focused node-operation error. Empty array responses emit no fabricated placeholder item.
+
+## Troubleshooting
+
+Confirm opaque IDs are passed as strings and controlled inputs use one of the choices shown in
+the editor. **Avatar → Get URL** validates the image with a `HEAD` request, so a missing image or
+CDN outage is reported as a request failure. Use the
+[issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose) for
+reproducible defects and [private vulnerability reporting](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/advisories/new)
+for security reports.
 
 ## Privacy and public data
 
@@ -176,7 +188,7 @@ handling and retention.
 
 ## Community testing
 
-Version `0.2.0` remains open to feedback from clean, supported self-hosted n8n environments. Follow the
+Release feedback remains welcome from clean, supported self-hosted n8n environments. Follow the
 [community-testing guide](docs/community-testing.md), then use the
 [structured issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose)
 for compatibility results, reproducible bugs, or feature requests. Report suspected security
@@ -193,7 +205,7 @@ and bounded player queries; do not ask an agent to infer private or unknown iden
 
 - Package engine: Node.js 22.22.0 or newer
 - Isolated UI and workflow testing: n8n 2.32.7
-- Development CLI: `@n8n/node-cli` 0.42.0
+- Development CLI: `@n8n/node-cli` 0.46.4
 - Development package manager: pnpm 11.15.0
 
 These are tested versions, not a promise of compatibility with every version admitted by a
@@ -206,11 +218,15 @@ lineup changes, adds/drops, trades, draft actions, league-setting changes, chat,
 paid contests, player search, single-player lookup, composite standings, scoreboards, roster
 resolution, activity feeds, enrichment, and hidden caching.
 
-Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.0`.
+Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.1`.
 The n8n Cloud update remains pending. Phase 2, Phase 3, and Phase 4 have not begun.
 
-**Avatar → Get URL** constructs a documented fixed CDN URL locally. It makes no HTTP request,
-does not verify that the image exists, and emits no binary data.
+**Avatar → Get URL** makes a `HEAD` request to the documented CDN URL before emitting it. The
+operation therefore fails when the image is missing or the CDN is unavailable; it emits URL
+metadata rather than binary image data.
+
+Ordinary action operations use n8n declarative routing. The Sleeper Trigger remains programmatic
+because polling compares validated responses with persisted state across scheduled invocations.
 
 ## Development
 
@@ -222,7 +238,10 @@ pnpm run lint
 pnpm run format:check
 pnpm run test
 pnpm run build
+pnpm run scan:source
+pnpm run smoke:load
 pnpm run package:check
+pnpm run smoke:install
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
@@ -249,16 +268,16 @@ MIT. See [LICENSE](LICENSE).
 Sleeper API data and names remain the property of their respective owners. Trending-data users
 must provide the attribution required by Sleeper's API documentation.
 
-The node icon incorporates the MIT-licensed `ball-american-football` icon from Tabler Icons,
-adapted and displayed on a custom background. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The node icon is the current Sleeper-controlled robot favicon, extracted without visual changes
+from the multi-size icon served by Sleeper's homepage. See [branding documentation](docs/branding.md).
 
 ## Non-affiliation
 
 This project is unofficial. It is not affiliated with, endorsed by, sponsored by, or produced
-by Sleeper or Blitz Studios. The node icon does not use Sleeper's logo, mascot, app
-icon, or copied brand artwork.
+by Sleeper or Blitz Studios. Sleeper owns the robot favicon used as the node icon; its inclusion
+does not imply endorsement.
 
-## Official resources
+## Resources
 
 - [Sleeper API documentation](https://docs.sleeper.com/)
 - [n8n community nodes](https://docs.n8n.io/integrations/community-nodes/)

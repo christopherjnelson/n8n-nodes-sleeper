@@ -90,10 +90,7 @@ test('describes a credential-free polling trigger with the exact identity', () =
 	assert.deepEqual(description.outputs, [NodeConnectionTypes.Main]);
 	assert.equal(description.credentials, undefined);
 	assert.equal(description.version, 1);
-	assert.deepEqual(description.icon, {
-		light: 'file:sleeper.svg',
-		dark: 'file:sleeper.dark.svg',
-	});
+	assert.deepEqual(description.icon, { light: 'file:sleeper.png', dark: 'file:sleeper.dark.png' });
 });
 
 test('exposes all four trigger events with event-specific required parameters', () => {
@@ -488,10 +485,10 @@ test('registers exact source and compiled codex metadata for both nodes', () => 
 		assert.deepEqual(metadata.categories, ['Development']);
 		assert.equal(metadata.categories.includes('Developer Tools'), false);
 	}
-	assert.equal(packageMetadata.version, '0.2.0');
+	assert.equal(packageMetadata.version, '0.2.1');
 	assert.deepEqual(packageMetadata.dependencies ?? {}, {});
 	assert.deepEqual(packageMetadata.n8n.credentials, []);
-	for (const icon of ['sleeper.svg', 'sleeper.dark.svg']) {
+	for (const icon of ['sleeper.png', 'sleeper.dark.png']) {
 		const actionIcon = fs.readFileSync(path.join(projectRoot, 'nodes', 'Sleeper', icon));
 		const triggerIcon = fs.readFileSync(path.join(projectRoot, 'nodes', 'SleeperTrigger', icon));
 		assert.deepEqual(triggerIcon, actionIcon);
@@ -516,15 +513,15 @@ test('packed artifact contains both nodes and icons without development or sensi
 	for (const expected of [
 		'dist/nodes/Sleeper/Sleeper.node.js',
 		'dist/nodes/Sleeper/Sleeper.node.json',
-		'dist/nodes/Sleeper/sleeper.svg',
-		'dist/nodes/Sleeper/sleeper.dark.svg',
+		'dist/nodes/Sleeper/sleeper.png',
+		'dist/nodes/Sleeper/sleeper.dark.png',
 		'dist/nodes/SleeperTrigger/SleeperTrigger.node.js',
 		'dist/nodes/SleeperTrigger/SleeperTrigger.node.json',
 		'dist/nodes/SleeperTrigger/leagueStatusChanged.js',
 		'dist/nodes/SleeperTrigger/nflWeekChanged.js',
 		'dist/nodes/SleeperTrigger/transactionChanged.js',
-		'dist/nodes/SleeperTrigger/sleeper.svg',
-		'dist/nodes/SleeperTrigger/sleeper.dark.svg',
+		'dist/nodes/SleeperTrigger/sleeper.png',
+		'dist/nodes/SleeperTrigger/sleeper.dark.png',
 	]) {
 		assert.ok(files.includes(expected), `missing ${expected}`);
 	}

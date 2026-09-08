@@ -1,5 +1,8 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+import { formatPlayerMap } from './response';
+
 export const playerDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -18,6 +21,9 @@ export const playerDescription: INodeProperties[] = [
 				action: 'Get many players',
 				description:
 					"Retrieve Sleeper's keyed player map with server-side filters. Unfiltered data is about 5 MB; use it sparingly. No single-player endpoint is documented.",
+				routing: sleeperRoute('=/players/{{$parameter.sport}}', {
+					postReceive: [formatPlayerMap],
+				}),
 			},
 			{
 				name: 'Get Trending',
@@ -25,6 +31,7 @@ export const playerDescription: INodeProperties[] = [
 				action: 'Get trending players',
 				description:
 					'Retrieve raw player IDs and counts. Sleeper requires attribution when displaying or republishing them.',
+				routing: sleeperRoute('=/players/{{$parameter.sport}}/trending/{{$parameter.trendType}}'),
 			},
 		],
 		default: 'getMany',
@@ -62,6 +69,13 @@ export const playerDescription: INodeProperties[] = [
 				operation: ['getMany'],
 			},
 		},
+		routing: {
+			request: {
+				qs: {
+					active: '={{$value ? true : undefined}}',
+				},
+			},
+		},
 	},
 	{
 		displayName: 'Position',
@@ -75,6 +89,13 @@ export const playerDescription: INodeProperties[] = [
 			show: {
 				resource: ['player'],
 				operation: ['getMany'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					position: '={{$value.trim() || undefined}}',
+				},
 			},
 		},
 	},
@@ -147,6 +168,12 @@ export const playerDescription: INodeProperties[] = [
 				operation: ['getTrending'],
 			},
 		},
+		routing: {
+			send: {
+				type: 'query',
+				property: 'lookback_hours',
+			},
+		},
 	},
 	{
 		displayName: 'Limit',
@@ -163,6 +190,12 @@ export const playerDescription: INodeProperties[] = [
 			show: {
 				resource: ['player'],
 				operation: ['getTrending'],
+			},
+		},
+		routing: {
+			send: {
+				type: 'query',
+				property: 'limit',
 			},
 		},
 	},

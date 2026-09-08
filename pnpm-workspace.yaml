@@ -4,3 +4,8 @@ allowBuilds:
   isolated-vm: true
   ssh2: true
   unrs-resolver: true
+overrides:
+  typescript: 5.9.3
+  tmp: 0.2.7
+  nanoid: 3.3.18
+  qs: 6.16.0

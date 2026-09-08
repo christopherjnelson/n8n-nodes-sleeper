@@ -1,5 +1,22 @@
 # Release readiness
 
+## 0.2.1 pre-release dependency audit — 2026-09-08
+
+- `pnpm audit --prod` reports zero known vulnerabilities. The package has no runtime dependencies,
+  and its validated npm tarball excludes development dependencies and `node_modules`.
+- Same-line overrides safely resolve the development-only advisories for `tmp` at `0.2.7`
+  (`@n8n/scan-community-package`), `nanoid` at `3.3.18` (n8n tooling/workflow paths), and `qs` at
+  `6.16.0` (`@n8n/node-cli` paths). The frozen lockfile and all development, build, scanner,
+  package, and isolated-install gates pass with those resolutions.
+- The full development audit retains two moderate advisories. `uuid <11.1.1`
+  (`@n8n/node-cli → @n8n/ai-node-sdk → @n8n/ai-utilities → @langchain/classic → uuid`, and the
+  corresponding `@langchain/community → @langchain/classic → uuid` and
+  `@langchain/community → uuid` paths) would require a cross-major override. `stream-json <=3.4.0`
+  (`@n8n/node-cli → @n8n/ai-node-sdk → @n8n/ai-utilities → @n8n/backend-network` →
+  `@n8n/backend-common → stream-json`) cannot be safely moved from its 1.x dependency line to 3.x.
+  Neither development-only path enters the published package, so both remain for their upstream
+  owners rather than being forced across incompatible major versions.
+
 ## Current project status — 2026-08-08
 
 - `n8n-nodes-sleeper` remains verified by n8n; the currently approved n8n Cloud version has not yet
@@ -220,7 +237,7 @@ All Phase 2A validation gates passed:
 - The trending attribution notice rendered. Internal `resultLimit` appeared only as **Limit**.
 - The node subtitle rendered as **Read-only public data**. `usableAsTool: true` remained in
   metadata, with no credential or AI runtime dependency.
-- The light and dark football icons rendered in node search and remained recognizable at n8n's
+- The then-current light and dark node icons rendered in node search and remained recognizable at n8n's
   small display size.
 - All three examples imported in n8n 2.32.7 with their Sleeper and core node types resolved.
 
@@ -257,11 +274,9 @@ registry and reported installed version `0.1.0`.
 
 ## Icon review
 
-Both SVGs use a square `0 0 24 24` view box and incorporate the MIT-licensed Tabler Icons
-`ball-american-football` paths on a custom rounded-square background. Temporary renders were
-reviewed at 16, 24, 32, 60, and 128 pixels in light and dark contexts. The files contain no
-scripts, animation, external references, embedded raster data, text/fonts, filters, or metadata.
-Both metadata references resolve and both icons are included by the package allowlist.
+This historical checkpoint reviewed the former SVG assets. They were superseded in Unreleased by
+the exact 48×48 frame extracted from the Sleeper-controlled favicon; current provenance and hashes
+are recorded in `docs/branding.md`.
 
 ## Package contents
 

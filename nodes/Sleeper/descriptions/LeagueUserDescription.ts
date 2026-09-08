@@ -1,5 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+import { sleeperRoute } from './routing';
+
 export const leagueUserDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -18,6 +20,9 @@ export const leagueUserDescription: INodeProperties[] = [
 				action: 'Get many league users',
 				description:
 					'Retrieve users participating in a league. Roster ownership is returned separately by Roster → Get Many.',
+				routing: sleeperRoute(
+					'=/league/{{encodeURIComponent(String($parameter.leagueId).trim())}}/users',
+				),
 			},
 		],
 		default: 'getMany',
