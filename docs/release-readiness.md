@@ -1,5 +1,22 @@
 # Release readiness
 
+## 0.2.1 pre-release dependency audit — 2026-09-08
+
+- `pnpm audit --prod` reports zero known vulnerabilities. The package has no runtime dependencies,
+  and its validated npm tarball excludes development dependencies and `node_modules`.
+- Same-line overrides safely resolve the development-only advisories for `tmp` at `0.2.7`
+  (`@n8n/scan-community-package`), `nanoid` at `3.3.18` (n8n tooling/workflow paths), and `qs` at
+  `6.16.0` (`@n8n/node-cli` paths). The frozen lockfile and all development, build, scanner,
+  package, and isolated-install gates pass with those resolutions.
+- The full development audit retains two moderate advisories. `uuid <11.1.1`
+  (`@n8n/node-cli → @n8n/ai-node-sdk → @n8n/ai-utilities → @langchain/classic → uuid`, and the
+  corresponding `@langchain/community → @langchain/classic → uuid` and
+  `@langchain/community → uuid` paths) would require a cross-major override. `stream-json <=3.4.0`
+  (`@n8n/node-cli → @n8n/ai-node-sdk → @n8n/ai-utilities → @n8n/backend-network` →
+  `@n8n/backend-common → stream-json`) cannot be safely moved from its 1.x dependency line to 3.x.
+  Neither development-only path enters the published package, so both remain for their upstream
+  owners rather than being forced across incompatible major versions.
+
 ## Current project status — 2026-08-08
 
 - `n8n-nodes-sleeper` remains verified by n8n; the currently approved n8n Cloud version has not yet

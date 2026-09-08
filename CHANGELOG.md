@@ -10,7 +10,7 @@
 - Add shared pre-request validation, encoded path segments, declarative player query parameters, and focused response transforms for player maps and avatar URLs.
 - Change Avatar → Get URL to validate the documented CDN resource with a `HEAD` request before emitting its URL; missing or unavailable images can now fail execution.
 - Add strict TypeScript Vitest contracts, retain the full polling-trigger regression suite, and remove obsolete programmatic action-executor tests.
-- Refresh pinned development tooling, official scanner and package/load/install smoke gates, Node 22.22/24 CI lanes, and template 2.1 migration documentation while preserving pnpm and staged release publishing.
+- Refresh pinned development tooling, apply safe same-line dependency security overrides, add official scanner and package/load/install smoke gates, use Node 22.22/24 CI lanes, and document the template 2.1 migration while preserving pnpm and staged release publishing.
 - Replace the generic football artwork with the exact 48×48 Sleeper robot favicon frame served by Sleeper's current homepage and package it for both nodes.
 
 ## [0.2.0] - 2026-08-08

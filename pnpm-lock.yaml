@@ -6,6 +6,9 @@ settings:
 
 overrides:
   typescript: 5.9.3
+  tmp: 0.2.7
+  nanoid: 3.3.18
+  qs: 6.16.0
 
 importers:
   .:
@@ -4481,14 +4484,6 @@ packages:
     engines: { node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1 }
     hasBin: true
 
-  nanoid@3.3.8:
-    resolution:
-      {
-        integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==,
-      }
-    engines: { node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1 }
-    hasBin: true
-
   napi-postinstall@0.3.4:
     resolution:
       {
@@ -4995,10 +4990,10 @@ packages:
       }
     engines: { node: '>=6' }
 
-  qs@6.15.2:
+  qs@6.16.0:
     resolution:
       {
-        integrity: sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw==,
+        integrity: sha512-h6fhOIaRrID2CbEY2fqs+7t+UXZo+MLAnU5gRIq85uFtdiUPCdsApMlHhXogKVM4HM2DVbIjGNTTYH2OcmP1vA==,
       }
     engines: { node: '>=0.6' }
 
@@ -5480,13 +5475,6 @@ packages:
       {
         integrity: sha512-RwM7MoPojPxsOBYnyd2hy0bxtIlVrihNs9pj5SUvY8Zz1sQcQG2tG1hSr8PDxfgEB8RNKDhqbIlroIarSNDNsQ==,
       }
-
-  tmp@0.2.4:
-    resolution:
-      {
-        integrity: sha512-UdiSoX6ypifLmrfQ/XfiawN6hkjSBpCjhKxxZcWlUUmoXLaCKQU0bx4HF/tdDK2uzRuchf1txGvrWBzYREssoQ==,
-      }
-    engines: { node: '>=14.14' }
 
   tmp@0.2.7:
     resolution:
@@ -6868,7 +6856,7 @@ snapshots:
       iconv-lite: 0.6.3
       n8n-workflow: 2.37.4(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)(zod@3.25.76)
       proxy-from-env: 1.1.0
-      qs: 6.15.2
+      qs: 6.16.0
       reflect-metadata: 0.2.2
       undici: 7.29.0
       zod: 3.25.76
@@ -7137,7 +7125,7 @@ snapshots:
       eslint-plugin-n8n-nodes-base: 1.16.7(eslint@9.29.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
       fast-glob: 3.3.3
       semver: 7.7.3
-      tmp: 0.2.4
+      tmp: 0.2.7
       typescript: 5.9.3
     transitivePeerDependencies:
       - debug
@@ -7162,7 +7150,7 @@ snapshots:
   '@n8n/utils@1.40.0':
     dependencies:
       '@n8n/constants': 0.32.0
-      nanoid: 3.3.8
+      nanoid: 3.3.18
 
   '@n8n/utils@1.45.2':
     dependencies:
@@ -9184,8 +9172,6 @@ snapshots:
 
   nanoid@3.3.18: {}
 
-  nanoid@3.3.8: {}
-
   napi-postinstall@0.3.4: {}
 
   natural-compare@1.4.0: {}
@@ -9460,8 +9446,9 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  qs@6.15.2:
+  qs@6.16.0:
     dependencies:
+      es-define-property: 1.0.1
       side-channel: 1.1.1
 
   querystringify@2.2.0: {}
@@ -9760,8 +9747,6 @@ snapshots:
   tmp-promise@3.0.3:
     dependencies:
       tmp: 0.2.7
-
-  tmp@0.2.4: {}
 
   tmp@0.2.7: {}
 
