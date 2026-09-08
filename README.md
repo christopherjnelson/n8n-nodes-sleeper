@@ -17,7 +17,7 @@ The source repository is public at
 `n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.1` is the stable release and
 contains the complete Phase 1 Sleeper Trigger: Draft Pick Made, Transaction Created or Updated,
 League Status Changed, and NFL Week Changed. npm's `latest` tag selects stable `0.2.1`; `next`
-remains a separate prerelease/testing channel and may differ. An unqualified/default npm install
+remains on the separate `0.2.0` testing channel. An unqualified/default npm install
 receives stable `0.2.1`.
 
 Owner real-instance evaluation is complete and npm `0.2.1` is the stable/default release. The
@@ -219,7 +219,8 @@ paid contests, player search, single-player lookup, composite standings, scorebo
 resolution, activity feeds, enrichment, and hidden caching.
 
 Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.1`.
-The n8n Cloud update remains pending. Phase 2, Phase 3, and Phase 4 have not begun.
+Creator Portal and n8n Cloud updates remain separate owner-managed steps and are not yet verified.
+Phase 2, Phase 3, and Phase 4 have not begun.
 
 **Avatar → Get URL** makes a `HEAD` request to the documented CDN URL before emitting it. The
 operation therefore fails when the image is missing or the CDN is unavailable; it emits URL
@@ -249,7 +250,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
 
 ## Release and provenance
 
-Releases are manual, tag-gated GitHub Actions runs. Versions `0.1.1` and `0.2.0` proved the
+Releases are manual, tag-gated GitHub Actions runs. Versions `0.1.1`, `0.2.0`, and `0.2.1` proved the
 trusted-stage path end to end: GitHub OIDC created each staged package and the owner approved it
 separately with npm 2FA. The workflow has no direct-publish or token fallback, and developer
 machines do not publish. See [docs/releasing.md](docs/releasing.md).

@@ -40,21 +40,20 @@ Use this procedure only for a legitimate, reviewed new package version:
 2. Review and approve the source, create an annotated `v<package-version>` tag, and push it
    without moving or reusing an existing tag.
 3. Dispatch `release.yml` from that exact tag with `trusted-stage`, confirm
-   `n8n-nodes-sleeper`, and choose the explicitly approved dist-tag. Use `latest` for the approved
-   stable `0.2.1` release; the safe default remains `next`.
+   `n8n-nodes-sleeper`, and choose the explicitly approved dist-tag. Use `latest` only for an
+   approved stable release; the safe default remains `next`.
 4. Let the protected GitHub-hosted job verify the annotated tag, selected source, unpublished
    version, quality gates, and exact tarball before GitHub OIDC runs `npm stage publish`.
 5. Inspect the staged package on npm. Approval is a separate owner action and must be completed
    manually with 2FA through npm's website or supported interactive tooling.
 6. After approval, dispatch the same immutable tag with `verify-published`. This fresh,
-   read-only job verifies registry metadata, repository identity, `latest → 0.2.1`, SLSA
+   read-only job verifies registry metadata, repository identity, the intended stable tag, SLSA
    provenance v1, packed node/icon contents, and the official published-package scanner's exact
    success text. It neither stages nor publishes again.
 7. Create or update the GitHub release for the unchanged version tag and document the evidence.
 
 Never automate stage approval, fall back to a traditional token, or replace staging with direct
-publication. The workflow rejects an already published version, so `0.1.1` cannot be staged
-again.
+publication. The workflow rejects any already published version.
 
 ## Proven v0.1.1 trusted stage
 
@@ -74,6 +73,15 @@ separately with npm 2FA. After publication, the public registry tarball matched 
 dry-run, and trusted-stage candidate byte-for-byte. These are version-specific results, not new
 generic release requirements.
 
+## Proven v0.2.1 trusted stage and verification
+
+Version `0.2.1` used annotated tag object `dd13a4d160cd01862abed7433e18255f02f88e9d`
+at main commit `d8beba091de16715cb9574bfd45e4751af23c5be`. Main CI `34192040787`, dry-run
+`34192333086`, and the single trusted-stage run `34192643479` succeeded. That stage had ID
+`0c5efd9b-fea8-4e85-86c5-5def5e60c533`, and the owner approved it separately with npm 2FA.
+Read-only verifier `34193865267` then passed registry metadata, SLSA v1 provenance, package
+boundary/install/load/icon checks, and the official scanner's exact success requirement.
+
 ## Tooling requirements
 
 Trusted publishing requires a GitHub-hosted runner, `id-token: write`, Node.js 22.14 or newer,
@@ -90,7 +98,7 @@ are terminal.
 
 Future prerelease and community-testing versions use `next`. Use `latest` only after explicit
 stable-release approval; never promote a prerelease silently. npm currently maps `next` to `0.2.0`
-and `latest` to `0.2.0` after the explicitly approved stable promotion. No dist-tag should be
+and `latest` to stable `0.2.1`. No dist-tag should be
 mutated without an explicitly approved release or promotion task.
 
 ## Template homepage divergence

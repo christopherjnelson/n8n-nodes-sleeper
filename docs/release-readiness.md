@@ -1,5 +1,26 @@
 # Release readiness
 
+## 0.2.1 post-publication checkpoint — 2026-09-08
+
+- Stable `n8n-nodes-sleeper@0.2.1` was published at `2026-09-08T05:59:49.733Z`; npm maps
+  `latest → 0.2.1` and retains `next → 0.2.0`. Registry SHA-1 is
+  `0aea958390dbcbd31642bef1e8ba8c9b2177db42`, and integrity is
+  `sha512-vKxBD/SpJFCn7cQBjcF5N+FLzKe7pXkWfJxmsEPY8AgMDnE1ftVgv8d2G2X/cMs1uxHEK6m2jy1wtX2K9TRBaQ==`.
+- Annotated tag `v0.2.1` has tag object `dd13a4d160cd01862abed7433e18255f02f88e9d`
+  and peels to release/main commit `d8beba091de16715cb9574bfd45e4751af23c5be`.
+- Main CI `34192040787` and dry-run `34192333086` succeeded. Trusted-stage run `34192643479`
+  succeeded exactly once and created stage `0c5efd9b-fea8-4e85-86c5-5def5e60c533`; the owner
+  approved it separately. Provenance is recorded in Sigstore log `2755305364`.
+- Read-only verifier `34193865267` passed exact tag/main, metadata, SLSA v1 provenance, registry
+  tarball boundary, isolated install, two-node load, and icon checks. The official scanner reported
+  exactly `Package n8n-nodes-sleeper@0.2.1 has passed all security checks`.
+- The registry tarball contains 36 files and is 27,848 bytes. All four packaged 48×48 icons match
+  SHA-256 `6b0012a943317a7cd7abda4bbf4e02ce7c8180ba6a63bef320a40b3ef3103f29`.
+- The owner completed the manual n8n editor smoke on 2026-09-08. The stable GitHub release is
+  [v0.2.1](https://github.com/christopherjnelson/n8n-nodes-sleeper/releases/tag/v0.2.1).
+- Creator Portal submission/update and n8n Cloud/catalog availability for `0.2.1` remain separate
+  owner-managed steps and have not been verified or claimed complete.
+
 ## 0.2.1 pre-release dependency audit — 2026-09-08
 
 - `pnpm audit --prod` reports zero known vulnerabilities. The package has no runtime dependencies,
@@ -17,17 +38,16 @@
   Neither development-only path enters the published package, so both remain for their upstream
   owners rather than being forced across incompatible major versions.
 
-## Current project status — 2026-08-08
+## Current project status — 2026-09-08
 
-- `n8n-nodes-sleeper` remains verified by n8n; the currently approved n8n Cloud version has not yet
-  been updated to `0.2.0`.
-- npm `0.2.0` is public and stable; both `latest → 0.2.0` and `next → 0.2.0`, so default installs
-  receive `0.2.0`.
-- Public `0.2.0` contains the complete Phase 1 Sleeper Trigger and preserves all 18 action
-  operations. Self-hosted testing is available through `@next` or `@0.2.0`.
-- Owner real-instance evaluation, `latest` promotion, and the GitHub prerelease-to-normal-release
-  transition are complete. The n8n verified-node update process remains pending and `0.2.0` must
-  not be described as available in n8n Cloud until n8n confirms it.
+- `n8n-nodes-sleeper` remains verified by n8n, but Creator Portal and n8n Cloud/catalog updates for
+  `0.2.1` have not been verified and remain separate owner-managed work.
+- npm `0.2.1` is public and stable with `latest → 0.2.1`; `next` intentionally remains on `0.2.0`.
+  Default installs receive `0.2.1`.
+- Public `0.2.1` preserves the complete Phase 1 Sleeper Trigger and all 18 action operations while
+  migrating the actions to declarative routing. Exact self-hosted testing uses `@0.2.1`.
+- Owner manual editor evaluation, stable publication, post-publication verification, and the stable
+  GitHub release are complete. No `0.2.1` n8n Cloud availability is claimed.
 - The dated sections below are preserved as historical checkpoint evidence. Their npm tags,
   verification state, and outstanding actions describe those checkpoints rather than current
   project status.
