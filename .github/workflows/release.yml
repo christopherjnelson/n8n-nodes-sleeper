@@ -12,13 +12,15 @@ on:
         options:
           - dry-run
           - trusted-stage
+          - verify-published
       npm_dist_tag:
-        description: npm prerelease dist tag
+        description: npm distribution tag
         required: true
         type: choice
         default: next
         options:
           - next
+          - latest
       package_confirmation:
         description: Type n8n-nodes-sleeper exactly
         required: true
@@ -34,7 +36,9 @@ concurrency:
 jobs:
   quality:
     name: Quality gates and package inspection
+    if: inputs.release_mode != 'verify-published'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     outputs:
@@ -105,6 +109,11 @@ jobs:
             echo "::error::$REF_NAME does not point to the selected source commit"
             exit 1
           fi
+          git fetch --no-tags origin main
+          if [[ "$(git rev-parse origin/main)" != "$SELECTED_SHA" ]]; then
+            echo "::error::Release tag must point exactly to the freshly fetched origin/main commit"
+            exit 1
+          fi
 
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
@@ -126,6 +135,15 @@ jobs:
 
       - name: Build package
         run: pnpm run build
+
+      - name: Run official source and built scanner
+        run: pnpm run scan:source
+
+      - name: Load compiled registrations
+        run: pnpm run smoke:load
+
+      - name: Install packed package in an isolated consumer
+        run: pnpm run smoke:install
 
       - name: Run project package inspection
         run: pnpm run package:check
@@ -207,6 +225,7 @@ jobs:
     if: inputs.release_mode == 'trusted-stage'
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: npm-release
     permissions:
       contents: read
@@ -241,3 +260,85 @@ jobs:
           NPM_DIST_TAG: ${{ inputs.npm_dist_tag }}
           PACKAGE_TARBALL: ./package-tarball/${{ needs.quality.outputs.tarball }}
         run: npm stage publish "$PACKAGE_TARBALL" --provenance --access public --tag "$NPM_DIST_TAG"
+
+  verify-published:
+    name: Verify owner-approved publication
+    if: inputs.release_mode == 'verify-published'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check out selected tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.18.0'
+          package-manager-cache: false
+
+      - name: Install verification npm CLI
+        run: npm install --global npm@11.16.0
+
+      - name: Verify immutable tag and current main
+        env:
+          PACKAGE_CONFIRMATION: ${{ inputs.package_confirmation }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SELECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
+          if [[ "$PACKAGE_CONFIRMATION" != "$package_name" ]]; then
+            echo "::error::Package confirmation must exactly match $package_name"
+            exit 1
+          fi
+          expected_tag="v${package_version}"
+          if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "$expected_tag" ]]; then
+            echo "::error::Verification requires the exact tag $expected_tag"
+            exit 1
+          fi
+          if [[ "$(git cat-file -t "$REF_NAME" 2>/dev/null || true)" != "tag" ]]; then
+            echo "::error::$REF_NAME must be an annotated tag"
+            exit 1
+          fi
+          if [[ "$(git rev-parse "${REF_NAME}^{commit}")" != "$SELECTED_SHA" ]]; then
+            echo "::error::$REF_NAME does not point to the selected source commit"
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          if [[ "$(git rev-parse origin/main)" != "$SELECTED_SHA" ]]; then
+            echo "::error::Release tag must point exactly to the freshly fetched origin/main commit"
+            exit 1
+          fi
+
+      - name: Install locked verification tooling
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify registry metadata, stable tag, and provenance
+        run: |
+          set -euo pipefail
+          npm view "$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")" version repository dist-tags.latest dist.attestations --json > /tmp/npm-release-metadata.json
+          node <<'NODE'
+          const fs = require('node:fs');
+          const pkg = require('./package.json');
+          const metadata = JSON.parse(fs.readFileSync('/tmp/npm-release-metadata.json', 'utf8'));
+          if (metadata.version !== pkg.version) throw new Error('Registry version mismatch');
+          if (metadata['dist-tags.latest'] !== pkg.version) throw new Error('latest does not point to the stable release');
+          const repository = metadata.repository?.url ?? metadata.repository;
+          if (!String(repository).includes('github.com/christopherjnelson/n8n-nodes-sleeper')) throw new Error('Registry repository mismatch');
+          if (metadata['dist.attestations']?.provenance?.predicateType !== 'https://slsa.dev/provenance/v1') throw new Error('SLSA provenance v1 is missing');
+          NODE
+
+      - name: Inspect, install, and load exact published package
+        run: node scripts/published-package-smoke.mjs
+
+      - name: Require exact official published scanner success
+        run: pnpm run scan:published

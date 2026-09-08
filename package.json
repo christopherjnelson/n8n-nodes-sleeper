@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-sleeper",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Retrieve public Sleeper fantasy football data with n8n.",
 	"license": "MIT",
 	"homepage": "https://github.com/christopherjnelson/n8n-nodes-sleeper#readme",
@@ -43,8 +43,10 @@
 		"test:trigger": "pnpm run build && node --test --experimental-test-isolation=none test/*.test.cjs",
 		"validate": "n8n-node lint",
 		"scan:source": "node scripts/scan-source.mjs",
+		"scan:published": "node scripts/scan-published.mjs",
 		"smoke:load": "pnpm run build && node scripts/node-load-smoke.mjs",
 		"smoke:install": "pnpm run build && node scripts/package-install-smoke.mjs",
+		"smoke:published": "node scripts/published-package-smoke.mjs",
 		"package:check": "pnpm run build && npm pack --dry-run --json | node scripts/validate-pack.mjs",
 		"release": "n8n-node release",
 		"prepublishOnly": "n8n-node prerelease"

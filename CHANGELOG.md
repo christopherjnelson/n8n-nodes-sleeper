@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No changes yet.
+
+## [0.2.1] - 2026-09-08
+
 - Migrate all 18 ordinary action operations from a programmatic executor to n8n declarative routing, while retaining the polling trigger as a documented programmatic exception.
 - Add shared pre-request validation, encoded path segments, declarative player query parameters, and focused response transforms for player maps and avatar URLs.
 - Change Avatar → Get URL to validate the documented CDN resource with a `HEAD` request before emitting its URL; missing or unavailable images can now fail execution.

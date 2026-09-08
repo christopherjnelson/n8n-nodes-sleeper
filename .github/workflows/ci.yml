@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  quality:
     name: Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -65,3 +65,13 @@ jobs:
 
       - name: Install packed package in isolated consumer
         run: pnpm run smoke:install
+
+  build:
+    name: build
+    needs: quality
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Confirm required quality matrix
+        run: echo "All required Node.js quality lanes passed."

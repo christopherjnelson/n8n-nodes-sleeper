@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 
@@ -21,6 +22,16 @@ for (const registration of metadata.n8n.nodes) {
 			throw new Error(`Missing icon ${icon} for ${registration}`);
 		}
 		if (!/\.(?:svg|png)$/i.test(iconPath)) throw new Error(`Unsupported icon type: ${icon}`);
+		if (/\.png$/i.test(iconPath)) {
+			const png = readFileSync(iconPath);
+			if (png.readUInt32BE(16) !== 48 || png.readUInt32BE(20) !== 48)
+				throw new Error(`PNG icon must be exactly 48x48: ${icon}`);
+			if (
+				createHash('sha256').update(png).digest('hex') !==
+				'6b0012a943317a7cd7abda4bbf4e02ce7c8180ba6a63bef320a40b3ef3103f29'
+			)
+				throw new Error(`PNG icon hash does not match the documented Sleeper frame: ${icon}`);
+		}
 		if (/\.svg$/i.test(iconPath)) {
 			const values =
 				/<svg\b[^>]*\bviewBox=["']([^"']+)["']/i

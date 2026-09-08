@@ -129,8 +129,8 @@ test('uses the exact verified Sleeper favicon frame', () => {
 	);
 });
 
-test('keeps prerelease package metadata publishable without runtime dependencies', () => {
-	assert.equal(packageMetadata.version, '0.2.0');
+test('keeps release package metadata publishable without runtime dependencies', () => {
+	assert.equal(packageMetadata.version, '0.2.1');
 	assert.equal(packageMetadata.private, undefined);
 	assert.deepEqual(packageMetadata.dependencies ?? {}, {});
 	assert.deepEqual(packageMetadata.publishConfig, { access: 'public' });

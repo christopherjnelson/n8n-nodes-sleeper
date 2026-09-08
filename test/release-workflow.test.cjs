@@ -7,6 +7,15 @@ const workflow = fs.readFileSync(
 	path.resolve(__dirname, '../.github/workflows/release.yml'),
 	'utf8',
 );
+const publishedScanner = fs.readFileSync(
+	path.resolve(__dirname, '../scripts/scan-published.mjs'),
+	'utf8',
+);
+const publishedSmoke = fs.readFileSync(
+	path.resolve(__dirname, '../scripts/published-package-smoke.mjs'),
+	'utf8',
+);
+const ciWorkflow = fs.readFileSync(path.resolve(__dirname, '../.github/workflows/ci.yml'), 'utf8');
 
 function job(name, nextName) {
 	const start = workflow.indexOf(`\n  ${name}:`);
@@ -21,12 +30,20 @@ test('release workflow is manual-only with safe defaults', () => {
 	assert.doesNotMatch(workflow, /^  (?:push|pull_request|pull_request_target|release):/m);
 	assert.match(
 		workflow,
-		/release_mode:[\s\S]*?default: dry-run[\s\S]*?options:\n\s+- dry-run\n\s+- trusted-stage/,
+		/release_mode:[\s\S]*?default: dry-run[\s\S]*?options:\n\s+- dry-run\n\s+- trusted-stage\n\s+- verify-published/,
 	);
-	assert.match(workflow, /npm_dist_tag:[\s\S]*?default: next[\s\S]*?options:\n\s+- next/);
+	assert.match(
+		workflow,
+		/npm_dist_tag:[\s\S]*?default: next[\s\S]*?options:\n\s+- next\n\s+- latest/,
+	);
 	assert.match(workflow, /package_confirmation:[\s\S]*?required: true/);
 	assert.doesNotMatch(workflow, /first-publish|trusted-publish/);
-	assert.doesNotMatch(workflow, /^\s+- latest\s*$/m);
+	assert.doesNotMatch(workflow, /setup-node@v6[\s\S]*registry-url:/);
+	assert.match(ciWorkflow, /quality:[\s\S]*node-version: \['22\.22\.0', '24'\]/);
+	assert.match(
+		ciWorkflow,
+		/\n  build:\n\s+name: build\n\s+needs: quality\n\s+if: \$\{\{ success\(\) \}\}/,
+	);
 });
 
 test('quality job verifies intent and runs every gate before packaging', () => {
@@ -39,6 +56,7 @@ test('quality job verifies intent and runs every gate before packaging', () => {
 	assert.match(quality, /expected_tag="v\$\{package_version\}"/);
 	assert.match(quality, /git cat-file -t "\$REF_NAME"[\s\S]*must be an annotated tag/);
 	assert.match(quality, /git rev-parse "\$\{REF_NAME\}\^\{commit\}"/);
+	assert.match(quality, /git fetch --no-tags origin main[\s\S]*git rev-parse origin\/main/);
 	assert.match(quality, /npm view "\$\{package_name\}@\$\{package_version\}" version --json/);
 	assert.match(quality, /npm stage list "\$package_name" --json/);
 
@@ -50,6 +68,9 @@ test('quality job verifies intent and runs every gate before packaging', () => {
 		'pnpm run format:check',
 		'pnpm run test',
 		'pnpm run build',
+		'pnpm run scan:source',
+		'pnpm run smoke:load',
+		'pnpm run smoke:install',
 		'pnpm run package:check',
 		'npm pack --json',
 		'actions/upload-artifact@v4',
@@ -62,8 +83,9 @@ test('quality job verifies intent and runs every gate before packaging', () => {
 	}
 });
 
-test('trusted-stage is environment-protected, least-privilege, and stage-only', () => {
-	const trustedStage = job('trusted-stage');
+test('trusted-stage and post-publication verification preserve release boundaries', () => {
+	const trustedStage = job('trusted-stage', 'verify-published');
+	const verifier = job('verify-published');
 	assert.match(trustedStage, /if: inputs\.release_mode == 'trusted-stage'/);
 	assert.match(trustedStage, /needs: quality/);
 	assert.match(trustedStage, /runs-on: ubuntu-latest/);
@@ -75,6 +97,20 @@ test('trusted-stage is environment-protected, least-privilege, and stage-only', 
 		trustedStage,
 		/npm stage publish "\$PACKAGE_TARBALL" --provenance --access public --tag "\$NPM_DIST_TAG"/,
 	);
+	assert.match(verifier, /if: inputs\.release_mode == 'verify-published'/);
+	assert.match(verifier, /timeout-minutes: 30[\s\S]*permissions:\n\s+contents: read/);
+	assert.doesNotMatch(verifier, /environment: npm-release|id-token: write|npm stage publish/);
+	assert.match(verifier, /git fetch --no-tags origin main[\s\S]*git rev-parse origin\/main/);
+	assert.match(verifier, /pnpm install --frozen-lockfile/);
+	assert.match(verifier, /metadata\['dist-tags\.latest'\][\s\S]*SLSA provenance v1 is missing/);
+	assert.match(verifier, /node scripts\/published-package-smoke\.mjs/);
+	assert.match(publishedSmoke, /npm[\s\S]*pack[\s\S]*packageSpec/);
+	assert.match(publishedSmoke, /scripts\/validate-pack\.mjs/);
+	assert.match(publishedSmoke, /npm[\s\S]*install[\s\S]*--ignore-scripts/);
+	assert.match(publishedSmoke, /scripts\/node-load-smoke\.mjs/);
+	assert.doesNotMatch(publishedSmoke, /pnpm run build|prepublish|npm publish/);
+	assert.match(verifier, /pnpm run scan:published/);
+	assert.match(publishedScanner, /@n8n\/scan-community-package@0\.34\.0/);
 	assert.match(
 		trustedStage,
 		/PACKAGE_TARBALL: \.\/package-tarball\/\$\{\{ needs\.quality\.outputs\.tarball \}\}/,

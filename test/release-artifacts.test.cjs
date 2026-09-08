@@ -94,13 +94,15 @@ test('README has current release-status sections and every relative link resolve
 		'Status',
 		'Features',
 		'Installation',
-		'Supported operations',
+		'Credentials',
+		'Operations',
 		'Usage examples',
 		'Community workflow examples',
 		'Player data guidance',
 		'Trending players and attribution',
 		'Rate guidance',
 		'Error behavior',
+		'Troubleshooting',
 		'Privacy and public data',
 		'Community testing',
 		'AI-tool use',
@@ -112,26 +114,20 @@ test('README has current release-status sections and every relative link resolve
 		'License',
 		'Attribution',
 		'Non-affiliation',
+		'Resources',
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.equal(packageMetadata.version, '0.2.0');
+	assert.equal(packageMetadata.version, '0.2.1');
 	assert.match(readme, /npm install n8n-nodes-sleeper$/m);
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
-	assert.match(readme, /npm install n8n-nodes-sleeper@0\.2\.0/);
+	assert.match(readme, /npm install n8n-nodes-sleeper@0\.2\.1/);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(
-		readme,
-		/npm's `latest` and `next` tags both resolve to the\s+same immutable `0\.2\.0`/i,
-	);
-	assert.match(readme, /default npm install receives `0\.2\.0`/i);
+	assert.match(readme, /default npm install\s+receives stable `0\.2\.1`/i);
 	assert.match(readme, /remains a verified n8n community node/i);
-	assert.match(
-		readme,
-		/currently\s+approved n8n Cloud version has not yet been\s+updated to `0\.2\.0`/i,
-	);
+	assert.match(readme, /currently approved n8n Cloud version may lag npm/i);
 	assert.doesNotMatch(readme, /`0\.2\.0` is available directly in n8n Cloud/i);
-	assert.match(readme, /npm `0\.2\.0` is publicly published/i);
+	assert.match(readme, /npm `0\.2\.1` is the stable release/i);
 	assert.match(
 		readme,
 		/Draft Pick Made[\s\S]*Transaction Created or Updated[\s\S]*League Status Changed[\s\S]*NFL Week Changed/,

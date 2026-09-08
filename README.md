@@ -14,15 +14,15 @@ has no runtime dependencies.
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-`n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.0` is publicly published and
+`n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.1` is the stable release and
 contains the complete Phase 1 Sleeper Trigger: Draft Pick Made, Transaction Created or Updated,
-League Status Changed, and NFL Week Changed. npm's `latest` and `next` tags both resolve to the
-same immutable `0.2.0` package, so an unqualified/default npm install receives `0.2.0`.
+League Status Changed, and NFL Week Changed. npm's `latest` tag selects stable `0.2.1`; `next`
+remains a separate prerelease/testing channel and may differ. An unqualified/default npm install
+receives stable `0.2.1`.
 
-Owner real-instance evaluation is complete, npm `0.2.0` is the stable/default release, and GitHub
-release `v0.2.0` is a normal release. The currently approved n8n Cloud version has not yet been
-updated to `0.2.0` and does not include the Sleeper Trigger; the n8n verified-node update remains
-pending.
+Owner real-instance evaluation is complete and npm `0.2.1` is the stable/default release. The
+currently approved n8n Cloud version may lag npm and may not include the Sleeper Trigger; confirm
+the installed package version before relying on trigger availability.
 
 ## Features
 
@@ -38,8 +38,8 @@ pending.
 ### n8n Cloud
 
 Search for **Sleeper** from the node picker or canvas. The verified action node is available
-directly in n8n Cloud, but the currently approved Cloud version has not yet been updated to `0.2.0`
-and does not include the Sleeper Trigger.
+directly in n8n Cloud, but the currently approved Cloud version may lag npm and may not include
+the Sleeper Trigger. Confirm the installed version in your environment.
 
 ### Self-hosted n8n
 
@@ -49,17 +49,17 @@ Where Community Nodes are supported, open **Settings → Community Nodes** and e
 n8n-nodes-sleeper
 ```
 
-This ordinary/default selector follows npm `latest` and installs stable version `0.2.0`.
+This ordinary/default selector follows npm `latest` and installs stable version `0.2.1`.
 
 ### npm
 
-The default package selector resolves to the current stable release, `0.2.0`:
+The default package selector resolves to the current stable release, `0.2.1`:
 
 ```bash
 npm install n8n-nodes-sleeper
 ```
 
-The retained `next` selector also resolves to the same immutable `0.2.0` package:
+The retained `next` selector follows the prerelease channel and may differ from stable:
 
 ```bash
 npm install n8n-nodes-sleeper@next
@@ -68,7 +68,7 @@ npm install n8n-nodes-sleeper@next
 For a reproducible exact-version install:
 
 ```bash
-npm install n8n-nodes-sleeper@0.2.0
+npm install n8n-nodes-sleeper@0.2.1
 ```
 
 See the [community-testing guide](docs/community-testing.md) for requested test evidence and
@@ -86,7 +86,11 @@ pnpm run dev --custom-user-folder /tmp/n8n-nodes-sleeper-dev
 
 Do not install development builds into an active n8n service.
 
-## Supported operations
+## Credentials
+
+No credentials are required. The node uses Sleeper's public, read-only API and CDN endpoints.
+
+## Operations
 
 | Resource          | Operation           | Required inputs                          | Optional inputs | Output shape                                       |
 | ----------------- | ------------------- | ---------------------------------------- | --------------- | -------------------------------------------------- |
@@ -166,6 +170,15 @@ The action node validates required and controlled values before transport, then 
 execution and service errors to n8n's declarative request framework. Invalid player-map shapes
 produce a focused node-operation error. Empty array responses emit no fabricated placeholder item.
 
+## Troubleshooting
+
+Confirm opaque IDs are passed as strings and controlled inputs use one of the choices shown in
+the editor. **Avatar → Get URL** validates the image with a `HEAD` request, so a missing image or
+CDN outage is reported as a request failure. Use the
+[issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose) for
+reproducible defects and [private vulnerability reporting](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/advisories/new)
+for security reports.
+
 ## Privacy and public data
 
 Sleeper exposes public user and league data without authentication. This node does not log in,
@@ -175,7 +188,7 @@ handling and retention.
 
 ## Community testing
 
-Version `0.2.0` remains open to feedback from clean, supported self-hosted n8n environments. Follow the
+Release feedback remains welcome from clean, supported self-hosted n8n environments. Follow the
 [community-testing guide](docs/community-testing.md), then use the
 [structured issue forms](https://github.com/christopherjnelson/n8n-nodes-sleeper/issues/new/choose)
 for compatibility results, reproducible bugs, or feature requests. Report suspected security
@@ -205,7 +218,7 @@ lineup changes, adds/drops, trades, draft actions, league-setting changes, chat,
 paid contests, player search, single-player lookup, composite standings, scoreboards, roster
 resolution, activity feeds, enrichment, and hidden caching.
 
-Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.0`.
+Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.1`.
 The n8n Cloud update remains pending. Phase 2, Phase 3, and Phase 4 have not begun.
 
 **Avatar → Get URL** makes a `HEAD` request to the documented CDN URL before emitting it. The
@@ -261,10 +274,10 @@ from the multi-size icon served by Sleeper's homepage. See [branding documentati
 ## Non-affiliation
 
 This project is unofficial. It is not affiliated with, endorsed by, sponsored by, or produced
-by Sleeper or Blitz Studios. The node icon does not use Sleeper's logo, mascot, app
-icon, or copied brand artwork.
+by Sleeper or Blitz Studios. Sleeper owns the robot favicon used as the node icon; its inclusion
+does not imply endorsement.
 
-## Official resources
+## Resources
 
 - [Sleeper API documentation](https://docs.sleeper.com/)
 - [n8n community nodes](https://docs.n8n.io/integrations/community-nodes/)
