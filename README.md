@@ -6,30 +6,23 @@
 > This is an unofficial community project and is not affiliated with, endorsed by, or
 > sponsored by Sleeper or Blitz Studios.
 
-`n8n-nodes-sleeper` is a read-only n8n community node for public Sleeper fantasy football
-and NFL state data. It uses Sleeper's documented public endpoints, needs no credentials, and
-has no runtime dependencies.
+`n8n-nodes-sleeper` is a read-only n8n community node for public Sleeper fantasy football,
+basketball, and hockey data. It needs no credentials and has no runtime dependencies.
 
 ## Status
 
 The source repository is public at
 [github.com/christopherjnelson/n8n-nodes-sleeper](https://github.com/christopherjnelson/n8n-nodes-sleeper).
-`n8n-nodes-sleeper` remains a verified n8n community node. npm `0.2.1` is the stable release and
-contains the complete Phase 1 Sleeper Trigger: Draft Pick Made, Transaction Created or Updated,
-League Status Changed, and NFL Week Changed. npm's `latest` tag selects stable `0.2.1`; `next`
-remains on the separate `0.2.0` testing channel. An unqualified/default npm install
-receives stable `0.2.1`.
-
-Owner real-instance evaluation is complete and npm `0.2.1` is the stable/default release. The
-currently approved n8n Cloud version may lag npm and may not include the Sleeper Trigger; confirm
-the installed package version before relying on trigger availability.
+NBA/NHL controls require package version `0.3.0` or newer. Check the installed package version if
+the UI does not expose those controls. The four polling events are Draft Pick Made, Transaction
+Created or Updated, League Status Changed, and NFL Week Changed.
 
 ## Features
 
 - 18 deterministic read operations across 14 resources
 - Exact opaque string IDs, per-input execution, paired-item metadata, and `continueOnFail()`
 - Raw Sleeper response fields without hidden joins, enrichment, caching, or truncation
-- NFL-only documented public API scope with zero credentials and zero runtime dependencies
+- Operation-specific NFL, NBA, and NHL public API scope with zero credentials and zero runtime dependencies
 - Four Phase 1 polling triggers with first-run baselines and monotonic anti-replay state
 - `usableAsTool: true` for n8n AI agents without bundling an AI dependency
 
@@ -49,11 +42,12 @@ Where Community Nodes are supported, open **Settings → Community Nodes** and e
 n8n-nodes-sleeper
 ```
 
-This ordinary/default selector follows npm `latest` and installs stable version `0.2.1`.
+The installer provides the latest version published to npm. Confirm that the installed version is
+`0.3.0` or newer to use the NBA/NHL operations described here.
 
 ### npm
 
-The default package selector resolves to the current stable release, `0.2.1`:
+Install the latest version published to npm:
 
 ```bash
 npm install n8n-nodes-sleeper
@@ -65,10 +59,11 @@ The retained `next` selector follows the prerelease channel and may differ from 
 npm install n8n-nodes-sleeper@next
 ```
 
-For a reproducible exact-version install:
+For a reproducible install, confirm that the package registry lists the version before pinning it.
+The NBA/NHL features require `0.3.0` or newer:
 
 ```bash
-npm install n8n-nodes-sleeper@0.2.1
+npm install n8n-nodes-sleeper@0.3.0
 ```
 
 See the [community-testing guide](docs/community-testing.md) for requested test evidence and
@@ -96,26 +91,26 @@ No credentials are required. The node uses Sleeper's public, read-only API and C
 
 ## Operations
 
-| Resource          | Operation           | Required inputs                          | Optional inputs | Output shape                                       |
-| ----------------- | ------------------- | ---------------------------------------- | --------------- | -------------------------------------------------- |
-| User              | Get                 | Username or User ID                      | —               | One raw user object                                |
-| League            | Get                 | League ID                                | —               | One raw league object                              |
-| League            | Get Many for User   | User ID, Sport, Season                   | —               | One item per league; an empty array emits no items |
-| League User       | Get Many            | League ID                                | —               | One raw participating-user item                    |
-| Roster            | Get Many            | League ID                                | —               | One raw roster item                                |
-| Matchup           | Get Many            | League ID, Week                          | —               | One raw item per roster side                       |
-| Transaction       | Get Many            | League ID, Round or Week                 | —               | One raw transaction item                           |
-| Playoff           | Get Bracket         | League ID, Bracket Type                  | —               | One raw bracket-matchup item                       |
-| Traded Pick       | Get Many            | League ID                                | —               | One league-scoped traded-pick item                 |
-| Draft             | Get                 | Draft ID                                 | —               | One raw draft object                               |
-| Draft             | Get Many for League | League ID                                | —               | One raw item per associated draft                  |
-| Draft             | Get Many for User   | User ID, Sport, Season                   | —               | One raw item per user draft                        |
-| Draft Pick        | Get Many            | Draft ID                                 | —               | One raw item per recorded pick                     |
-| Draft Traded Pick | Get Many            | Draft ID                                 | —               | One draft-scoped traded-pick item                  |
-| Player            | Get Many            | Sport, Active Only, Output Mode          | Position        | One keyed map or one item per player-map entry     |
-| Player            | Get Trending        | Sport, Trend Type, Lookback Hours, Limit | —               | One raw player-ID/count item                       |
-| Sport             | Get State           | Sport                                    | —               | One raw NFL state object                           |
-| Avatar            | Get URL             | Avatar ID, Image Size                    | —               | One validated `{ avatar_id, size, url }` object    |
+| Resource          | Operation           | Required inputs                            | Optional inputs | Output shape                                       |
+| ----------------- | ------------------- | ------------------------------------------ | --------------- | -------------------------------------------------- |
+| User              | Get                 | Username or User ID                        | —               | One raw user object                                |
+| League            | Get                 | League ID                                  | —               | One raw league object                              |
+| League            | Get Many for User   | User ID, Sport, Season                     | —               | One item per league; an empty array emits no items |
+| League User       | Get Many            | League ID                                  | —               | One raw participating-user item                    |
+| Roster            | Get Many            | League ID                                  | —               | One raw roster item                                |
+| Matchup           | Get Many            | League ID, Week                            | —               | One raw item per roster side                       |
+| Transaction       | Get Many            | League ID, Round or Week                   | —               | One raw transaction item                           |
+| Playoff           | Get Bracket         | League ID, Bracket Type                    | —               | One raw bracket-matchup item                       |
+| Traded Pick       | Get Many            | League ID                                  | —               | One league-scoped traded-pick item                 |
+| Draft             | Get                 | Draft ID                                   | —               | One raw draft object                               |
+| Draft             | Get Many for League | League ID                                  | —               | One raw item per associated draft                  |
+| Draft             | Get Many for User   | User ID, NFL/NBA, Season                   | —               | One item per user draft                            |
+| Draft Pick        | Get Many            | Draft ID                                   | —               | One raw item per recorded pick                     |
+| Draft Traded Pick | Get Many            | Draft ID                                   | —               | One draft-scoped traded-pick item                  |
+| Player            | Get Many            | Sport, Active Only, Output Mode            | Position        | One keyed map or one item per player-map entry     |
+| Player            | Get Trending        | NFL/NBA, Trend Type, Lookback Hours, Limit | —               | One raw player-ID/count item                       |
+| Sport             | Get State           | NFL, NBA, or NHL                           | —               | One raw sport-specific state object                |
+| Avatar            | Get URL             | Avatar ID, Image Size                      | —               | One validated `{ avatar_id, size, url }` object    |
 
 Usernames can change. Save the stable `user_id` returned by **User → Get** for later user
 lookups. League and draft IDs are opaque strings and must not be converted to numbers.
@@ -123,14 +118,25 @@ lookups. League and draft IDs are opaque strings and must not be converted to nu
 League users and rosters are separate API results; this node does not join them. **Matchup →
 Get Many** emits one record per roster side and does not pair records sharing a `matchup_id`.
 **Transaction → Get Many** uses Sleeper's `round` path parameter, which commonly corresponds
-to an NFL week. **Draft Traded Pick → Get Many** is draft-scoped; **Traded Pick → Get Many**
-is league-scoped.
+to an NFL week; NBA round-to-week semantics are not inferred. **Draft Traded Pick → Get Many** is
+draft-scoped; **Traded Pick → Get Many** is league-scoped. Unsafe numeric opaque IDs in the
+draft-scoped traded-pick response are returned as exact strings to avoid JavaScript precision loss. Sport support is operation-specific. Player catalogs support NFL, NBA, and
+NHL; trending supports NFL and NBA; user seasonal league and draft listings support NFL and
+observed NBA results; sport state supports NFL, NBA, and NHL. Sleeper's current documentation
+still labels seasonal user listing routes NFL-only. NHL catalogs support active filtering, but
+position filtering is hidden and rejected locally because tested NHL position queries returned
+empty results. NHL trending and seasonal user league/draft support are not advertised. NBA
+seasonal results are observed live behavior and retain the documentation caveat.
 
 ## Usage examples
 
 The repository includes importable, inactive workflows with no credentials:
 
 - [Get NFL state](examples/get-nfl-state.json)
+- [Get NBA state](examples/get-nba-state.json)
+- [Get NHL state](examples/get-nhl-state.json)
+- [Get NBA players](examples/get-nba-players.json)
+- [Get NHL players](examples/get-nhl-players.json)
 - [Resolve a sample username and retrieve leagues](examples/get-user-leagues.json)
 - [Get trending adds with explicit attribution](examples/get-trending-players.json)
 
@@ -148,7 +154,9 @@ Their own setup guides cover the additional n8n configuration and credentials th
 **Player → Get Many** returns Sleeper's object keyed by player ID. The unfiltered response is
 approximately 5 MB, so Sleeper recommends fetching it sparingly and generally no more than
 once daily. **Active Only** sends the server-side `active=true` filter; **Position** sends a
-server-side fantasy-position filter. Sleeper documents no single-player endpoint.
+server-side fantasy-position filter for NFL and NBA. Tested NHL position filters returned an
+empty response, so Position is hidden and stale nonempty NHL values fail before a request. Sleeper
+documents no single-player endpoint.
 
 **Single Map**, the default, emits the keyed object as one n8n item. **One Item per Player**
 preserves each raw player object and map order, adding the string map key as `player_id` only
@@ -217,14 +225,15 @@ peer dependency range.
 
 ## Limitations
 
-The package supports only NFL in its visible interface. It intentionally omits authentication,
-lineup changes, adds/drops, trades, draft actions, league-setting changes, chat, Sleeper Picks,
-paid contests, player search, single-player lookup, composite standings, scoreboards, roster
-resolution, activity feeds, enrichment, and hidden caching.
+Sport availability depends on the operation. NHL trending and NHL seasonal user league/draft
+listings are not offered. Sleeper's current docs still call user seasonal league/draft routes NFL
+only; NBA results are live-observed and retain that caveat. NHL state omits fields available in
+NFL/NBA state, so raw sport-specific state objects pass through without inferred values. No NBA or
+NHL week trigger is included; only the existing NFL Week Changed trigger watches global state.
 
-Phase 1 polling-trigger implementation is complete and publicly available as stable npm `0.2.1`.
-Creator Portal and n8n Cloud updates remain separate owner-managed steps and are not yet verified.
-Phase 2, Phase 3, and Phase 4 have not begun.
+The package continues to omit authentication, lineup changes, adds/drops, trades, draft actions,
+league-setting changes, chat, Sleeper Picks, paid contests, player search, single-player lookup,
+composite standings, scoreboards, roster resolution, activity feeds, enrichment, and hidden caching.
 
 **Avatar → Get URL** makes a `HEAD` request to the documented CDN URL before emitting it. The
 operation therefore fails when the image is missing or the CDN is unavailable; it emits URL

@@ -3,10 +3,12 @@
 The Sleeper Trigger polls Sleeper's documented public HTTP API. Sleeper does not document webhook
 subscriptions for these events, so this is not instant backend delivery and polling frequency
 should remain comfortably below Sleeper's published rate guidance. Draft Pick Made, Transaction
-Created or Updated, League Status Changed, and NFL Week Changed were introduced in `0.2.0` and are
-available in current stable npm `0.2.1`. npm `latest` resolves to `0.2.1`, while `next` remains on
-`0.2.0`. Creator Portal and n8n Cloud availability for `0.2.1` remain separate owner-managed,
-unverified steps. Phase 2, Phase 3, and Phase 4 have not begun.
+Created or Updated, League Status Changed, and NFL Week Changed were introduced in `0.2.0` and
+remain the four existing events. The current branch prepares `0.3.0` action support; that version
+is unpublished pending release approval. The previously completed `0.2.1` editor smoke does not
+cover this branch. The three ID-based events continue to accept NBA league/draft IDs when those
+resources are configured, while NFL Week Changed remains hardcoded to `/state/nfl`. No NBA or NHL
+week event is included; behavior across live event transitions has not been established.
 
 ## Draft Pick Made
 

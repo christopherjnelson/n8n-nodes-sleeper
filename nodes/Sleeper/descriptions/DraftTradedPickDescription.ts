@@ -1,6 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 import { sleeperRoute } from './routing';
+import { formatDraftTradedPicks } from './response';
 
 export const draftTradedPickDescription: INodeProperties[] = [
 	{
@@ -22,6 +23,10 @@ export const draftTradedPickDescription: INodeProperties[] = [
 					'Retrieve raw traded-pick ownership records scoped to a specific public Sleeper draft',
 				routing: sleeperRoute(
 					'=/draft/{{encodeURIComponent(String($parameter.draftId).trim())}}/traded_picks',
+					{
+						request: { json: false, encoding: 'text' },
+						postReceive: [formatDraftTradedPicks],
+					},
 				),
 			},
 		],

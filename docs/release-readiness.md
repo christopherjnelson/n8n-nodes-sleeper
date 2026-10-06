@@ -1,5 +1,15 @@
 # Release readiness
 
+## 0.3.0 candidate — unpublished
+
+- This branch prepares version `0.3.0` with bounded NBA/NHL action support and lossless unsafe opaque-ID output for Draft Traded Pick.
+- Publication and staging await owner approval; CI and merge status are reported by the PR. The last published stable checkpoint below remains historical and does not describe this candidate.
+- The prepared source passes local format, lint, both TypeScript checks, unit and retained trigger tests (57 Vitest and 114 CommonJS tests), source review/scan, build, release configuration audit, package boundary, isolated load, and isolated install checks. The official published-package scanner is intentionally deferred until the owner-approved package is public. Do not describe `0.3.0` as available before the immutable publication step.
+- The candidate adds no NBA/NHL week trigger; the existing NFL Week Changed event remains NFL-only.
+- Template guidance was reviewed on 2026-10-06 against upstream source snapshot `596e784cfe69cd8894529b8a81c491921cde9773` (template baseline 2.2 plus its unversioned current follow-up guidance). The review retained the repository's pnpm package manager and manual trusted-stage release flow where the template's generic defaults did not fit.
+- The smoke-tested 37-file package (`SHA-256 a5422199fb90b1fecc53d7704c2f9719791e7af909112d9aea8a1a2e529659c6`) was loaded in isolated n8n 2.41.6 / Node 24.18.0 on 2026-10-06. The editor smoke verified NFL/NBA/NHL state, NBA player/trending and seasonal list routes, NHL player catalog, NBA league/draft operations, exact unsafe traded-pick ID preservation, and the stale NHL Position guard: the invalid saved filter failed locally without reaching its downstream sentinel, while the unfiltered NHL catalog completed. For Draft Pick Made, activation established a baseline at observed pick number 378, an unchanged scheduled poll emitted no event, and reactivation after restart restored the same saved state; manual preview also returned the expected event shape. No future external event transition was asserted. Detailed live-check evidence is retained in the task evidence directory; this summary is the committed release record.
+- GitHub's latest 2026-10-06 lockfile snapshot lists 27 open Dependabot alerts: 7 high, 17 moderate, and 3 low, all classified as development dependencies. The current alert list is available in the [repository Dependabot dashboard](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/dependabot). The package has no runtime dependencies; `n8n-workflow` remains a host peer dependency. The sports change adds no unrelated dependency upgrades.
+
 ## 0.2.1 post-publication checkpoint — 2026-09-08
 
 - Stable `n8n-nodes-sleeper@0.2.1` was published at `2026-09-08T05:59:49.733Z`; npm maps

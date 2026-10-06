@@ -10,7 +10,8 @@ export class Sleeper implements INodeType {
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Retrieve public Sleeper fantasy football and NFL state data without credentials',
+		description:
+			'Retrieve public Sleeper fantasy football, basketball, and hockey data without credentials',
 		defaults: {
 			name: 'Sleeper',
 		},

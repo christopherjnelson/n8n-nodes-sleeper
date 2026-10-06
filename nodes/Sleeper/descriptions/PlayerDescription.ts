@@ -2,6 +2,7 @@ import type { INodeProperties } from 'n8n-workflow';
 
 import { sleeperRoute } from './routing';
 import { formatPlayerMap } from './response';
+import { sportOptionsForCapability } from '../utils/sports';
 
 export const playerDescription: INodeProperties[] = [
 	{
@@ -41,18 +42,28 @@ export const playerDescription: INodeProperties[] = [
 		name: 'sport',
 		type: 'options',
 		required: true,
-		options: [
-			{
-				name: 'NFL',
-				value: 'nfl',
-			},
-		],
+		options: sportOptionsForCapability('playerCatalog'),
 		default: 'nfl',
-		description: 'The Sleeper sport path value. This release supports NFL only.',
+		description: 'Choose NFL, NBA, or NHL for the player catalog',
 		displayOptions: {
 			show: {
 				resource: ['player'],
-				operation: ['getMany', 'getTrending'],
+				operation: ['getMany'],
+			},
+		},
+	},
+	{
+		displayName: 'Sport',
+		name: 'sport',
+		type: 'options',
+		required: true,
+		options: sportOptionsForCapability('trending'),
+		default: 'nfl',
+		description: 'Choose NFL or NBA. Sleeper NHL trending support has not been established.',
+		displayOptions: {
+			show: {
+				resource: ['player'],
+				operation: ['getTrending'],
 			},
 		},
 	},
@@ -84,11 +95,12 @@ export const playerDescription: INodeProperties[] = [
 		default: '',
 		placeholder: 'QB',
 		description:
-			'Optional Sleeper fantasy-position code, such as QB. This server-side filter reduces the player response size.',
+			'Optional Sleeper fantasy-position code, such as QB or PG. NHL position filtering is unavailable because tested position queries returned no players.',
 		displayOptions: {
 			show: {
 				resource: ['player'],
 				operation: ['getMany'],
+				sport: ['nfl', 'nba'],
 			},
 		},
 		routing: {
@@ -96,6 +108,33 @@ export const playerDescription: INodeProperties[] = [
 				qs: {
 					position: '={{$value.trim() || undefined}}',
 				},
+			},
+		},
+	},
+	{
+		displayName: 'Position',
+		name: 'position',
+		type: 'hidden',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['player'],
+				operation: ['getMany'],
+				sport: ['nhl'],
+			},
+		},
+	},
+	{
+		displayName: 'NHL Position Filtering',
+		name: 'nhlPositionNotice',
+		type: 'notice',
+		default:
+			'Sleeper returned no players for tested NHL position filters. Position is hidden for NHL; clear any saved Position value before running.',
+		displayOptions: {
+			show: {
+				resource: ['player'],
+				operation: ['getMany'],
+				sport: ['nhl'],
 			},
 		},
 	},

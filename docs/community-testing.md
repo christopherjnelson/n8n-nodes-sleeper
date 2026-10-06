@@ -1,6 +1,10 @@
 # Community testing
 
-## Release under test
+## Candidate under preparation
+
+This source branch prepares `0.3.0` with NBA/NHL operation-specific support. It is not yet published, merged, or available through npm. After release approval, update this guide with the exact published version and verified installation selectors. The latest completed editor smoke documented here is for published `0.2.1` and does not cover the new sports.
+
+## Latest published release under test
 
 - Package: `n8n-nodes-sleeper`
 - Stable version: `0.2.1`
@@ -9,7 +13,7 @@
 - Exact selector: `n8n-nodes-sleeper@0.2.1`
 - Status: stable/default release on npm; ongoing self-hosted compatibility testing is welcome
 - Coverage: 18 direct operations across 14 resources and four Phase 1 trigger events
-- Scope: read-only public Sleeper data, no credentials, and an NFL-first visible interface
+- Scope of published `0.2.1`: read-only NFL-focused public Sleeper data with no credentials
 - Distribution: npm `latest → 0.2.1` and `next → 0.2.0`; the default installer receives `0.2.1`.
   Creator Portal and n8n Cloud updates for `0.2.1` remain separate owner-managed steps and are not
   claimed complete.
@@ -85,6 +89,7 @@ Please include the following in compatibility or bug reports:
 - switching event or event-specific configuration and establishing the new baseline
 - persistence across an n8n restart without replay
 - real transaction, draft, NFL week, and league-status transitions where practical
+- NFL defaults and NFL state regression; NBA state and supported seasonal listings; NHL state and position notice/preflight; NBA/NHL player catalog output modes; supported NBA trending operations; explicit-season and transaction-round behavior; and exact traded-pick opaque IDs
 - regression coverage for existing action operations, especially Sport → Get State
 
 Naturally occurring events are useful evidence where practical, but waiting for one is not a
@@ -111,14 +116,14 @@ not a public issue.
 
 ## Known limitations
 
-- The package is read-only and exposes only NFL in its visible sport choices.
+- This branch prepares operation-specific support: NFL/NBA/NHL player catalog, NFL/NBA trending, NFL/NBA observed seasonal user listings, and NFL/NBA/NHL state. Published `0.2.1` remains NFL-focused until a later package is approved and published.
 - Stable/default `0.2.1` includes all four trigger events.
-- Sleeper documents no single-player endpoint; the node does not invent one.
-- **Player → Get Many** can return a large map. Use server-side filters, avoid unnecessary
+- NHL Position is hidden and nonempty stale values fail locally because tested NHL position filters returned empty results. NHL trending and NHL seasonal user league/draft support are not advertised. NBA seasonal listings are live-observed despite Sleeper documentation still saying NFL only.
+- **Player → Get Many** can return a large map. NHL state omits `leg` and `league_season`; no missing field is inferred. NBA transaction rounds are explicit and are not auto-selected from state. The existing NFL Week Changed trigger remains NFL-specific; no NBA/NHL week trigger was added. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
 - Two reviewed moderate development-only alerts remain through upstream n8n tooling (`uuid` and
   `stream-json`). Neither is a runtime dependency or enters the published tarball.
-- npm `latest` and the default installer resolve to `0.2.1`; npm `next` remains on `0.2.0`.
+- The published npm tags described in the dated `0.2.1` release section remain historical until the `0.3.0` candidate is explicitly approved and published. Do not use those selectors as evidence of candidate availability.
 
 ## Success criteria
 

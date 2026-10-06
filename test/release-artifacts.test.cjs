@@ -44,7 +44,11 @@ test('all committed example workflows are inactive, credential-free, and use kno
 		.filter((name) => name.endsWith('.json'))
 		.sort();
 	assert.deepEqual(filenames, [
+		'get-nba-players.json',
+		'get-nba-state.json',
 		'get-nfl-state.json',
+		'get-nhl-players.json',
+		'get-nhl-state.json',
 		'get-trending-players.json',
 		'get-user-leagues.json',
 	]);
@@ -118,21 +122,20 @@ test('README has current release-status sections and every relative link resolve
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.equal(packageMetadata.version, '0.2.1');
+	assert.equal(packageMetadata.version, '0.3.0');
 	assert.match(readme, /npm install n8n-nodes-sleeper$/m);
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
-	assert.match(readme, /npm install n8n-nodes-sleeper@0\.2\.1/);
+	assert.match(readme, /npm install n8n-nodes-sleeper@0\.3\.0/);
+	assert.match(readme, /NBA\/NHL controls require package version `0\.3\.0` or newer/i);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(readme, /default npm install\s+receives stable `0\.2\.1`/i);
-	assert.match(readme, /remains a verified n8n community node/i);
-	assert.match(readme, /currently approved n8n Cloud version may lag npm/i);
+	assert.match(readme, /Confirm that the installed version is\s+`0\.3\.0` or newer/i);
+	assert.match(readme, /currently approved Cloud version may lag npm/i);
 	assert.doesNotMatch(readme, /`0\.2\.0` is available directly in n8n Cloud/i);
-	assert.match(readme, /npm `0\.2\.1` is the stable release/i);
 	assert.match(
 		readme,
-		/Draft Pick Made[\s\S]*Transaction Created or Updated[\s\S]*League Status Changed[\s\S]*NFL Week Changed/,
+		/Draft Pick Made[\s\S]*Transaction\s+Created or Updated[\s\S]*League Status\s+Changed[\s\S]*NFL Week Changed/,
 	);
-	assert.match(readme, /complete Phase 1 Sleeper Trigger/i);
+	assert.match(readme, /Four Phase 1 polling triggers/i);
 	assert.match(readme, /docs\/community-testing\.md/);
 
 	for (const match of readme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -146,7 +149,7 @@ test('README has current release-status sections and every relative link resolve
 test('community-testing documentation and structured issue forms remain complete', () => {
 	const guide = read('docs/community-testing.md');
 	for (const heading of [
-		'Release under test',
+		'Latest published release under test',
 		'Installation methods',
 		'Requested test coverage',
 		'Privacy and test-data rules',
@@ -157,15 +160,11 @@ test('community-testing documentation and structured issue forms remain complete
 	}
 	assert.match(guide, /18 direct operations across 14 resources/);
 	assert.match(guide, /n8n-nodes-sleeper@next/);
-	assert.match(guide, /n8n-nodes-sleeper@0\.2\.1/);
+	assert.match(guide, /not yet published, merged, or available through npm/i);
 	assert.match(guide, /private vulnerability reporting/);
 	assert.match(guide, /Status: stable\/default release on npm/);
 	assert.match(guide, /Creator Portal and n8n Cloud updates for `0\.2\.1` remain separate/);
 	assert.match(guide, /npm `latest → 0\.2\.1` and `next → 0\.2\.0`/);
-	assert.match(
-		guide,
-		/npm `latest` and the default installer resolve to `0\.2\.1`; npm `next` remains on `0\.2\.0`/,
-	);
 	assert.match(guide, /^## 0\.2\.1 stable release$/m);
 	assert.match(guide, /^## 0\.2\.0 stable release$/m);
 	assert.match(guide, /Naturally occurring events[\s\S]*not a\s+condition for installing/i);

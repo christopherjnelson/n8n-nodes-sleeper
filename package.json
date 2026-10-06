@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-sleeper",
-	"version": "0.2.1",
-	"description": "Retrieve public Sleeper fantasy football data with n8n.",
+	"version": "0.3.0",
+	"description": "Retrieve public Sleeper fantasy football, basketball, and hockey data with n8n.",
 	"license": "MIT",
 	"homepage": "https://github.com/christopherjnelson/n8n-nodes-sleeper#readme",
 	"keywords": [
@@ -9,7 +9,8 @@
 		"n8n",
 		"sleeper",
 		"fantasy-football",
-		"nfl"
+		"nba",
+		"nhl"
 	],
 	"author": {
 		"name": "Christopher J. Nelson",

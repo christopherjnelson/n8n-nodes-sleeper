@@ -1,6 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 import { sleeperRoute } from './routing';
+import { sportOptionsForCapability } from '../utils/sports';
 
 export const leagueDescription: INodeProperties[] = [
 	{
@@ -27,7 +28,8 @@ export const leagueDescription: INodeProperties[] = [
 				name: 'Get Many for User',
 				value: 'getManyForUser',
 				action: 'Get many leagues for a user',
-				description: 'Retrieve all leagues for a stable user ID, sport, and season',
+				description:
+					'Retrieve leagues for a stable user ID, sport, and season. NBA listings are observed live behavior; Sleeper documentation still says this route supports NFL only.',
 				routing: sleeperRoute(
 					'=/user/{{encodeURIComponent(String($parameter.userId).trim())}}/leagues/{{$parameter.sport}}/{{String($parameter.season).trim()}}',
 				),
@@ -69,14 +71,10 @@ export const leagueDescription: INodeProperties[] = [
 		name: 'sport',
 		type: 'options',
 		required: true,
-		options: [
-			{
-				name: 'NFL',
-				value: 'nfl',
-			},
-		],
+		options: sportOptionsForCapability('seasonalListings'),
 		default: 'nfl',
-		description: 'The Sleeper sport path value. This release supports NFL only.',
+		description:
+			'Choose NFL or NBA. NBA user league listings return populated results in live checks, though Sleeper documentation currently says NFL only.',
 		displayOptions: {
 			show: {
 				resource: ['league'],
@@ -92,7 +90,7 @@ export const leagueDescription: INodeProperties[] = [
 		default: '',
 		placeholder: '2026',
 		description:
-			'The four-digit NFL season year. The current year is not substituted automatically.',
+			'The four-digit NFL or NBA season year. The current year is not substituted automatically.',
 		displayOptions: {
 			show: {
 				resource: ['league'],

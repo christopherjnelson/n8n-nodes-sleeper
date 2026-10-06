@@ -5,6 +5,8 @@ import {
 	type INodeProperties,
 	type PostReceiveAction,
 } from 'n8n-workflow';
+import { validateSleeperSport } from '../utils/validation';
+import { sportCapabilityForOperation, sportsForCapability } from '../utils/sports';
 
 const requiredParameters: Record<string, readonly string[]> = {
 	'avatar:getUrl': ['avatarId', 'imageSize'],
@@ -31,12 +33,17 @@ const allowedValues: Record<string, readonly string[]> = {
 	bracketType: ['winners', 'losers'],
 	imageSize: ['full', 'thumbnail'],
 	outputMode: ['singleMap', 'splitItems'],
-	sport: ['nfl'],
 	trendType: ['add', 'drop'],
 };
 
 function isBlank(value: unknown): boolean {
 	return value === undefined || value === null || (typeof value === 'string' && !value.trim());
+}
+
+function isConfigured(value: unknown): boolean {
+	return (
+		value !== undefined && value !== null && (typeof value !== 'string' || value.trim() !== '')
+	);
 }
 
 export async function validateSleeperRequest(
@@ -45,6 +52,7 @@ export async function validateSleeperRequest(
 ): Promise<IHttpRequestOptions> {
 	const resource = String(this.getNodeParameter('resource'));
 	const operation = String(this.getNodeParameter('operation'));
+	const itemIndex = this.getItemIndex();
 	const key = `${resource}:${operation}`;
 	const required = requiredParameters[key];
 
@@ -66,6 +74,34 @@ export async function validateSleeperRequest(
 			throw new NodeOperationError(this.getNode(), `${parameter} has an unsupported value`, {
 				description: `${parameter} must be one of: ${allowed.join(', ')}.`,
 			});
+		}
+	}
+
+	const sportCapability = sportCapabilityForOperation(resource, operation);
+	if (sportCapability) {
+		const sport = validateSleeperSport(
+			this,
+			this.getNodeParameter('sport'),
+			itemIndex,
+			sportsForCapability(sportCapability),
+		);
+		if (resource === 'player' && operation === 'getMany' && sport === 'nhl') {
+			const savedPosition = this.getNode().parameters.position;
+			if (isConfigured(savedPosition)) {
+				throw new NodeOperationError(this.getNode(), 'NHL position filtering is unavailable', {
+					description:
+						'Tested NHL position filters returned no players. Switch to NFL or NBA, clear Position, then choose NHL to retrieve the unfiltered player map.',
+					itemIndex,
+				});
+			}
+			const evaluatedPosition = this.getNodeParameter('position', '');
+			if (isConfigured(evaluatedPosition)) {
+				throw new NodeOperationError(this.getNode(), 'NHL position filtering is unavailable', {
+					description:
+						'Tested NHL position filters returned no players. Switch to NFL or NBA, clear Position, then choose NHL to retrieve the unfiltered player map.',
+					itemIndex,
+				});
+			}
 		}
 	}
 
@@ -91,12 +127,17 @@ type Routing = NonNullable<INodeProperties['routing']>;
 
 export function sleeperRoute(
 	url: string,
-	options: { method?: 'GET' | 'HEAD'; postReceive?: PostReceiveAction[] } = {},
+	options: {
+		method?: 'GET' | 'HEAD';
+		postReceive?: PostReceiveAction[];
+		request?: Pick<IHttpRequestOptions, 'json' | 'encoding'>;
+	} = {},
 ): Routing {
 	return {
 		request: {
 			method: options.method ?? 'GET',
 			url,
+			...options.request,
 		},
 		send: {
 			preSend: [validateSleeperRequest],
