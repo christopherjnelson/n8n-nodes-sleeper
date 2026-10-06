@@ -50,17 +50,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24.18.0'
-          package-manager-cache: false
-
-      - name: Install staged-publishing npm CLI
-        run: npm install --global npm@11.16.0
+      - name: Verify annotated tag against current main
+        if: inputs.release_mode == 'trusted-stage'
+        run: node scripts/verify-release-tag.mjs
 
       - name: Verify release intent, package name, and source ref
         env:
@@ -92,28 +84,17 @@ jobs:
             exit 1
           fi
 
-          expected_tag="v${package_version}"
-          if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "$expected_tag" ]]; then
-            echo "::error::Trusted staging requires the exact tag $expected_tag"
-            exit 1
-          fi
-          if [[ "$(git cat-file -t "$REF_NAME" 2>/dev/null || true)" != "tag" ]]; then
-            echo "::error::$REF_NAME must be an annotated tag"
-            exit 1
-          fi
-          if [[ "$(git rev-parse HEAD)" != "$SELECTED_SHA" ]]; then
-            echo "::error::Checked-out source does not match the selected workflow ref"
-            exit 1
-          fi
-          if [[ "$(git rev-parse "${REF_NAME}^{commit}")" != "$SELECTED_SHA" ]]; then
-            echo "::error::$REF_NAME does not point to the selected source commit"
-            exit 1
-          fi
-          git fetch --no-tags origin main
-          if [[ "$(git rev-parse origin/main)" != "$SELECTED_SHA" ]]; then
-            echo "::error::Release tag must point exactly to the freshly fetched origin/main commit"
-            exit 1
-          fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.18.0'
+          package-manager-cache: false
+
+      - name: Install staged-publishing npm CLI
+        run: npm install --global npm@11.16.0
 
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
@@ -133,6 +114,9 @@ jobs:
       - name: Run all tests
         run: pnpm run test
 
+      - name: Review node source
+        run: pnpm run review:source
+
       - name: Build package
         run: pnpm run build
 
@@ -147,6 +131,9 @@ jobs:
 
       - name: Run project package inspection
         run: pnpm run package:check
+
+      - name: Audit release configuration
+        run: pnpm run release:check
 
       - name: Reject an existing registry or staged version
         if: inputs.release_mode == 'trusted-stage'
@@ -274,6 +261,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify annotated tag against current main
+        run: node scripts/verify-release-tag.mjs
+
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
 
@@ -298,24 +288,6 @@ jobs:
           package_version="$(node -p "require('./package.json').version")"
           if [[ "$PACKAGE_CONFIRMATION" != "$package_name" ]]; then
             echo "::error::Package confirmation must exactly match $package_name"
-            exit 1
-          fi
-          expected_tag="v${package_version}"
-          if [[ "$REF_TYPE" != "tag" || "$REF_NAME" != "$expected_tag" ]]; then
-            echo "::error::Verification requires the exact tag $expected_tag"
-            exit 1
-          fi
-          if [[ "$(git cat-file -t "$REF_NAME" 2>/dev/null || true)" != "tag" ]]; then
-            echo "::error::$REF_NAME must be an annotated tag"
-            exit 1
-          fi
-          if [[ "$(git rev-parse "${REF_NAME}^{commit}")" != "$SELECTED_SHA" ]]; then
-            echo "::error::$REF_NAME does not point to the selected source commit"
-            exit 1
-          fi
-          git fetch --no-tags origin main
-          if [[ "$(git rev-parse origin/main)" != "$SELECTED_SHA" ]]; then
-            echo "::error::Release tag must point exactly to the freshly fetched origin/main commit"
             exit 1
           fi
 

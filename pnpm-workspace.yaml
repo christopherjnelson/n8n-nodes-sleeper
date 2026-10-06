@@ -5,6 +5,7 @@ allowBuilds:
   ssh2: true
   unrs-resolver: true
 overrides:
+  '@n8n/scan-community-package>typescript': 'npm:@typescript/typescript6@6.0.2'
   typescript: 5.9.3
   tmp: 0.2.7
   nanoid: 3.3.18

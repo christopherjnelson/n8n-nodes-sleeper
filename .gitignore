@@ -6,6 +6,7 @@ coverage
 .nyc_output
 .n8n
 .n8n-node-cli
+.codex-scratch
 
 # Environment and local configuration
 .env

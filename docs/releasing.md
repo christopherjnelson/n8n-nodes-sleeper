@@ -89,10 +89,12 @@ and npm 11.5.1 or newer. Staged publishing requires npm 11.15.0 or newer. The wo
 Node.js 24 and npm 11.16.0, grants `contents: read` and `id-token: write` only to the protected
 stage job, and relies on npm-generated provenance for trusted publication.
 
-The published scanner is pinned to `@n8n/scan-community-package` 0.34.0. Its verifier retries
-only the scanner's exact missing-version metadata response and the full provenance-repository
-404 message, for six bounded attempts. Generic 403, 404, rate-limit, timeout, and scanner failures
-are terminal.
+The source and built-package scanner is pinned to `@n8n/scan-community-package` 0.38.0. The
+published-package verifier retries only the exact missing-version metadata response and a 404
+from the provenance source repository. Generic scanner-analysis errors, including 404 responses,
+are terminal. Retries share a 360-second deadline, each scanner process is bounded by the
+remaining time, and success requires both exit status zero and the
+scanner's explicit success text. Other failures are terminal.
 
 ## Dist-tag policy
 
