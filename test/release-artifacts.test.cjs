@@ -125,6 +125,7 @@ test('README has current release-status sections and every relative link resolve
 	assert.equal(packageMetadata.version, '0.3.0');
 	assert.match(readme, /npm install n8n-nodes-sleeper$/m);
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
+	assert.match(readme, /npm install n8n-nodes-sleeper@0\.3\.0/);
 	assert.match(readme, /NBA\/NHL controls require package version `0\.3\.0` or newer/i);
 	assert.match(readme, /Settings → Community Nodes/);
 	assert.match(readme, /Confirm that the installed version is\s+`0\.3\.0` or newer/i);

@@ -87,8 +87,15 @@ export async function validateSleeperRequest(
 		);
 		if (resource === 'player' && operation === 'getMany' && sport === 'nhl') {
 			const savedPosition = this.getNode().parameters.position;
+			if (isConfigured(savedPosition)) {
+				throw new NodeOperationError(this.getNode(), 'NHL position filtering is unavailable', {
+					description:
+						'Tested NHL position filters returned no players. Switch to NFL or NBA, clear Position, then choose NHL to retrieve the unfiltered player map.',
+					itemIndex,
+				});
+			}
 			const evaluatedPosition = this.getNodeParameter('position', '');
-			if (isConfigured(savedPosition) || isConfigured(evaluatedPosition)) {
+			if (isConfigured(evaluatedPosition)) {
 				throw new NodeOperationError(this.getNode(), 'NHL position filtering is unavailable', {
 					description:
 						'Tested NHL position filters returned no players. Switch to NFL or NBA, clear Position, then choose NHL to retrieve the unfiltered player map.',

@@ -59,10 +59,11 @@ The retained `next` selector follows the prerelease channel and may differ from 
 npm install n8n-nodes-sleeper@next
 ```
 
-For a reproducible install, pin the version you verified in the package registry:
+For a reproducible install, confirm that the package registry lists the version before pinning it.
+The NBA/NHL features require `0.3.0` or newer:
 
 ```bash
-npm install n8n-nodes-sleeper@<published-version>
+npm install n8n-nodes-sleeper@0.3.0
 ```
 
 See the [community-testing guide](docs/community-testing.md) for requested test evidence and

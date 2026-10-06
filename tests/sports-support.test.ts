@@ -17,6 +17,7 @@ function context(
 	parameters: Record<string, unknown>,
 	evaluatedParameters: Record<string, unknown> = parameters,
 	itemIndex = 0,
+	rejectPositionEvaluation = false,
 ): IExecuteSingleFunctions {
 	return {
 		getNode: () => ({
@@ -26,10 +27,14 @@ function context(
 			position: [0, 0],
 			parameters,
 		}),
-		getNodeParameter: (name: string, fallback?: unknown) =>
-			Object.prototype.hasOwnProperty.call(evaluatedParameters, name)
+		getNodeParameter: (name: string, fallback?: unknown) => {
+			if (rejectPositionEvaluation && name === 'position') {
+				throw new Error('A saved NHL position expression must not be evaluated');
+			}
+			return Object.prototype.hasOwnProperty.call(evaluatedParameters, name)
 				? evaluatedParameters[name]
-				: fallback,
+				: fallback;
+		},
 		getItemIndex: () => itemIndex,
 	} as unknown as IExecuteSingleFunctions;
 }
@@ -210,6 +215,41 @@ describe('operation-specific sport support', () => {
 		expect((error as NodeOperationError).description).toContain(
 			'Switch to NFL or NBA, clear Position, then choose NHL',
 		);
+	});
+
+	it('rejects a saved invalid NHL expression before evaluating it', async () => {
+		const nodeParameters: INodeParameters = {
+			resource: 'player',
+			operation: 'getMany',
+			sport: 'nhl',
+			position: '={{ invalid( }}',
+			outputMode: 'singleMap',
+		};
+		const sleeperDescription = new Sleeper().description;
+		const normalizedParameters = NodeHelpers.getNodeParameters(
+			sleeperDescription.properties,
+			nodeParameters,
+			true,
+			false,
+			{ typeVersion: 1 },
+			sleeperDescription,
+		);
+		expect(normalizedParameters?.position).toBe('={{ invalid( }}');
+		const evaluatedParameters = {
+			resource: 'player',
+			operation: 'getMany',
+			sport: 'nhl',
+			outputMode: 'singleMap',
+		};
+		await expect(
+			validateSleeperRequest.call(
+				context(normalizedParameters as Record<string, unknown>, evaluatedParameters, 0, true),
+				{ url: '/must-not-run' } as never,
+			),
+		).rejects.toMatchObject({
+			name: 'NodeOperationError',
+			message: 'NHL position filtering is unavailable',
+		});
 	});
 
 	it('allows blank saved NHL position and preserves NFL/NBA position query routing', async () => {

@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.0] - Unreleased
+## [0.3.0] - 2026-10-06
 
 - Align template safeguards to baseline 2.2.0: pin the 0.38.0 scanner, add source and release
   configuration reviews, validate release tags before setup, and isolate local n8n development on
