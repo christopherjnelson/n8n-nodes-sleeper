@@ -485,7 +485,7 @@ test('registers exact source and compiled codex metadata for both nodes', () => 
 		assert.deepEqual(metadata.categories, ['Development']);
 		assert.equal(metadata.categories.includes('Developer Tools'), false);
 	}
-	assert.equal(packageMetadata.version, '0.2.1');
+	assert.equal(packageMetadata.version, '0.3.0');
 	assert.deepEqual(packageMetadata.dependencies ?? {}, {});
 	assert.deepEqual(packageMetadata.n8n.credentials, []);
 	for (const icon of ['sleeper.png', 'sleeper.dark.png']) {

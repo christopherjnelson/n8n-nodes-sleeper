@@ -1,5 +1,15 @@
 # Release readiness
 
+## 0.3.0 candidate — unpublished
+
+- This branch prepares version `0.3.0` with bounded NBA/NHL action support and lossless unsafe opaque-ID output for Draft Traded Pick.
+- It has not been merged, tagged, submitted for release, or published. The last published stable checkpoint below remains historical and does not describe this candidate.
+- Release readiness still requires reviewer approval, successful CI on the final merged source, packed-package verification, and the isolated n8n 2.41.6 smoke. Do not describe `0.3.0` as available before the immutable publication step.
+- The candidate adds no NBA/NHL week trigger; the existing NFL Week Changed event remains NFL-only.
+- Template guidance was reviewed on 2026-10-06 against upstream source snapshot `596e784cfe69cd8894529b8a81c491921cde9773` (template baseline 2.2 plus its unversioned current follow-up guidance). The review retained the repository's pnpm package manager and manual trusted-stage release flow where the template's generic defaults did not fit.
+- Actual editor-smoke evidence is tracked in the task evidence note `runtime-smoke-0.3.0.md`; refresh it against the final packed artifact and record the stale NHL Position guard result before release sign-off.
+- GitHub's 2026-10-06 lockfile review classified four advisories as development-only; patched resolutions are `js-yaml` 4.3.2 (GHSA-2883-xcg3-v3hh), `ip-address` 10.5.1 (GHSA-2vr4-cq9g-pvrc), `stream-json` 3.5.0 (GHSA-528h-pc64-c93x), and `uuid` 11.1.1 (GHSA-w5hq-g745-h8pq). The package has no runtime dependencies; `n8n-workflow` remains a host peer dependency. The sports change adds no unrelated dependency upgrades.
+
 ## 0.2.1 post-publication checkpoint — 2026-09-08
 
 - Stable `n8n-nodes-sleeper@0.2.1` was published at `2026-09-08T05:59:49.733Z`; npm maps

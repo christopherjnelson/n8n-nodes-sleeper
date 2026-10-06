@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## [0.3.0] - Unreleased
 
 - Align template safeguards to baseline 2.2.0: pin the 0.38.0 scanner, add source and release
   configuration reviews, validate release tags before setup, and isolate local n8n development on
   port 5690. Preserve the manual trusted-stage release path and record intentional differences.
+- Add operation-specific NBA and NHL player/state support and observed NBA seasonal user league/draft listings.
+- Add local rejection and editor notice for NHL position filtering, which returned empty results in live checks.
+- Preserve unsafe numeric opaque IDs in draft traded-pick responses as exact strings without changing safe numeric fields.
+- Keep existing NFL defaults and all four polling events; no NBA/NHL week trigger is added.
 
 ## [0.2.1] - 2026-09-08
 

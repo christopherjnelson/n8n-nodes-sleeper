@@ -122,8 +122,12 @@ test('accepts four-digit seasons and rejects malformed seasons', () => {
 	}
 });
 
-test('maps only the controlled NFL sport value', () => {
+test('keeps NFL as the default sport helper whitelist and accepts explicitly supported sports', () => {
 	assert.equal(getSport(createParameterContext({ sport: 'nfl' }), 'sport', 0), 'nfl');
+	assert.equal(
+		getSport(createParameterContext({ sport: 'nba' }), 'sport', 0, ['nfl', 'nba']),
+		'nba',
+	);
 	assert.throws(
 		() => getSport(createParameterContext({ sport: 'nba' }), 'sport', 1),
 		(error) => error instanceof NodeOperationError && error.message === 'Unsupported sport',

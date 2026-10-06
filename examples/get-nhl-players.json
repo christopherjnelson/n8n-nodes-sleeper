@@ -1,0 +1,46 @@
+{
+	"name": "Sleeper - Get NHL Players",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "2f494565-e79b-4cda-818b-2f3052a41017",
+			"name": "When clicking \u2018Execute workflow\u2019",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [0, 0]
+		},
+		{
+			"parameters": {
+				"resource": "player",
+				"operation": "getMany",
+				"sport": "nhl",
+				"activeOnly": true,
+				"outputMode": "singleMap"
+			},
+			"id": "b59e8764-6f14-4aa5-824e-28ba143d1e5f",
+			"name": "Get NHL Players",
+			"type": "n8n-nodes-sleeper.sleeper",
+			"typeVersion": 1,
+			"position": [240, 0]
+		}
+	],
+	"pinData": {},
+	"connections": {
+		"When clicking \u2018Execute workflow\u2019": {
+			"main": [
+				[
+					{
+						"node": "Get NHL Players",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"active": false,
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"tags": []
+}

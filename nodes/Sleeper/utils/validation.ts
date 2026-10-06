@@ -1,6 +1,6 @@
 import { NodeOperationError, type IExecuteFunctions, type INode } from 'n8n-workflow';
 
-export type SleeperSport = 'nfl';
+export type SleeperSport = 'nfl' | 'nba' | 'nhl';
 export type SleeperBracketType = 'winners' | 'losers';
 export type SleeperAvatarSize = 'full' | 'thumbnail';
 export type SleeperPlayerOutputMode = 'singleMap' | 'splitItems';
@@ -172,12 +172,19 @@ export function getPositiveSafeIntegerParameter(
 }
 
 export function getOptionalPositionCode(
-	context: IExecuteFunctions,
+	context: Pick<IExecuteFunctions, 'getNode' | 'getNodeParameter'>,
 	parameterName: string,
 	itemIndex: number,
 ): string | undefined {
 	const value = context.getNodeParameter(parameterName, itemIndex, '');
+	return validateOptionalPositionCode(context, value, itemIndex);
+}
 
+export function validateOptionalPositionCode(
+	context: Pick<IExecuteFunctions, 'getNode'>,
+	value: unknown,
+	itemIndex: number,
+): string | undefined {
 	if (typeof value !== 'string') {
 		throw invalidParameter(
 			context,
@@ -310,20 +317,30 @@ export function getSeason(
 }
 
 export function getSport(
-	context: IExecuteFunctions,
+	context: Pick<IExecuteFunctions, 'getNode' | 'getNodeParameter'>,
 	parameterName: string,
 	itemIndex: number,
+	allowedSports: readonly SleeperSport[] = ['nfl'],
 ): SleeperSport {
-	const sport = getRequiredTrimmedString(context, parameterName, itemIndex, 'Sport');
+	const value = context.getNodeParameter(parameterName, itemIndex, '');
+	return validateSleeperSport(context, value, itemIndex, allowedSports);
+}
 
-	if (sport !== 'nfl') {
+export function validateSleeperSport(
+	context: Pick<IExecuteFunctions, 'getNode'>,
+	value: unknown,
+	itemIndex: number,
+	allowedSports: readonly SleeperSport[],
+): SleeperSport {
+	const sport = validateRequiredTrimmedString(context, value, 'Sport', itemIndex);
+	if (!allowedSports.includes(sport as SleeperSport)) {
 		throw invalidParameter(
 			context,
 			'Unsupported sport',
-			'NFL is the only sport supported by this version of the Sleeper node.',
+			`Choose one of the supported sports: ${allowedSports.join(', ')}.`,
 			itemIndex,
 		);
 	}
 
-	return sport;
+	return sport as SleeperSport;
 }

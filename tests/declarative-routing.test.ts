@@ -26,6 +26,7 @@ function context(parameters: Record<string, unknown>): IExecuteSingleFunctions {
 			parameters: {},
 		}),
 		getNodeParameter: (name: string) => parameters[name],
+		getItemIndex: () => 0,
 	} as unknown as IExecuteSingleFunctions;
 }
 
@@ -151,7 +152,6 @@ describe('routing hooks', () => {
 	});
 
 	it.each([
-		[{ resource: 'sport', operation: 'getState', sport: 'nba' }, 'sport'],
 		[
 			{
 				resource: 'player',

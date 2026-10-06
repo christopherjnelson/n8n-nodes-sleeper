@@ -1,6 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 import { sleeperRoute } from './routing';
+import { sportOptionsForCapability } from '../utils/sports';
 
 export const sportDescription: INodeProperties[] = [
 	{
@@ -18,7 +19,7 @@ export const sportDescription: INodeProperties[] = [
 				name: 'Get State',
 				value: 'getState',
 				action: 'Get sport state',
-				description: 'Retrieve the current Sleeper season and week state for a sport',
+				description: 'Retrieve the current Sleeper season and week state for NFL, NBA, or NHL',
 				routing: sleeperRoute('=/state/{{$parameter.sport}}'),
 			},
 		],
@@ -29,14 +30,9 @@ export const sportDescription: INodeProperties[] = [
 		name: 'sport',
 		type: 'options',
 		required: true,
-		options: [
-			{
-				name: 'NFL',
-				value: 'nfl',
-			},
-		],
+		options: sportOptionsForCapability('state'),
 		default: 'nfl',
-		description: 'The Sleeper sport path value. This release supports NFL only.',
+		description: 'The sport state fields returned by Sleeper vary by sport',
 		displayOptions: {
 			show: {
 				resource: ['sport'],
