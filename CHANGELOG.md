@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- No changes yet.
+- Align template safeguards to baseline 2.2.0: pin the 0.38.0 scanner, add source and release
+  configuration reviews, validate release tags before setup, and isolate local n8n development on
+  port 5690. Preserve the manual trusted-stage release path and record intentional differences.
 
 ## [0.2.1] - 2026-09-08
 

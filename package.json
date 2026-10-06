@@ -32,7 +32,7 @@
 	"scripts": {
 		"build": "n8n-node build",
 		"build:watch": "tsc --watch",
-		"dev": "n8n-node dev",
+		"dev": "node scripts/dev.mjs",
 		"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
 		"lint": "n8n-node lint",
 		"lint:fix": "n8n-node lint --fix",
@@ -44,6 +44,8 @@
 		"validate": "n8n-node lint",
 		"scan:source": "node scripts/scan-source.mjs",
 		"scan:published": "node scripts/scan-published.mjs",
+		"review:source": "node scripts/review-node-source.mjs",
+		"release:check": "node scripts/release-check.mjs",
 		"smoke:load": "pnpm run build && node scripts/node-load-smoke.mjs",
 		"smoke:install": "pnpm run build && node scripts/package-install-smoke.mjs",
 		"smoke:published": "node scripts/published-package-smoke.mjs",
@@ -70,7 +72,7 @@
 	},
 	"devDependencies": {
 		"@n8n/node-cli": "0.46.4",
-		"@n8n/scan-community-package": "0.34.0",
+		"@n8n/scan-community-package": "0.38.0",
 		"@types/node": "22.19.11",
 		"eslint": "9.39.4",
 		"n8n-workflow": "2.32.1",
