@@ -234,7 +234,6 @@ NHL week trigger is included; only the existing NFL Week Changed trigger watches
 The package continues to omit authentication, lineup changes, adds/drops, trades, draft actions,
 league-setting changes, chat, Sleeper Picks, paid contests, player search, single-player lookup,
 composite standings, scoreboards, roster resolution, activity feeds, enrichment, and hidden caching.
-Version `0.3.0` is prepared on this branch but remains unpublished pending release approval.
 
 **Avatar → Get URL** makes a `HEAD` request to the documented CDN URL before emitting it. The
 operation therefore fails when the image is missing or the CDN is unavailable; it emits URL
