@@ -71,25 +71,15 @@ privacy rules.
 
 ### Local development
 
-Clone this repository, install the locked development dependencies, and start the disposable
-development instance on editor port `5690` and task-runner broker port `5691` (the regular n8n
-defaults are `5678` and `5679`):
+Clone this repository, install the locked development dependencies, and run:
 
 ```bash
-mkdir -p .codex-scratch/n8n-dev/tmp
-export TMPDIR="$PWD/.codex-scratch/n8n-dev/tmp"
 pnpm install --frozen-lockfile
-pnpm run dev --custom-user-folder "$PWD/.codex-scratch/n8n-dev"
+npm run dev
 ```
 
-The CLI's `o` browser shortcut still opens `http://localhost:5678`; open `http://localhost:5690`
-manually. If either port is occupied, select another pair explicitly
-with:
-
-```bash
-N8N_PORT=5692 N8N_RUNNERS_BROKER_PORT=5693 \
-	pnpm exec n8n-node dev --custom-user-folder "$PWD/.codex-scratch/n8n-dev"
-```
+Open `http://localhost:5690` manually. The task-runner broker uses port `5691`. The CLI's `o`
+shortcut still targets `5678`.
 
 Do not install development builds into an active n8n service.
 
