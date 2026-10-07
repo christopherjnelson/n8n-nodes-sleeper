@@ -41,7 +41,7 @@
 		"format:write": "prettier --write .",
 		"test": "vitest run && pnpm run test:trigger",
 		"test:unit": "vitest run",
-		"test:trigger": "pnpm run build && node --test --experimental-test-isolation=none test/*.test.cjs",
+		"test:trigger": "pnpm run build && node --test --experimental-test-isolation=none tests/*.test.cjs",
 		"validate": "n8n-node lint",
 		"scan:source": "node scripts/scan-source.mjs",
 		"scan:published": "node scripts/scan-published.mjs",

@@ -7,6 +7,9 @@ const packageMetadata = require('../package.json');
 
 const projectRoot = path.resolve(__dirname, '..');
 const sleeperNodeType = 'n8n-nodes-sleeper.sleeper';
+const packageVersionPattern =
+	'(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?';
+const packageVersion = packageMetadata.version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const allowedOperations = {
 	avatar: new Set(['getUrl']),
 	draft: new Set(['get', 'getManyForLeague', 'getManyForUser']),
@@ -122,15 +125,15 @@ test('README has current release-status sections and every relative link resolve
 	]) {
 		assert.match(readme, new RegExp(`^## ${heading}$`, 'm'));
 	}
-	assert.equal(packageMetadata.version, '0.3.0');
 	assert.match(readme, /npm install n8n-nodes-sleeper$/m);
 	assert.match(readme, /npm install n8n-nodes-sleeper@next/);
-	assert.match(readme, /npm install n8n-nodes-sleeper@0\.3\.0/);
-	assert.match(readme, /NBA\/NHL controls require package version `0\.3\.0` or newer/i);
+	assert.match(readme, new RegExp(`npm install n8n-nodes-sleeper@${packageVersion}`));
+	assert.match(
+		readme,
+		/NBA\/NHL (?:controls|operations) require package version\s+`0\.3\.0` or newer/i,
+	);
 	assert.match(readme, /Settings → Community Nodes/);
-	assert.match(readme, /Confirm that the installed version is\s+`0\.3\.0` or newer/i);
 	assert.match(readme, /currently approved Cloud version may lag npm/i);
-	assert.doesNotMatch(readme, /`0\.2\.0` is available directly in n8n Cloud/i);
 	assert.match(
 		readme,
 		/Draft Pick Made[\s\S]*Transaction\s+Created or Updated[\s\S]*League Status\s+Changed[\s\S]*NFL Week Changed/,
@@ -149,22 +152,49 @@ test('README has current release-status sections and every relative link resolve
 test('community-testing documentation and structured issue forms remain complete', () => {
 	const guide = read('docs/community-testing.md');
 	for (const heading of [
-		'Latest published release under test',
+		'Latest published release',
 		'Installation methods',
 		'Requested test coverage',
 		'Privacy and test-data rules',
-		'Known limitations',
+		'Candidate coverage and limitations',
 		'Success criteria',
 	]) {
 		assert.match(guide, new RegExp(`^## ${heading}$`, 'm'));
 	}
+	const statusHeading = guide.match(/^## [^\n]*status[^\n]* — checked \d{4}-\d{2}-\d{2}$/im);
+	assert.ok(statusHeading, 'community guide needs a dated current status section');
+	const statusStart = guide.indexOf(statusHeading[0]) + statusHeading[0].length;
+	const nextHeading = guide.indexOf('\n## ', statusStart);
+	const currentGuideStatus = guide.slice(statusStart, nextHeading < 0 ? undefined : nextHeading);
+	assert.ok(currentGuideStatus.includes(packageMetadata.version));
+	assert.match(currentGuideStatus, /\[manual testing\]\(manual-testing\.md\)/);
 	assert.match(guide, /18 direct operations across 14 resources/);
 	assert.match(guide, /n8n-nodes-sleeper@next/);
-	assert.match(guide, /not yet published, merged, or available through npm/i);
 	assert.match(guide, /private vulnerability reporting/);
 	assert.match(guide, /Status: stable\/default release on npm/);
-	assert.match(guide, /Creator Portal and n8n Cloud updates for `0\.2\.1` remain separate/);
-	assert.match(guide, /npm `latest → 0\.2\.1` and `next → 0\.2\.0`/);
+	const publishedStableVersion = guide.match(
+		new RegExp(`Stable version: \`(${packageVersionPattern})\``),
+	)?.[1];
+	assert.ok(publishedStableVersion, 'community guide needs a valid published stable version');
+	assert.match(
+		guide,
+		new RegExp(`Exact selector: \`n8n-nodes-sleeper@${publishedStableVersion}\``),
+	);
+	assert.match(guide, /Creator Portal and n8n Cloud updates for `\d+\.\d+\.\d+` remain separate/);
+	assert.match(
+		guide,
+		new RegExp(
+			`Distribution: npm \`latest → ${packageVersionPattern}\` and \`next → ${packageVersionPattern}\``,
+		),
+	);
+	assert.match(
+		guide,
+		/These selectors describe the last verified published registry state, checked on \d{4}-\d{2}-\d{2}\./,
+	);
+	assert.match(
+		guide,
+		/Confirm\s+the registry before installing because\s+tags can change independently/,
+	);
 	assert.match(guide, /^## 0\.2\.1 stable release$/m);
 	assert.match(guide, /^## 0\.2\.0 stable release$/m);
 	assert.match(guide, /Naturally occurring events[\s\S]*not a\s+condition for installing/i);
@@ -255,32 +285,51 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(plan, /Phase 1B — Transaction Created or Updated ✅ implementation complete/);
 	assert.match(plan, /Phase 1C — League Status Changed ✅ implementation complete/);
 	assert.match(plan, /Phase 1D — NFL Week Changed ✅ implementation complete/);
-	assert.match(plan, /All four Phase 1 events are implementation-complete/);
-	assert.match(plan, /Phase 2,\s+Phase 3, and Phase 4 remain future work/);
+	assert.match(plan, /^Historical plan for version 0\.2\.0\./m);
+	assert.match(
+		plan,
+		/All four Phase 1 events were implementation-complete and publicly available in stable npm `0\.2\.0`/,
+	);
+	assert.match(plan, /Phase 2, Phase 3, and Phase 4 remained future work at\s+this checkpoint\./);
 	assert.match(plan, /publicly available in stable npm `0\.2\.0`/);
 	assert.match(plan, /does not add current-week lookup, filters,\s+backend webhooks/);
 
 	const readiness = read('docs/release-readiness.md');
-	assert.match(readiness, /^## Current project status — 2026-09-08$/m);
-	assert.match(readiness, /^## 0\.2\.1 post-publication checkpoint — 2026-09-08$/m);
-	assert.match(readiness, /34193865267/);
-	assert.match(readiness, /0aea958390dbcbd31642bef1e8ba8c9b2177db42/);
-	assert.match(readiness, /^## 0\.2\.0 post-publication checkpoint — 2026-08-08$/m);
-	assert.match(readiness, /fe410fd6e5d87a29a15978ef051d0f6c7ed855fa/);
-	assert.match(readiness, /passed 182 tests/);
-	assert.match(readiness, /`next → 0\.2\.0`/);
-	assert.match(readiness, /`latest → 0\.2\.1`/);
-	assert.match(readiness, /^## 0\.2\.0 stable-promotion checkpoint — 2026-08-08$/m);
-	assert.match(readiness, /release ID `367310296`/);
-	assert.match(readiness, /19977e8a69f5dcd5d655bb201caa9d48e00dd74bd7d652428bc1311536018c16/);
-	assert.match(readiness, /dated sections below are preserved as historical checkpoint evidence/);
-	assert.match(readiness, /Historical checkpoint: Phase 2B-4/);
+	assert.match(readiness, /^## Current status — \d{4}-\d{2}-\d{2}$/m);
+	const currentStatus = readiness.split('\n## Historical records')[0];
+	assert.ok(currentStatus.includes(packageMetadata.version));
+	assert.match(
+		readiness,
+		new RegExp(
+			`Current verified published selectors remain \`latest → ${packageVersionPattern}\` and \`next → ${packageVersionPattern}\``,
+		),
+	);
+	assert.match(readiness, /Check npm\s+before relying on these tags/);
+	assert.match(readiness, /\[the release history\]\(archive\/release-history\.md\)/);
+	assert.doesNotMatch(readiness, /34193865267|0aea958390dbcbd31642bef1e8ba8c9b2177db42|367310296/);
+	const history = read('docs/archive/release-history.md');
+	assert.match(history, /^## Historical project status — 2026-09-08$/m);
+	assert.match(history, /^## 0\.2\.1 post-publication checkpoint — 2026-09-08$/m);
+	assert.match(history, /34193865267/);
+	assert.match(history, /0aea958390dbcbd31642bef1e8ba8c9b2177db42/);
+	assert.match(history, /^## 0\.2\.0 post-publication checkpoint — 2026-08-08$/m);
+	assert.match(history, /fe410fd6e5d87a29a15978ef051d0f6c7ed855fa/);
+	assert.match(history, /passed 182 tests/);
+	assert.match(history, /`next → 0\.2\.0`/);
+	assert.match(history, /`latest → 0\.2\.1`/);
+	assert.match(history, /^## 0\.2\.0 stable-promotion checkpoint — 2026-08-08$/m);
+	assert.match(history, /release ID `367310296`/);
+	assert.match(history, /19977e8a69f5dcd5d655bb201caa9d48e00dd74bd7d652428bc1311536018c16/);
+	assert.match(history, /Historical checkpoint: Phase 2B-4/);
 
 	const releasing = read('docs/releasing.md');
 	assert.match(
 		releasing,
-		/npm currently maps `next` to `0\.2\.0`\s+and `latest` to stable `0\.2\.1`/,
+		new RegExp(
+			`npm was last verified on \\d{4}-\\d{2}-\\d{2}[\\s\\S]*with \`next\` at \`${packageVersionPattern}\` and \`latest\` at stable \`${packageVersionPattern}\``,
+		),
 	);
+	assert.match(releasing, /Confirm the live registry before relying on\s+those selectors/);
 });
 
 test('package files intentionally exclude source, tests, examples, and release documentation', () => {

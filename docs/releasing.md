@@ -99,9 +99,10 @@ scanner's explicit success text. Other failures are terminal.
 ## Dist-tag policy
 
 Future prerelease and community-testing versions use `next`. Use `latest` only after explicit
-stable-release approval; never promote a prerelease silently. npm currently maps `next` to `0.2.0`
-and `latest` to stable `0.2.1`. No dist-tag should be
-mutated without an explicitly approved release or promotion task.
+stable-release approval; never promote a prerelease silently. npm was last verified on 2026-10-07
+with `next` at `0.2.0` and `latest` at stable `0.2.1`. Confirm the live registry before relying on
+those selectors. No dist-tag should be mutated without an explicitly approved release or promotion
+task. As of 2026-10-07, the merged `0.3.0` source is unpublished.
 
 ## Template homepage divergence
 

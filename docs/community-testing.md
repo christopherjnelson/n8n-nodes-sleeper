@@ -1,10 +1,10 @@
 # Community testing
 
-## Candidate under preparation
+## Source candidate status — checked 2026-10-07
 
-This source branch prepares `0.3.0` with NBA/NHL operation-specific support. It is not yet published, merged, or available through npm. After release approval, update this guide with the exact published version and verified installation selectors. The latest completed editor smoke documented here is for published `0.2.1` and does not cover the new sports.
+The `0.3.0` source is merged and its packed candidate has completed supervised editor and public-API checks. Owner testing is ongoing. It remains unpublished: a new npm install still resolves the published `0.2.1` stable package unless the registry changes after this guide was updated. The candidate adds operation-specific NBA/NHL support; see [manual testing](manual-testing.md) for the local editor walkthrough. Do not treat source checks as a claim that the candidate is available in npm, n8n Cloud, or the Creator Portal.
 
-## Latest published release under test
+## Latest published release
 
 - Package: `n8n-nodes-sleeper`
 - Stable version: `0.2.1`
@@ -17,6 +17,9 @@ This source branch prepares `0.3.0` with NBA/NHL operation-specific support. It 
 - Distribution: npm `latest → 0.2.1` and `next → 0.2.0`; the default installer receives `0.2.1`.
   Creator Portal and n8n Cloud updates for `0.2.1` remain separate owner-managed steps and are not
   claimed complete.
+
+These selectors describe the last verified published registry state, checked on 2026-10-07. Confirm
+the registry before installing because tags can change independently of this repository.
 
 ## 0.2.1 stable release
 
@@ -114,15 +117,16 @@ Report security issues through
 [private vulnerability reporting](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/advisories/new),
 not a public issue.
 
-## Known limitations
+## Candidate coverage and limitations
 
-- This branch prepares operation-specific support: NFL/NBA/NHL player catalog, NFL/NBA trending, NFL/NBA observed seasonal user listings, and NFL/NBA/NHL state. Published `0.2.1` remains NFL-focused until a later package is approved and published.
+- The unpublished `0.3.0` source supports the NFL/NBA/NHL player catalog, NFL/NBA trending, observed NFL/NBA seasonal user listings, and NFL/NBA/NHL state. Published `0.2.1` remains NFL-focused until a later package is approved and published.
 - Stable/default `0.2.1` includes all four trigger events.
 - NHL Position is hidden and nonempty stale values fail locally because tested NHL position filters returned empty results. NHL trending and NHL seasonal user league/draft support are not advertised. NBA seasonal listings are live-observed despite Sleeper documentation still saying NFL only.
 - **Player → Get Many** can return a large map. NHL state omits `leg` and `league_season`; no missing field is inferred. NBA transaction rounds are explicit and are not auto-selected from state. The existing NFL Week Changed trigger remains NFL-specific; no NBA/NHL week trigger was added. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
-- Two reviewed moderate development-only alerts remain through upstream n8n tooling (`uuid` and
-  `stream-json`). Neither is a runtime dependency or enters the published tarball.
+- The 2026-10-06 lockfile snapshot reported 27 open Dependabot alerts, all development-only. Consult
+  the live [Dependabot dashboard](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/dependabot)
+  for current counts; these counts are a dated observation, not current alert status.
 - The published npm tags described in the dated `0.2.1` release section remain historical until the `0.3.0` candidate is explicitly approved and published. Do not use those selectors as evidence of candidate availability.
 
 ## Success criteria
