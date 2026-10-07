@@ -156,7 +156,7 @@ test('community-testing documentation and structured issue forms remain complete
 		'Installation methods',
 		'Requested test coverage',
 		'Privacy and test-data rules',
-		'Candidate coverage and limitations',
+		'Coverage and limitations',
 		'Success criteria',
 	]) {
 		assert.match(guide, new RegExp(`^## ${heading}$`, 'm'));
@@ -184,12 +184,12 @@ test('community-testing documentation and structured issue forms remain complete
 	assert.match(
 		guide,
 		new RegExp(
-			`Distribution: npm \`latest → ${packageVersionPattern}\` and \`next → ${packageVersionPattern}\``,
+			`Distribution: npm \`latest → ${publishedStableVersion}\` and \`next → ${packageVersionPattern}\``,
 		),
 	);
 	assert.match(
 		guide,
-		/These selectors describe the last verified published registry state, checked on \d{4}-\d{2}-\d{2}\./,
+		/These selectors describe the verified published registry state, checked on \d{4}-\d{2}-\d{2} after the\s+`[^`]+` release\./,
 	);
 	assert.match(
 		guide,
@@ -300,14 +300,17 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.ok(currentStatus.includes(packageMetadata.version));
 	assert.match(
 		readiness,
-		new RegExp(
-			`Current verified published selectors remain \`latest → ${packageVersionPattern}\` and \`next → ${packageVersionPattern}\``,
-		),
+		/Current verified published selectors are `latest → \d+\.\d+\.\d+` and `next → \d+\.\d+\.\d+`/,
 	);
-	assert.match(readiness, /Check npm\s+before relying on these tags/);
+	assert.match(readiness, /checked on\s+2026-10-07 after publication/);
 	assert.match(readiness, /\[the release history\]\(archive\/release-history\.md\)/);
 	assert.doesNotMatch(readiness, /34193865267|0aea958390dbcbd31642bef1e8ba8c9b2177db42|367310296/);
 	const history = read('docs/archive/release-history.md');
+	assert.match(history, /^## \d+\.\d+\.\d+ post-publication checkpoint — 2026-10-07$/m);
+	assert.match(
+		history,
+		/completed quality,\s+publish, verify-published, and GitHub Release jobs successfully/,
+	);
 	assert.match(history, /^## Historical project status — 2026-09-08$/m);
 	assert.match(history, /^## 0\.2\.1 post-publication checkpoint — 2026-09-08$/m);
 	assert.match(history, /34193865267/);
@@ -323,15 +326,15 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(history, /Historical checkpoint: Phase 2B-4/);
 
 	const releasing = read('docs/releasing.md');
+	assert.match(releasing, /Verified v0\.3\.0 direct publication — 2026-10-07/);
+	assert.match(releasing, /Package n8n-nodes-sleeper@0\.3\.0 has passed all security checks/);
 	assert.match(
 		releasing,
-		new RegExp(
-			`npm was last verified on \\d{4}-\\d{2}-\\d{2}[\\s\\S]*with \`next\` at \`${packageVersionPattern}\`\\s+and \`latest\` at stable \`${packageVersionPattern}\``,
-		),
+		/Before `0\.3\.0` publication, npm's 2026-10-07 selector\s+snapshot was `next → 0\.2\.0` and `latest → 0\.2\.1`; the snapshot is historical\./,
 	);
 	assert.match(
 		releasing,
-		/Those selectors are dated registry evidence and must be checked\s+live before relying on them/,
+		/After the verified\s+release, npm selectors were `latest → \d+\.\d+\.\d+` and `next → \d+\.\d+\.\d+`/,
 	);
 });
 

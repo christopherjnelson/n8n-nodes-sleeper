@@ -1,25 +1,37 @@
 # Community testing
 
-## Source candidate status — checked 2026-10-07
+## Publication status — checked 2026-10-07
 
-The `0.3.0` source is merged and its packed candidate has completed supervised editor and public-API checks. Owner testing is ongoing. It remains unpublished: a new npm install still resolves the published `0.2.1` stable package unless the registry changes after this guide was updated. The candidate adds operation-specific NBA/NHL support; see [manual testing](manual-testing.md) for the local editor walkthrough. Do not treat source checks as a claim that the candidate is available in npm, n8n Cloud, or the Creator Portal.
+Stable version `0.3.0` is published on npm. It adds operation-specific NBA/NHL support; see
+[manual testing](manual-testing.md) for the dated local editor walkthrough. The npm release and
+published-package checks are complete; Creator Portal and n8n Cloud availability remain separate
+owner-managed steps and are not claimed here.
 
 ## Latest published release
 
 - Package: `n8n-nodes-sleeper`
-- Stable version: `0.2.1`
+- Stable version: `0.3.0`
 - Default selector: `n8n-nodes-sleeper`
 - Secondary selector: `n8n-nodes-sleeper@next`
-- Exact selector: `n8n-nodes-sleeper@0.2.1`
+- Exact selector: `n8n-nodes-sleeper@0.3.0`
 - Status: stable/default release on npm; ongoing self-hosted compatibility testing is welcome
 - Coverage: 18 direct operations across 14 resources and four Phase 1 trigger events
-- Scope of published `0.2.1`: read-only NFL-focused public Sleeper data with no credentials
-- Distribution: npm `latest → 0.2.1` and `next → 0.2.0`; the default installer receives `0.2.1`.
-  Creator Portal and n8n Cloud updates for `0.2.1` remain separate owner-managed steps and are not
+- Scope of published `0.3.0`: read-only NFL/NBA/NHL actions and four polling triggers, with no
+  credentials
+- Distribution: npm `latest → 0.3.0` and `next → 0.2.0`; the default installer receives `0.3.0`.
+  Creator Portal and n8n Cloud updates for `0.3.0` remain separate owner-managed steps and are not
   claimed complete.
 
-These selectors describe the last verified published registry state, checked on 2026-10-07. Confirm
-the registry before installing because tags can change independently of this repository.
+These selectors describe the verified published registry state, checked on 2026-10-07 after the
+`0.3.0` release. Confirm the registry before installing because tags can change independently of
+this repository.
+
+## 0.3.0 stable release
+
+Version `0.3.0` extends the read-only actions to bounded NBA/NHL support, retains the existing four
+polling triggers, and preserves unsafe opaque IDs exactly. The direct OIDC publication, provenance,
+published-package scanner, and package install/load verification passed in release run
+`37698692473`.
 
 ## 0.2.1 stable release
 
@@ -45,12 +57,12 @@ install a community node, and enter:
 n8n-nodes-sleeper
 ```
 
-The normal installer resolves stable version `0.2.1` because npm's `latest` tag points to `0.2.1`.
+The normal installer resolves stable version `0.3.0` because npm's `latest` tag points to `0.3.0`.
 
 ### n8n Cloud
 
 Search for **Sleeper** in the node picker or canvas. Creator Portal submission and n8n Cloud
-availability for `0.2.1` have not been verified and remain separate owner-managed steps. Confirm
+availability for `0.3.0` have not been verified and remain separate owner-managed steps. Confirm
 the installed version before relying on current action or trigger behavior.
 
 ### npm testing
@@ -61,14 +73,14 @@ The retained secondary tag remains on the earlier testing artifact:
 npm install n8n-nodes-sleeper@next
 ```
 
-This selector resolves to `0.2.0`; npm `latest` resolves to stable `0.2.1`.
+This selector resolves to `0.2.0`; npm `latest` resolves to stable `0.3.0`.
 
 ### Exact-version testing
 
 For reproducible testing, pin the exact public version:
 
 ```bash
-npm install n8n-nodes-sleeper@0.2.1
+npm install n8n-nodes-sleeper@0.3.0
 ```
 
 ## Requested test coverage
@@ -117,17 +129,17 @@ Report security issues through
 [private vulnerability reporting](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/advisories/new),
 not a public issue.
 
-## Candidate coverage and limitations
+## Coverage and limitations
 
-- The unpublished `0.3.0` source supports the NFL/NBA/NHL player catalog, NFL/NBA trending, observed NFL/NBA seasonal user listings, and NFL/NBA/NHL state. Published `0.2.1` remains NFL-focused until a later package is approved and published.
-- Stable/default `0.2.1` includes all four trigger events.
+- Published `0.3.0` supports the NFL/NBA/NHL player catalog, NFL/NBA trending, observed NFL/NBA seasonal user listings, and NFL/NBA/NHL state.
+- Published `0.3.0` includes all four trigger events. The earlier stable `0.2.1` package remains NFL-focused.
 - NHL Position is hidden and nonempty stale values fail locally because tested NHL position filters returned empty results. NHL trending and NHL seasonal user league/draft support are not advertised. NBA seasonal listings are live-observed despite Sleeper documentation still saying NFL only.
 - **Player → Get Many** can return a large map. NHL state omits `leg` and `league_season`; no missing field is inferred. NBA transaction rounds are explicit and are not auto-selected from state. The existing NFL Week Changed trigger remains NFL-specific; no NBA/NHL week trigger was added. Use server-side filters, avoid unnecessary
   polling, and generally fetch the full player map no more than once daily.
 - The 2026-10-06 lockfile snapshot reported 27 open Dependabot alerts, all development-only. Consult
   the live [Dependabot dashboard](https://github.com/christopherjnelson/n8n-nodes-sleeper/security/dependabot)
   for current counts; these counts are a dated observation, not current alert status.
-- The published npm tags described in the dated `0.2.1` release section remain historical until the `0.3.0` candidate is explicitly approved and published. Do not use those selectors as evidence of candidate availability.
+- The npm tags recorded in the dated `0.2.1` release section are historical; the current verified selectors are listed above.
 
 ## Success criteria
 
@@ -140,4 +152,4 @@ Ongoing compatibility confidence benefits from feedback demonstrating:
 - no unresolved high-severity release blocker
 
 These are ongoing testing goals, not claims about tester counts already achieved or gates on the
-completed stable promotion.
+completed stable release.

@@ -1,9 +1,10 @@
 # Manual editor smoke test
 
-This guide covers the merged `0.3.0` source candidate in the local n8n editor. The packed-package
-and public API smoke ran on n8n 2.41.6 on 2026-10-06; a separate picker-label check ran on n8n
-2.42.4 on 2026-10-07. It does not install an npm release or establish that future Sleeper events
-will occur. Use public Sleeper endpoints; the node needs no credentials.
+This guide records local editor checks for the packed `0.3.0` package. The packed-package and
+public API smoke ran on n8n 2.41.6 on 2026-10-06; a separate picker-label check ran on n8n 2.42.4
+on 2026-10-07. These editor checks used a local package and do not establish npm installation,
+Creator Portal listing, n8n Cloud availability, or that future Sleeper events will occur. Use
+public Sleeper endpoints; the node needs no credentials.
 
 ## Open the editor
 
