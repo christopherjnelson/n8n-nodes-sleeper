@@ -247,7 +247,8 @@ and bounded player queries; do not ask an agent to infer private or unknown iden
 ## Compatibility
 
 - Package engine: Node.js 22.22.0 or newer
-- Earlier isolated UI baseline: n8n 2.32.7; the 0.3.0 package smoke used n8n 2.41.6
+- Earlier isolated UI baseline: n8n 2.32.7
+- Final 0.3.0 packed-package runtime smoke: n8n 2.42.4 on Node.js 24.18.0 (2026-10-07)
 - Node-picker summary check: n8n 2.42.4 on 2026-10-07
 - Development CLI: `@n8n/node-cli` 0.46.4
 - Development package manager: pnpm 11.15.0
