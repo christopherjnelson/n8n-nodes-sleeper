@@ -100,9 +100,56 @@ describe('operation-specific sport support', () => {
 			).map((option) => option.value),
 		).toEqual(['nfl', 'nba']);
 		const positions = properties().filter((property) => property.name === 'position');
-		expect(positions).toHaveLength(2);
-		const visiblePosition = positions.find((property) => property.type === 'string');
-		expect(visiblePosition?.displayOptions?.show?.sport).toEqual(['nfl', 'nba']);
+		expect(positions).toHaveLength(3);
+		const nflPosition = positions.find(
+			(property) =>
+				property.type === 'options' && property.displayOptions?.show?.sport?.includes('nfl'),
+		);
+		const nbaPosition = positions.find(
+			(property) =>
+				property.type === 'options' && property.displayOptions?.show?.sport?.includes('nba'),
+		);
+		expect(nflPosition?.displayOptions?.show?.sport).toEqual(['nfl']);
+		expect(nflPosition?.default).toBe('');
+		expect(nflPosition?.routing?.request?.qs).toEqual({
+			position: '={{$value.trim() || undefined}}',
+		});
+		expect(
+			(nflPosition?.options as INodePropertyOptions[]).map((option) => option.value).sort(),
+		).toEqual(
+			[
+				'',
+				'DB',
+				'DEF',
+				'DL',
+				'K',
+				'K/P',
+				'LB',
+				'LEO',
+				'LS',
+				'OG',
+				'OL',
+				'OT',
+				'P',
+				'QB',
+				'RB',
+				'TE',
+				'WR',
+			].sort(),
+		);
+		expect(nbaPosition?.displayOptions?.show?.sport).toEqual(['nba']);
+		expect(nbaPosition?.default).toBe('');
+		expect(
+			(nbaPosition?.options as INodePropertyOptions[]).map((option) => option.value).sort(),
+		).toEqual(['', 'C', 'DEF', 'PF', 'PG', 'SF', 'SG'].sort());
+		for (const visiblePosition of [nflPosition, nbaPosition]) {
+			expect(
+				(visiblePosition?.options as INodePropertyOptions[]).find((option) => option.value === ''),
+			).toMatchObject({ name: 'All Positions', value: '' });
+			expect(visiblePosition?.routing?.request?.qs).toEqual({
+				position: '={{$value.trim() || undefined}}',
+			});
+		}
 		const hiddenPosition = positions.find((property) => property.type === 'hidden');
 		expect(hiddenPosition?.displayOptions?.show?.sport).toEqual(['nhl']);
 		expect(hiddenPosition?.routing).toBeUndefined();
@@ -280,6 +327,44 @@ describe('operation-specific sport support', () => {
 				{ url: '/players' } as never,
 			),
 		).resolves.toBeDefined();
+	});
+
+	it('preserves saved NFL/NBA position expressions and unknown legacy values without enum validation', async () => {
+		const sleeperDescription = new Sleeper().description;
+		for (const { sport, position } of [
+			{ sport: 'nfl', position: '={{ "QB" }}' },
+			{ sport: 'nba', position: '={{ "PG" }}' },
+			{ sport: 'nfl', position: 'XFL' },
+		]) {
+			const normalized = NodeHelpers.getNodeParameters(
+				sleeperDescription.properties,
+				{
+					resource: 'player',
+					operation: 'getMany',
+					sport,
+					position,
+					outputMode: 'singleMap',
+				} as INodeParameters,
+				true,
+				false,
+				{ typeVersion: 1 },
+				sleeperDescription,
+			);
+			expect(normalized?.position).toBe(position);
+		}
+		const request = { url: '/players/nfl', qs: { position: 'XFL' } } as never;
+		await expect(
+			validateSleeperRequest.call(
+				context({
+					resource: 'player',
+					operation: 'getMany',
+					sport: 'nfl',
+					position: 'XFL',
+					outputMode: 'singleMap',
+				}),
+				request,
+			),
+		).resolves.toBe(request);
 	});
 });
 

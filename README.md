@@ -91,26 +91,26 @@ No credentials are required. The node uses Sleeper's public, read-only API and C
 
 ## Operations
 
-| Resource          | Operation           | Required inputs                            | Optional inputs | Output shape                                       |
-| ----------------- | ------------------- | ------------------------------------------ | --------------- | -------------------------------------------------- |
-| User              | Get                 | Username or User ID                        | —               | One raw user object                                |
-| League            | Get                 | League ID                                  | —               | One raw league object                              |
-| League            | Get Many for User   | User ID, Sport, Season                     | —               | One item per league; an empty array emits no items |
-| League User       | Get Many            | League ID                                  | —               | One raw participating-user item                    |
-| Roster            | Get Many            | League ID                                  | —               | One raw roster item                                |
-| Matchup           | Get Many            | League ID, Week                            | —               | One raw item per roster side                       |
-| Transaction       | Get Many            | League ID, Round or Week                   | —               | One raw transaction item                           |
-| Playoff           | Get Bracket         | League ID, Bracket Type                    | —               | One raw bracket-matchup item                       |
-| Traded Pick       | Get Many            | League ID                                  | —               | One league-scoped traded-pick item                 |
-| Draft             | Get                 | Draft ID                                   | —               | One raw draft object                               |
-| Draft             | Get Many for League | League ID                                  | —               | One raw item per associated draft                  |
-| Draft             | Get Many for User   | User ID, NFL/NBA, Season                   | —               | One item per user draft                            |
-| Draft Pick        | Get Many            | Draft ID                                   | —               | One raw item per recorded pick                     |
-| Draft Traded Pick | Get Many            | Draft ID                                   | —               | One draft-scoped traded-pick item                  |
-| Player            | Get Many            | Sport, Active Only, Output Mode            | Position        | One keyed map or one item per player-map entry     |
-| Player            | Get Trending        | NFL/NBA, Trend Type, Lookback Hours, Limit | —               | One raw player-ID/count item                       |
-| Sport             | Get State           | NFL, NBA, or NHL                           | —               | One raw sport-specific state object                |
-| Avatar            | Get URL             | Avatar ID, Image Size                      | —               | One validated `{ avatar_id, size, url }` object    |
+| Resource          | Operation           | Required inputs                            | Optional inputs                                                                                      | Output shape                                       |
+| ----------------- | ------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| User              | Get                 | Username or User ID                        | —                                                                                                    | One raw user object                                |
+| League            | Get                 | League ID                                  | —                                                                                                    | One raw league object                              |
+| League            | Get Many for User   | User ID, Sport, Season                     | —                                                                                                    | One item per league; an empty array emits no items |
+| League User       | Get Many            | League ID                                  | —                                                                                                    | One raw participating-user item                    |
+| Roster            | Get Many            | League ID                                  | —                                                                                                    | One raw roster item                                |
+| Matchup           | Get Many            | League ID, Week                            | —                                                                                                    | One raw item per roster side                       |
+| Transaction       | Get Many            | League ID, Round or Week                   | —                                                                                                    | One raw transaction item                           |
+| Playoff           | Get Bracket         | League ID, Bracket Type                    | —                                                                                                    | One raw bracket-matchup item                       |
+| Traded Pick       | Get Many            | League ID                                  | —                                                                                                    | One league-scoped traded-pick item                 |
+| Draft             | Get                 | Draft ID                                   | —                                                                                                    | One raw draft object                               |
+| Draft             | Get Many for League | League ID                                  | —                                                                                                    | One raw item per associated draft                  |
+| Draft             | Get Many for User   | User ID, NFL/NBA, Season                   | —                                                                                                    | One item per user draft                            |
+| Draft Pick        | Get Many            | Draft ID                                   | —                                                                                                    | One raw item per recorded pick                     |
+| Draft Traded Pick | Get Many            | Draft ID                                   | —                                                                                                    | One draft-scoped traded-pick item                  |
+| Player            | Get Many            | Sport, Active Only, Output Mode            | Position; collection: Team, Has Team, Player IDs, Output Fields; Return All/Limit; Sort By/Direction | One keyed map or one item per player-map entry     |
+| Player            | Get Trending        | NFL/NBA, Trend Type, Lookback Hours, Limit | —                                                                                                    | One raw player-ID/count item                       |
+| Sport             | Get State           | NFL, NBA, or NHL                           | —                                                                                                    | One raw sport-specific state object                |
+| Avatar            | Get URL             | Avatar ID, Image Size                      | —                                                                                                    | One validated `{ avatar_id, size, url }` object    |
 
 Usernames can change. Save the stable `user_id` returned by **User → Get** for later user
 lookups. League and draft IDs are opaque strings and must not be converted to numbers.
@@ -158,10 +158,36 @@ server-side fantasy-position filter for NFL and NBA. Tested NHL position filters
 empty response, so Position is hidden and stale nonempty NHL values fail before a request. Sleeper
 documents no single-player endpoint.
 
+NFL and NBA Position use a static dropdown with readable names and Sleeper codes, including
+Quarterback (`QB`) and Point Guard (`PG`); the default choice is **All Positions** (empty query
+value). NFL choices are DB (defensive
+back), DEF (team defense), DL (defensive line), K (kicker), K/P (kicker/punter), LB (linebacker),
+LEO, LS (long snapper), OG (offensive guard), OL (offensive line), OT (offensive tackle), P
+(punter), QB, RB (running back), TE (tight end), and WR (wide receiver). NBA choices are C
+(center), DEF (team entry), PF (power forward), PG (point guard), SF (small forward), and SG
+(shooting guard). Saved expressions remain intact when changing sports. To clear a stale NHL
+Position, switch to NFL or NBA, choose **All Positions**, then switch back to NHL. NHL keeps
+Position hidden and rejects any stale nonempty saved value locally.
+
 **Single Map**, the default, emits the keyed object as one n8n item. **One Item per Player**
 preserves each raw player object and map order, adding the string map key as `player_id` only
 when that field is absent. The node performs no caching, deduplication, or static-data storage.
 For repeated lookups, fetch a bounded dataset on a schedule and store it externally.
+
+The optional **Team**, **Has Team**, **Player IDs**, and **Output Fields** controls are in the
+player-options collection. They filter or project the fetched map locally; team matching ignores
+case, player IDs are comma-separated exact map keys, and `Has Team` is off unless explicitly set
+to true. **Output Fields** accepts comma-separated flat field names; blank keeps all fields.
+Projection runs for both output modes and always retains `player_id`, falling back to the exact
+map key if the player object has no ID. **Return All** defaults to true; when disabled, **Limit**
+defaults to 50. The top-level **Sort By** control can use `full_name`, `team`, `position`, or
+`player_id`, with ascending order by default. Sorting applies only to **One Item per Player** and
+follows the native map-entry order when no sort is selected.
+
+The node applies filters, then sort, then limit, then field projection. These controls run
+locally after the player map is fetched; they do not reduce the API response downloaded from
+Sleeper. They reduce the saved execution history and downstream items. Active and supported
+position filters remain server-side. Position remains hidden and locally rejected for NHL.
 
 ## Trending players and attribution
 

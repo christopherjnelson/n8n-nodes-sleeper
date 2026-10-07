@@ -87,10 +87,43 @@ returned; it must not be rounded or changed to a JSON number.
 These are observed fixture results, not stable contracts or endorsements. Avoid sharing returned
 user names, league names, or full execution data in public reports.
 
-For NBA **Player → Get Many**, test Position `PG` and confirm it filters the `fantasy_positions`
-array. A player whose primary `position` is `SG` can still match if `fantasy_positions` includes
-`PG`; this control does not mean primary-position-only. Test the output in both Single Map and One
-Item per Player modes if both are relevant to your workflow.
+For **Player → Get Many**, use NFL, NBA, and NHL. Check both Single Map and One Item per Player.
+On NFL, confirm the Position dropdown defaults to **All Positions** and offers readable labels
+paired with Sleeper codes, including Quarterback (`QB`). On NBA, inspect the Point Guard (`PG`)
+and team entry (`DEF`) choices. Position `PG` filters the `fantasy_positions` array; a player
+whose primary `position` is `SG` can still match if that array includes `PG`, so this control is
+not primary-position-only. Enter a
+saved Position expression, switch between NFL and NBA, and confirm the expression remains intact.
+NHL supports Active Only but not Position.
+
+Check local output controls on an NFL or NBA catalog response:
+
+1. Before changing anything, confirm Return All is enabled and the output mode defaults to Single
+   Map. Sort By is presented as `None` by default. The optional player-options collection is not
+   added by default; open **Add Option** to add Team, Has Team, Player IDs, and Output Fields.
+2. Add Team and Has Team. Clear Team before checking Has Team: Team matching already excludes
+   null/empty team values. With Team clear, set Has Team to false and confirm unteamed players
+   remain; set it to true and confirm they are excluded. Leaving Has Team unset should not filter.
+3. Set Team to a team abbreviation and confirm matching ignores case. Enter two comma-separated
+   Player IDs. Confirm only exact map keys match, then enter an
+   unknown ID and confirm zero output items (or an empty keyed map in Single Map mode).
+4. Add Output Fields and enter `player_id,full_name,team,position,fantasy_positions,status`.
+   Confirm these fields are projected and `player_id` is retained. Blank Output Fields retains all
+   fields. If a selected player object lacks `player_id`, confirm the output uses its exact map key.
+5. Use an NBA recipe with no Position filter, Has Team true, the Output Fields above, One Item per
+   Player, Sort By `Full Name`, ascending direction, and Limit 25. Confirm 25 projected results,
+   sorted by full name. Sorting applies only to split items; `None` preserves native map order.
+   Return All defaults to true; disabling it without setting Limit uses the default limit of 50.
+6. Repeat the recipe for NHL without Position. Confirm the same local filters/projection work.
+   Combine filters and sorting with a limit and projection to confirm the processing order is
+   filters, sort, limit, then projection. These controls run after download and reduce saved
+   execution history and downstream items, not API fetch or download size.
+
+For NHL, confirm a nonempty saved Position value still fails locally before an HTTP request,
+including when the value is stale/hidden in the editor. To clear it, switch to NFL or NBA, select
+**All Positions**, then switch back to NHL; confirm the unfiltered or active-filtered catalog
+succeeds. Do not treat local Team, Has Team, Player IDs, Output Fields,
+or Limit settings as reducing the NHL response downloaded from Sleeper.
 
 For NHL, confirm **Sport → Get State** returns one raw state object, and **Player → Get Many**
 works without Position. A saved nonempty NHL Position is

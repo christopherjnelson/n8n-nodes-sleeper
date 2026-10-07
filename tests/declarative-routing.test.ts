@@ -16,7 +16,7 @@ function operations(properties: INodeProperties[]) {
 		.flatMap((property) => property.options ?? []) as INodePropertyOptions[];
 }
 
-function context(parameters: Record<string, unknown>): IExecuteSingleFunctions {
+function context(parameters: Record<string, unknown>, itemIndex = 0): IExecuteSingleFunctions {
 	return {
 		getNode: () => ({
 			name: 'Sleeper',
@@ -26,7 +26,7 @@ function context(parameters: Record<string, unknown>): IExecuteSingleFunctions {
 			parameters: {},
 		}),
 		getNodeParameter: (name: string) => parameters[name],
-		getItemIndex: () => 0,
+		getItemIndex: () => itemIndex,
 	} as unknown as IExecuteSingleFunctions;
 }
 
@@ -181,9 +181,9 @@ describe('routing hooks', () => {
 			[{ json: { p1: { full_name: 'One' }, p2: { player_id: 'p2' } } }],
 			{} as never,
 		);
-		expect(result.map((item) => item.json)).toEqual([
-			{ full_name: 'One', player_id: 'p1' },
-			{ player_id: 'p2' },
+		expect(result).toEqual([
+			{ json: { full_name: 'One', player_id: 'p1' }, pairedItem: { item: 0 } },
+			{ json: { player_id: 'p2' }, pairedItem: { item: 0 } },
 		]);
 	});
 
@@ -191,11 +191,11 @@ describe('routing hooks', () => {
 		const map = { p1: { player_id: 'p1' } };
 		expect(
 			await formatPlayerMap.call(
-				context({ outputMode: 'singleMap' }),
+				context({ outputMode: 'singleMap' }, 3),
 				[{ json: map }],
 				{} as never,
 			),
-		).toEqual([{ json: map }]);
+		).toEqual([{ json: map, pairedItem: { item: 3 } }]);
 		expect(
 			await formatPlayerMap.call(
 				context({ outputMode: 'splitItems' }),
@@ -203,6 +203,22 @@ describe('routing hooks', () => {
 				{} as never,
 			),
 		).toEqual([]);
+	});
+
+	it('retains the originating input index for map and split outputs', async () => {
+		const map = { p1: { player_id: 'p1' }, p2: { full_name: 'Two' } };
+		const singleMap = await formatPlayerMap.call(
+			context({ outputMode: 'singleMap', playerOptions: { outputFields: 'full_name' } }, 3),
+			[{ json: map }],
+			{} as never,
+		);
+		const splitItems = await formatPlayerMap.call(
+			context({ outputMode: 'splitItems' }, 3),
+			[{ json: map }],
+			{} as never,
+		);
+		expect(singleMap.map((item) => item.pairedItem)).toEqual([{ item: 3 }]);
+		expect(splitItems.map((item) => item.pairedItem)).toEqual([{ item: 3 }, { item: 3 }]);
 	});
 
 	it('rejects malformed player maps', async () => {

@@ -3,6 +3,7 @@ import type { INodeProperties } from 'n8n-workflow';
 import { sleeperRoute } from './routing';
 import { formatPlayerMap } from './response';
 import { sportOptionsForCapability } from '../utils/sports';
+import { nbaPlayerPositionOptions, nflPlayerPositionOptions } from '../utils/playerPositions';
 
 export const playerDescription: INodeProperties[] = [
 	{
@@ -21,7 +22,7 @@ export const playerDescription: INodeProperties[] = [
 				value: 'getMany',
 				action: 'Get many players',
 				description:
-					"Retrieve Sleeper's keyed player map with server-side filters. Unfiltered data is about 5 MB; use it sparingly. No single-player endpoint is documented.",
+					"Retrieve Sleeper's keyed player map. Active Only and Position are sent to Sleeper; Player Options filter and shape the downloaded response locally. Unfiltered data is about 5 MB; local controls reduce saved output, not the API download. No single-player endpoint is documented.",
 				routing: sleeperRoute('=/players/{{$parameter.sport}}', {
 					postReceive: [formatPlayerMap],
 				}),
@@ -91,16 +92,39 @@ export const playerDescription: INodeProperties[] = [
 	{
 		displayName: 'Position',
 		name: 'position',
-		type: 'string',
+		type: 'options',
+		options: nflPlayerPositionOptions,
 		default: '',
-		placeholder: 'QB',
 		description:
-			'Optional Sleeper fantasy-position code, such as QB or PG. NHL position filtering is unavailable because tested position queries returned no players.',
+			'Optional NFL fantasy-position filter. Sleeper matches fantasy_positions, including multi-position players.',
 		displayOptions: {
 			show: {
 				resource: ['player'],
 				operation: ['getMany'],
-				sport: ['nfl', 'nba'],
+				sport: ['nfl'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					position: '={{$value.trim() || undefined}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Position',
+		name: 'position',
+		type: 'options',
+		options: nbaPlayerPositionOptions,
+		default: '',
+		description:
+			'Optional NBA fantasy-position filter. Sleeper matches fantasy_positions, including multi-position players.',
+		displayOptions: {
+			show: {
+				resource: ['player'],
+				operation: ['getMany'],
+				sport: ['nba'],
 			},
 		},
 		routing: {
@@ -139,6 +163,47 @@ export const playerDescription: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Player Options',
+		name: 'playerOptions',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		options: [
+			{
+				displayName: 'Team',
+				name: 'team',
+				type: 'string',
+				default: '',
+				description: 'Exact team code match, ignoring case and surrounding spaces',
+			},
+			{
+				displayName: 'Has Team',
+				name: 'hasTeam',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to keep only players with a nonempty team value',
+			},
+			{
+				displayName: 'Player IDs',
+				name: 'playerIds',
+				type: 'string',
+				default: '',
+				placeholder: '123, 456',
+				description: 'Comma-separated exact player-map IDs',
+			},
+			{
+				displayName: 'Output Fields',
+				name: 'outputFields',
+				type: 'string',
+				default: '',
+				placeholder: 'full_name, team, position',
+				description:
+					'Comma-separated flat fields; blank keeps all fields. player_id is always included.',
+			},
+		],
+		displayOptions: { show: { resource: ['player'], operation: ['getMany'] } },
+	},
+	{
 		displayName: 'Output Mode',
 		name: 'outputMode',
 		type: 'options',
@@ -147,13 +212,13 @@ export const playerDescription: INodeProperties[] = [
 			{
 				name: 'Single Map',
 				value: 'singleMap',
-				description: 'Return the complete raw object keyed by player ID as one n8n item',
+				description: 'Return one object keyed by player ID as one n8n item',
 			},
 			{
 				name: 'One Item per Player',
 				value: 'splitItems',
 				description:
-					'Return one n8n item per player-map entry, adding the map key only when player_id is absent',
+					'Return one item per matching player, preserving all fields by default and adding the map key when player_id is empty',
 			},
 		],
 		default: 'singleMap',
@@ -165,6 +230,66 @@ export const playerDescription: INodeProperties[] = [
 				operation: ['getMany'],
 			},
 		},
+	},
+	{
+		displayName: 'Local Processing Notice',
+		name: 'playerLocalProcessingNotice',
+		type: 'notice',
+		default:
+			'The player catalog is downloaded before these local filters and output controls run. They reduce saved workflow output, not the API download.',
+		displayOptions: { show: { resource: ['player'], operation: ['getMany'] } },
+	},
+	{
+		displayName: 'Sort By',
+		name: 'sortBy',
+		type: 'options',
+		default: '',
+		options: [
+			{ name: 'Full Name', value: 'full_name' },
+			{ name: 'None', value: '' },
+			{ name: 'Player ID', value: 'player_id' },
+			{ name: 'Position', value: 'position' },
+			{ name: 'Team', value: 'team' },
+		],
+		description: 'Local sort order for One Item per Player output',
+		displayOptions: {
+			show: { resource: ['player'], operation: ['getMany'], outputMode: ['splitItems'] },
+		},
+	},
+	{
+		displayName: 'Sort Direction',
+		name: 'sortDirection',
+		type: 'options',
+		default: 'asc',
+		options: [
+			{ name: 'Ascending', value: 'asc' },
+			{ name: 'Descending', value: 'desc' },
+		],
+		displayOptions: {
+			show: {
+				resource: ['player'],
+				operation: ['getMany'],
+				outputMode: ['splitItems'],
+				sortBy: ['full_name', 'team', 'position', 'player_id'],
+			},
+		},
+	},
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: true,
+		description: 'Whether to return all results or only up to a given limit',
+		displayOptions: { show: { resource: ['player'], operation: ['getMany'] } },
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		default: 50,
+		typeOptions: { minValue: 1, numberStepSize: 1 },
+		description: 'Max number of results to return',
+		displayOptions: { show: { resource: ['player'], operation: ['getMany'], returnAll: [false] } },
 	},
 	{
 		displayName: 'Trend Type',

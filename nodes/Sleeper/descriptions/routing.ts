@@ -7,6 +7,7 @@ import {
 } from 'n8n-workflow';
 import { validateSleeperSport } from '../utils/validation';
 import { sportCapabilityForOperation, sportsForCapability } from '../utils/sports';
+import { readPlayerOptions } from './response';
 
 const requiredParameters: Record<string, readonly string[]> = {
 	'avatar:getUrl': ['avatarId', 'imageSize'],
@@ -75,6 +76,10 @@ export async function validateSleeperRequest(
 				description: `${parameter} must be one of: ${allowed.join(', ')}.`,
 			});
 		}
+	}
+
+	if (resource === 'player' && operation === 'getMany') {
+		readPlayerOptions(this);
 	}
 
 	const sportCapability = sportCapabilityForOperation(resource, operation);
