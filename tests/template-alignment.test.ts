@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { createDevProcessOptions, DEV_PORT } from '../scripts/dev.mjs';
+import { createDevProcessOptions, DEV_BROKER_PORT, DEV_PORT } from '../scripts/dev.mjs';
 import { requireFilenameConstructor } from '../scripts/node-load-smoke.mjs';
 import { auditReleaseConfiguration } from '../scripts/release-check.mjs';
 import { findEmptyPropertyPlaceholders } from '../scripts/review-node-source.mjs';
@@ -25,13 +25,18 @@ afterEach(() => {
 });
 
 describe('template alignment safeguards', () => {
-	it('uses port 5690 while forwarding isolated development arguments', () => {
-		const options = createDevProcessOptions({ N8N_PORT: '5678', PATH: '/bin' }, [
-			'--custom-user-folder',
-			'.codex-scratch/n8n-dev',
-		]);
+	it('uses isolated editor and task-runner ports while forwarding development arguments', () => {
+		const options = createDevProcessOptions(
+			{ N8N_PORT: '5678', N8N_RUNNERS_BROKER_PORT: '5679', PATH: '/bin' },
+			['--custom-user-folder', '.codex-scratch/n8n-dev'],
+		);
 		expect(DEV_PORT).toBe('5690');
-		expect(options.environment).toMatchObject({ N8N_PORT: '5690', PATH: '/bin' });
+		expect(DEV_BROKER_PORT).toBe('5691');
+		expect(options.environment).toMatchObject({
+			N8N_PORT: '5690',
+			N8N_RUNNERS_BROKER_PORT: '5691',
+			PATH: '/bin',
+		});
 		expect(options.arguments).toEqual(['dev', '--custom-user-folder', '.codex-scratch/n8n-dev']);
 	});
 
