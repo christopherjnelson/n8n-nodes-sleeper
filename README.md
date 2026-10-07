@@ -31,8 +31,9 @@ Created or Updated, League Status Changed, and NFL Week Changed.
 ### n8n Cloud
 
 Search for **Sleeper** from the node picker or canvas. The verified action node is available
-directly in n8n Cloud, but the currently approved Cloud version may lag npm and may not include
-the Sleeper Trigger. Confirm the installed version in your environment.
+in the n8n node catalog. The currently approved Cloud version may lag npm and may not include the
+latest actions or Sleeper Trigger. Confirm the installed version in your environment before relying
+on specific operations.
 
 ### Self-hosted n8n
 
@@ -42,8 +43,9 @@ Where Community Nodes are supported, open **Settings → Community Nodes** and e
 n8n-nodes-sleeper
 ```
 
-The installer provides the latest version published to npm. Confirm that the installed version is
-`0.3.0` or newer to use the NBA/NHL operations described here.
+The installer provides the latest version published to npm. NBA/NHL operations require package
+version `0.3.0` or newer. Check the installed package version if the UI does not expose those
+controls.
 
 ### npm
 
@@ -214,7 +216,8 @@ and bounded player queries; do not ask an agent to infer private or unknown iden
 ## Compatibility
 
 - Package engine: Node.js 22.22.0 or newer
-- Isolated UI and workflow testing: n8n 2.32.7
+- Earlier isolated UI baseline: n8n 2.32.7; the 0.3.0 package smoke used n8n 2.41.6
+- Node-picker summary check: n8n 2.42.4 on 2026-10-07
 - Development CLI: `@n8n/node-cli` 0.46.4
 - Development package manager: pnpm 11.15.0
 
@@ -256,8 +259,11 @@ pnpm run package:check
 pnpm run smoke:install
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules and
-[docs/release-readiness.md](docs/release-readiness.md) for the latest local assessment.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and contribution rules,
+[docs/testing.md](docs/testing.md) for automated checks,
+[docs/manual-testing.md](docs/manual-testing.md) for the editor smoke guide, and
+[docs/release-readiness.md](docs/release-readiness.md) for current release status and links to the
+dated release record.
 
 ## Release and provenance
 

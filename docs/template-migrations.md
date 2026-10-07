@@ -24,8 +24,8 @@ These follow-ups do not change the template marker independently; the baseline r
 
 ## 2.2.0
 
-- Added the isolated `pnpm run dev` launcher on port 5690 and documented manual navigation to the
-  local editor with a disk-backed user folder.
+- Added the isolated `pnpm run dev` launcher on port 5690 with broker port 5691, and documented
+  manual navigation to the local editor using the normal n8n CLI profile.
 - Added `.codex-scratch` to ignore rules for local smoke artifacts.
 
 The optional template Discord notification was not adopted. The package keeps pnpm and its manual
@@ -41,8 +41,8 @@ No token fallback, direct publish command, or automated stage approval is allowe
 
 ## Intentional local differences
 
-- The legacy `test/*.test.cjs` suites remain for trigger, packaging, and release regression coverage;
-  new template-alignment contracts are added in TypeScript/Vitest.
+- The CommonJS `tests/*.test.cjs` suites remain for trigger, packaging, and release regression
+  coverage; action-node contracts use TypeScript/Vitest.
 - Release checks preserve the stricter requirement that a release tag equals the current `main`
   tip, plus the exact workflow SHA, rather than merely appearing in main's history.
 - Generic scanner-analysis 404 errors remain terminal even if upstream template retry behavior is
