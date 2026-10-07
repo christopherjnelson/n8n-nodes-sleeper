@@ -16,6 +16,8 @@ export function verifyReleaseTag({
 	executeGit = runGit,
 } = {}) {
 	const packageJson = JSON.parse(readFileSync(resolve(repository, 'package.json'), 'utf8'));
+	if (packageJson.version.includes('-'))
+		throw new Error('stable release tags cannot publish a prerelease version to latest');
 	const expectedRef = `refs/tags/v${packageJson.version}`;
 	if (env.GITHUB_REF !== expectedRef)
 		throw new Error(`GITHUB_REF must exactly match ${expectedRef}`);

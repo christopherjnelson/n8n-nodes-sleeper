@@ -326,10 +326,13 @@ test('trigger and release guidance distinguish current status from historical ev
 	assert.match(
 		releasing,
 		new RegExp(
-			`npm was last verified on \\d{4}-\\d{2}-\\d{2}[\\s\\S]*with \`next\` at \`${packageVersionPattern}\` and \`latest\` at stable \`${packageVersionPattern}\``,
+			`npm was last verified on \\d{4}-\\d{2}-\\d{2}[\\s\\S]*with \`next\` at \`${packageVersionPattern}\`\\s+and \`latest\` at stable \`${packageVersionPattern}\``,
 		),
 	);
-	assert.match(releasing, /Confirm the live registry before relying on\s+those selectors/);
+	assert.match(
+		releasing,
+		/Those selectors are dated registry evidence and must be checked\s+live before relying on them/,
+	);
 });
 
 test('package files intentionally exclude source, tests, examples, and release documentation', () => {

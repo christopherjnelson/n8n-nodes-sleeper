@@ -4,7 +4,8 @@
 
 - Align template safeguards to baseline 2.2.0: pin the 0.38.0 scanner, add source and release
   configuration reviews, validate release tags before setup, and isolate local n8n development on
-  port 5690. Preserve the manual trusted-stage release path and record intentional differences.
+  port 5690. Keep pnpm and package-specific safeguards; the direct OIDC release workflow is
+  recorded as an unversioned follow-up in the release guidance.
 - Add operation-specific NBA and NHL player/state support and observed NBA seasonal user league/draft listings.
 - Add optional local Player → Get Many filtering, sorting, limiting, and flat-field projection controls. Active and supported position filters remain server-side; filtering, sorting, limiting, and projection run after the response is downloaded.
 - Preserve source input-item links on successful outputs from all 18 action operations in multi-input workflows; n8n-owned transport and continue-on-fail error items retain n8n's error-item pairing behavior.

@@ -299,10 +299,11 @@ dated release record.
 
 ## Release and provenance
 
-Releases are manual, tag-gated GitHub Actions runs. Versions `0.1.1`, `0.2.0`, and `0.2.1` proved the
-trusted-stage path end to end: GitHub OIDC created each staged package and the owner approved it
-separately with npm 2FA. The workflow has no direct-publish or token fallback, and developer
-machines do not publish. See [docs/releasing.md](docs/releasing.md).
+Releases run from reviewed annotated version tags. GitHub Actions validates the exact tagged
+source, publishes directly to npm with provenance through GitHub OIDC, verifies the published
+package, and then creates the GitHub Release. Versions `0.1.1`, `0.2.0`, and `0.2.1` used the
+former staged flow; see [docs/releasing.md](docs/releasing.md) for the active procedure and
+historical records.
 
 ## Contributing
 

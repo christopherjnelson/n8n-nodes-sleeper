@@ -4,7 +4,11 @@ Generated repositories do not receive template changes automatically. Review the
 template diff, apply only relevant safeguards, run the repository's complete gate set, and update
 `.blackswamp/template.json` only after validation.
 
-## Unversioned release-tag and source-review safeguards
+## Earlier unversioned release-tag and source-review safeguards
+
+The workflow details in this section describe the prior manual staged-release model. The
+tag-triggered direct-publication follow-up below supersedes those release-mode details; source
+review, release-tag, registration-smoke, and scanner safeguards remain relevant.
 
 - CI and the manual release quality job run the TypeScript AST source review before build. It
   rejects operation modules that only export typed empty `INodeProperties` arrays.
@@ -22,15 +26,28 @@ template diff, apply only relevant safeguards, run the repository's complete gat
 
 These follow-ups do not change the template marker independently; the baseline remains 2.2.0.
 
+## Unversioned follow-up: direct tag publication
+
+Reviewed against template commit `b5ab481ccfc25dcc546e4b12629f5c7bfdfb0e87` and its
+`TEMPLATE_MIGRATIONS.md`. This repository adopts the template's tag-triggered direct publication
+and separate read-only verification, retaining this package's pnpm commands and npm Trusted
+Publisher tuple (`release.yml`, `npm-release`). The owner has enabled direct publication and
+dist-tag permissions in npm. Package-specific workflow additions retain the inspected tarball
+between quality and publish jobs and create the GitHub Release only after verification succeeds.
+The workflow publishes stable releases to `latest` with provenance, without staging or promotion.
+A failed read-only verification can be rerun without repeating the successful publish job. Keep
+`.blackswamp/template.json` at the adopted `2.2.0` marker; this is an unversioned follow-up, not a
+new template release.
+
 ## 2.2.0
 
 - Added the isolated `pnpm run dev` launcher on port 5690 with broker port 5691, and documented
   manual navigation to the local editor using the normal n8n CLI profile.
 - Added `.codex-scratch` to ignore rules for local smoke artifacts.
 
-The optional template Discord notification was not adopted. The package keeps pnpm and its manual
-trusted-stage workflow: npm OIDC creates an immutable stage, and the owner approves it separately.
-No token fallback, direct publish command, or automated stage approval is allowed.
+The optional template Discord notification was not adopted. The package keeps pnpm and its
+package-specific Trusted Publisher settings. The former staged flow is retained only in dated
+release records; current release instructions are in [releasing.md](releasing.md).
 
 ## 2.1.1
 
