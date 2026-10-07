@@ -1,8 +1,31 @@
 # Historical release and validation records
 
-This file preserves dated release checkpoints and validation evidence. For current candidate
+This file preserves dated release checkpoints and validation evidence. For current release
 status, see [release readiness](../release-readiness.md). Historical npm tags, test counts,
 security-alert counts, and outstanding actions describe the dates recorded below.
+
+## 0.3.0 post-publication checkpoint — 2026-10-07
+
+- Stable `n8n-nodes-sleeper@0.3.0` was published at `2026-10-07T22:52:28Z` through GitHub OIDC.
+  npm verified `latest → 0.3.0` and retained `next → 0.2.0`.
+- Annotated tag object `8d5c482e6a1e3696bcdd532f979efd37230a5c89` targets release commit
+  `744f8a85f372795655c1c5772bc672dfcb66950a`. Release run `37698692473` completed quality,
+  publish, verify-published, and GitHub Release jobs successfully.
+- The inspected quality tarball contained 37 files and had SHA-256
+  `9fbc45af6046a09c493899b210751507c457d2f408bcb704f44af946a44a93df`. The official scanner
+  reported exact success for the package and tagged source at `2026-10-07T22:59:03Z`; package
+  boundary, published install/load, and icon checks passed at `2026-10-07T22:59:07Z`.
+- The npm registry tarball, prepared local package, and Actions artifact were byte-identical (37
+  files, 33 in `dist/`). npm's signature audit reported no invalid or missing signatures. The SLSA
+  attestation names `refs/tags/v0.3.0`, `release.yml`, run `37698692473` attempt 1, and the exact
+  release commit; its subject SHA-512 matches the registry tarball.
+- npm provenance uses SLSA predicate `https://slsa.dev/provenance/v1`; transparency-log index is
+  `3135880305`. The [npm attestation](https://registry.npmjs.org/-/npm/v1/attestations/n8n-nodes-sleeper@0.3.0)
+  is available.
+- GitHub created the public, non-prerelease
+  [v0.3.0 release](https://github.com/christopherjnelson/n8n-nodes-sleeper/releases/tag/v0.3.0)
+  at `2026-10-07T22:59:15Z`. Creator Portal and n8n Cloud availability remain separate
+  owner-managed steps.
 
 ## 0.2.1 post-publication checkpoint — 2026-09-08
 

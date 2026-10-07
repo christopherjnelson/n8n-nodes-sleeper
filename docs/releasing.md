@@ -80,6 +80,30 @@ at main commit `d8beba091de16715cb9574bfd45e4751af23c5be`. Main CI `34192040787`
 Read-only verifier `34193865267` then passed registry metadata, SLSA v1 provenance, package
 boundary/install/load/icon checks, and the official scanner's exact success requirement.
 
+## Verified v0.3.0 direct publication — 2026-10-07
+
+Annotated tag object `8d5c482e6a1e3696bcdd532f979efd37230a5c89` targets commit
+`744f8a85f372795655c1c5772bc672dfcb66950a`. Release run `37698692473` completed all four jobs
+successfully. The publish job published the inspected quality artifact at `2026-10-07T22:52:28Z`
+with npm OIDC and provenance; its 37-file tarball SHA-256 was
+`9fbc45af6046a09c493899b210751507c457d2f408bcb704f44af946a44a93df`.
+
+The read-only verifier passed. The official scanner reported exactly
+`Package n8n-nodes-sleeper@0.3.0 has passed all security checks` at `2026-10-07T22:59:03Z` for
+source `github.com/christopherjnelson/n8n-nodes-sleeper@744f8a85f372795655c1c5772bc672dfcb66950a`.
+The package boundary contained 37 files and 32,355 bytes; published install/load and icon checks
+passed at `2026-10-07T22:59:07Z`. The published registry tarball was byte-identical to both the
+prepared local package and inspected Actions artifact (37 files, 33 in `dist/`). npm's signature
+audit reported no invalid or missing signatures. The SLSA attestation identifies `refs/tags/v0.3.0`,
+`release.yml`, run `37698692473` attempt 1, source commit
+`744f8a85f372795655c1c5772bc672dfcb66950a`, and the SLSA v1 predicate
+(`https://slsa.dev/provenance/v1`). The transparency-log index is `3135880305`; the
+[npm attestation](https://registry.npmjs.org/-/npm/v1/attestations/n8n-nodes-sleeper@0.3.0) is
+available. GitHub created the normal, non-prerelease
+[public non-prerelease v0.3.0 release](https://github.com/christopherjnelson/n8n-nodes-sleeper/releases/tag/v0.3.0) at
+`2026-10-07T22:59:15Z`. Creator Portal and n8n Cloud availability remain separate owner-managed
+steps.
+
 ## Tooling requirements
 
 Trusted publishing requires a GitHub-hosted runner, `id-token: write`, Node.js 22.14 or newer,
@@ -97,9 +121,9 @@ scanner's explicit success text. Other failures are terminal.
 ## Dist-tag policy
 
 The automated release publishes to `latest`; the workflow has no alternate dist-tag input and
-does not run a separate promotion step. npm was last verified on 2026-10-07 with `next` at `0.2.0`
-and `latest` at stable `0.2.1`. Those selectors are dated registry evidence and must be checked
-live before relying on them. As of 2026-10-07, the merged `0.3.0` source was unpublished.
+does not run a separate promotion step. Before `0.3.0` publication, npm's 2026-10-07 selector
+snapshot was `next → 0.2.0` and `latest → 0.2.1`; the snapshot is historical. After the verified
+release, npm selectors were `latest → 0.3.0` and `next → 0.2.0`, checked on 2026-10-07.
 
 ## Template homepage divergence
 
