@@ -7,8 +7,14 @@ import type {
 import { describe, expect, it } from 'vitest';
 
 import { Sleeper } from '../nodes/Sleeper/Sleeper.node';
-import { formatAvatarUrl, formatPlayerMap } from '../nodes/Sleeper/descriptions/response';
-import { validateSleeperRequest } from '../nodes/Sleeper/descriptions/routing';
+import {
+	attachSleeperPairedItem,
+	formatAvatarUrl,
+	formatDraftTradedPicks,
+	formatPlayerMap,
+	normalizeSleeperResponse,
+} from '../nodes/Sleeper/descriptions/response';
+import { sleeperRoute, validateSleeperRequest } from '../nodes/Sleeper/descriptions/routing';
 
 function operations(properties: INodeProperties[]) {
 	return properties
@@ -115,16 +121,89 @@ describe('Sleeper declarative contract', () => {
 		}
 	});
 
-	it('uses HEAD and the avatar response formatter', () => {
+	it('runs response normalization, custom transforms, and pairing for all 18 operations', () => {
 		const avatar = operations(new Sleeper().description.properties).find(
 			(option) => option.value === 'getUrl',
 		);
 		expect(avatar?.routing?.request?.method).toBe('HEAD');
-		expect(avatar?.routing?.output?.postReceive).toEqual([formatAvatarUrl]);
+		const routes = operations(new Sleeper().description.properties);
+		expect(routes).toHaveLength(18);
+		for (const route of routes) {
+			const handlers = route.routing?.output?.postReceive;
+			expect(handlers?.at(-1)).toBe(attachSleeperPairedItem);
+			if (handlers?.includes(formatAvatarUrl)) {
+				expect(handlers).toEqual([formatAvatarUrl, attachSleeperPairedItem]);
+			} else if (handlers?.includes(formatPlayerMap)) {
+				expect(handlers).toEqual([formatPlayerMap, attachSleeperPairedItem]);
+			} else if (handlers?.includes(formatDraftTradedPicks)) {
+				expect(handlers).toEqual([formatDraftTradedPicks, attachSleeperPairedItem]);
+			} else {
+				expect(handlers?.[0]).toBe(normalizeSleeperResponse);
+			}
+		}
+		expect(sleeperRoute('/test', { postReceive: [] }).output?.postReceive).toEqual([
+			normalizeSleeperResponse,
+			attachSleeperPairedItem,
+		]);
 	});
 });
 
 describe('routing hooks', () => {
+	it('normalizes API arrays, objects, and empty results without inventing items', async () => {
+		const ctx = context({}, 4);
+		const object = {
+			json: { league_id: 'opaque', nested: { ok: true } },
+			pairedItem: { item: 99 },
+		};
+		expect(await normalizeSleeperResponse.call(ctx, [object], {} as never)).toEqual([
+			{ ...object, pairedItem: { item: 99 } },
+		]);
+		expect(
+			await normalizeSleeperResponse.call(
+				ctx,
+				[{ json: [{ roster_id: 'a' }, { roster_id: 'b' }] }] as never,
+				{} as never,
+			),
+		).toEqual([{ json: { roster_id: 'a' } }, { json: { roster_id: 'b' } }]);
+		expect(await normalizeSleeperResponse.call(ctx, [{ json: [] }] as never, {} as never)).toEqual(
+			[],
+		);
+	});
+
+	it('pairs every response from each input independently, including uneven result counts', async () => {
+		const inputA = await normalizeSleeperResponse.call(
+			context({}, 0),
+			[{ json: [{ roster_id: 'a1' }, { roster_id: 'a2' }] }] as never,
+			{} as never,
+		);
+		const inputB = await normalizeSleeperResponse.call(
+			context({}, 1),
+			[{ json: [] }] as never,
+			{} as never,
+		);
+		const outputA = await attachSleeperPairedItem.call(context({}, 0), inputA, {} as never);
+		const outputB = await attachSleeperPairedItem.call(context({}, 1), inputB, {} as never);
+		expect([...outputA, ...outputB]).toEqual([
+			{ json: { roster_id: 'a1' }, pairedItem: { item: 0 } },
+			{ json: { roster_id: 'a2' }, pairedItem: { item: 0 } },
+		]);
+	});
+
+	it('rejects null API responses as indexed not-found errors', async () => {
+		await expect(
+			normalizeSleeperResponse.call(context({}, 3), [{ json: null }] as never, {} as never),
+		).rejects.toMatchObject({
+			message: 'Sleeper resource was not found',
+			context: { itemIndex: 3 },
+		});
+		await expect(
+			normalizeSleeperResponse.call(context({}, 3), [], {} as never),
+		).rejects.toMatchObject({
+			message: 'Sleeper returned an invalid response',
+			context: { itemIndex: 3 },
+		});
+	});
+
 	it('rejects blank IDs and invalid integers before transport', async () => {
 		const request = { url: '/draft/' } as IHttpRequestOptions;
 		await expect(
@@ -243,7 +322,7 @@ describe('routing hooks', () => {
 
 	it('returns the validated avatar URL after the CDN HEAD request', async () => {
 		const result = await formatAvatarUrl.call(
-			context({ avatarId: 'abc/def', imageSize: 'thumbnail' }),
+			context({ avatarId: 'abc/def', imageSize: 'thumbnail' }, 2),
 			[],
 			{} as never,
 		);
@@ -252,5 +331,8 @@ describe('routing hooks', () => {
 			size: 'thumbnail',
 			url: 'https://sleepercdn.com/avatars/thumbs/abc%2Fdef',
 		});
+		expect(await attachSleeperPairedItem.call(context({}, 2), result, {} as never)).toEqual([
+			{ ...result[0], pairedItem: { item: 2 } },
+		]);
 	});
 });

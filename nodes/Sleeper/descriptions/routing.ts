@@ -7,7 +7,7 @@ import {
 } from 'n8n-workflow';
 import { validateSleeperSport } from '../utils/validation';
 import { sportCapabilityForOperation, sportsForCapability } from '../utils/sports';
-import { readPlayerOptions } from './response';
+import { attachSleeperPairedItem, normalizeSleeperResponse, readPlayerOptions } from './response';
 
 const requiredParameters: Record<string, readonly string[]> = {
 	'avatar:getUrl': ['avatarId', 'imageSize'],
@@ -147,6 +147,12 @@ export function sleeperRoute(
 		send: {
 			preSend: [validateSleeperRequest],
 		},
-		...(options.postReceive ? { output: { postReceive: options.postReceive } } : {}),
+		output: {
+			postReceive: [
+				...(options.postReceive?.length ? [] : [normalizeSleeperResponse]),
+				...(options.postReceive ?? []),
+				attachSleeperPairedItem,
+			],
+		},
 	};
 }

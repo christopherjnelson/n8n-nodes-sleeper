@@ -125,6 +125,22 @@ including when the value is stale/hidden in the editor. To clear it, switch to N
 succeeds. Do not treat local Team, Has Team, Player IDs, Output Fields,
 or Limit settings as reducing the NHL response downloaded from Sleeper.
 
+The packed-package smoke on 2026-10-07 confirmed successful item links across multi-input action
+outputs. Two League IDs sent to **Roster → Get Many** returned 14 and 6 rosters; each roster's
+source index was correct, and downstream `$('Input').item` expressions resolved to its matching
+`leagueId`. Two inputs to **Draft Traded Pick → Get Many** returned 28 items each, preserved the
+exact `draft_id` string `1382095101836136448`, and linked each output to the correct input. **User →
+Get** and **Avatar → Get URL** each returned two outputs with correct links and ancestor references.
+**Player → Get Many** returned ten NBA split items per input, sorted Player IDs in numeric-aware
+ascending order and resolving downstream `.item` expressions correctly. As an additional manual
+check, use two inputs with distinct markers and confirm that each successful output resolves to the
+input that produced it. n8n-owned transport errors and continue-on-fail error items may not carry
+paired-item metadata.
+
+For **User → Get** with a username or ID known not to exist, Sleeper returns HTTP 200 with `null`.
+The packed-package runtime smoke confirmed that the action surfaces a not-found error with item
+index 0; n8n's execution runtime wraps it as `NodeApiError`.
+
 For NHL, confirm **Sport → Get State** returns one raw state object, and **Player → Get Many**
 works without Position. A saved nonempty NHL Position is
 expected to fail locally before an HTTP request because tested NHL position queries returned no
