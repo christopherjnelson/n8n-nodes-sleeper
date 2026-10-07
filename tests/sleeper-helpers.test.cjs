@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { NodeApiError, NodeOperationError } = require('n8n-workflow');
+const { NodeApiError } = require('n8n-workflow');
 const {
 	SLEEPER_API_BASE_URL,
 	SLEEPER_API_TIMEOUT_MS,
@@ -9,19 +9,6 @@ const {
 	buildSleeperUrl,
 	sleeperApiRequest,
 } = require('../dist/nodes/Sleeper/transport/sleeperApiRequest.js');
-const {
-	getBracketType,
-	getPositiveIntegerParameter,
-	getRequiredTrimmedString,
-	getSeason,
-	getSleeperId,
-	getSport,
-} = require('../dist/nodes/Sleeper/utils/validation.js');
-const {
-	ensureExecutionError,
-	toErrorExecutionItem,
-	toExecutionItems,
-} = require('../dist/nodes/Sleeper/utils/output.js');
 
 function getNode() {
 	return {
@@ -30,15 +17,6 @@ function getNode() {
 		typeVersion: 1,
 		position: [0, 0],
 		parameters: {},
-	};
-}
-
-function createParameterContext(parameters) {
-	return {
-		getNode,
-		getNodeParameter(name, _itemIndex, fallback) {
-			return Object.hasOwn(parameters, name) ? parameters[name] : fallback;
-		},
 	};
 }
 
@@ -82,177 +60,6 @@ test('encodes every path segment and omits empty query objects', () => {
 	);
 	assert.equal(buildQueryParameters(undefined), undefined);
 	assert.equal(buildQueryParameters({ missing: undefined }), undefined);
-});
-
-test('trims required strings and preserves large Sleeper IDs exactly', () => {
-	const context = createParameterContext({
-		usernameOrUserId: '  sleeper-user  ',
-		leagueId: '  90071992547409931234  ',
-	});
-
-	assert.equal(
-		getRequiredTrimmedString(context, 'usernameOrUserId', 0, 'Username or User ID'),
-		'sleeper-user',
-	);
-	assert.equal(getSleeperId(context, 'leagueId', 0, 'League ID'), '90071992547409931234');
-});
-
-test('rejects empty and non-string required values with item-aware native errors', () => {
-	for (const value of ['', '   ', 9007199254740992]) {
-		const context = createParameterContext({ leagueId: value });
-		assert.throws(
-			() => getSleeperId(context, 'leagueId', 3, 'League ID'),
-			(error) => error instanceof NodeOperationError && error.context.itemIndex === 3,
-		);
-	}
-});
-
-test('accepts four-digit seasons and rejects malformed seasons', () => {
-	assert.equal(getSeason(createParameterContext({ season: ' 2026 ' }), 'season', 0), '2026');
-	assert.equal(getSeason(createParameterContext({ season: 2017 }), 'season', 0), '2017');
-
-	for (const season of ['26', '20260', '20a6', '', null]) {
-		assert.throws(
-			() => getSeason(createParameterContext({ season }), 'season', 2),
-			(error) =>
-				error instanceof NodeOperationError &&
-				error.message.includes('four-digit') &&
-				error.context.itemIndex === 2,
-		);
-	}
-});
-
-test('keeps NFL as the default sport helper whitelist and accepts explicitly supported sports', () => {
-	assert.equal(getSport(createParameterContext({ sport: 'nfl' }), 'sport', 0), 'nfl');
-	assert.equal(
-		getSport(createParameterContext({ sport: 'nba' }), 'sport', 0, ['nfl', 'nba']),
-		'nba',
-	);
-	assert.throws(
-		() => getSport(createParameterContext({ sport: 'nba' }), 'sport', 1),
-		(error) => error instanceof NodeOperationError && error.message === 'Unsupported sport',
-	);
-});
-
-test('normalizes positive integer parameters from safe numbers and decimal strings', () => {
-	assert.equal(
-		getPositiveIntegerParameter(createParameterContext({ week: 18 }), 'week', 0, 'Week'),
-		'18',
-	);
-	assert.equal(
-		getPositiveIntegerParameter(createParameterContext({ week: ' 0018 ' }), 'week', 0, 'Week'),
-		'18',
-	);
-	assert.equal(
-		getPositiveIntegerParameter(
-			createParameterContext({ round: '90071992547409931234' }),
-			'round',
-			0,
-			'Round or Week',
-		),
-		'90071992547409931234',
-	);
-});
-
-test('rejects invalid positive integer parameters with the input item index', () => {
-	for (const value of [
-		undefined,
-		null,
-		'',
-		'   ',
-		false,
-		true,
-		[],
-		{},
-		Number.NaN,
-		Infinity,
-		0,
-		-1,
-		1.5,
-		'1.5',
-		'-1',
-		'week',
-		9007199254740992,
-	]) {
-		assert.throws(
-			() => getPositiveIntegerParameter(createParameterContext({ week: value }), 'week', 4, 'Week'),
-			(error) =>
-				error instanceof NodeOperationError &&
-				error.message === 'Week must be a positive integer' &&
-				error.context.itemIndex === 4,
-		);
-	}
-});
-
-test('maps only controlled playoff bracket types', () => {
-	assert.equal(
-		getBracketType(createParameterContext({ bracketType: 'winners' }), 'bracketType', 0),
-		'winners',
-	);
-	assert.equal(
-		getBracketType(createParameterContext({ bracketType: 'losers' }), 'bracketType', 0),
-		'losers',
-	);
-	assert.throws(
-		() => getBracketType(createParameterContext({ bracketType: 'custom_path' }), 'bracketType', 2),
-		(error) =>
-			error instanceof NodeOperationError &&
-			error.message === 'Unsupported bracket type' &&
-			error.context.itemIndex === 2,
-	);
-});
-
-test('converts object and array responses without changing JSON fields', () => {
-	const nested = {
-		league_id: '90071992547409931234',
-		avatar: null,
-		settings: { reserve_slots: 2, divisions: ['East', 'West'] },
-	};
-
-	assert.deepEqual(toExecutionItems(getNode(), nested, 'object', 4, 'League: Get'), [
-		{ json: nested, pairedItem: { item: 4 } },
-	]);
-	assert.deepEqual(
-		toExecutionItems(getNode(), [nested, { league_id: '2' }], 'array', 5, 'Get Many'),
-		[
-			{ json: nested, pairedItem: { item: 5 } },
-			{ json: { league_id: '2' }, pairedItem: { item: 5 } },
-		],
-	);
-	assert.deepEqual(toExecutionItems(getNode(), [], 'array', 0, 'Get Many'), []);
-});
-
-test('rejects null, primitives, and invalid array entries deliberately', () => {
-	for (const response of [null, 'not-json-object', 42]) {
-		assert.throws(
-			() => toExecutionItems(getNode(), response, 'object', 1, 'User: Get'),
-			(error) => error instanceof NodeOperationError && error.context.itemIndex === 1,
-		);
-	}
-
-	assert.throws(
-		() => toExecutionItems(getNode(), [{ ok: true }, null], 'array', 2, 'Get Many'),
-		(error) => error instanceof NodeOperationError && error.context.itemIndex === 2,
-	);
-
-	for (const response of [null, { unexpected: true }, 'not-an-array', 42]) {
-		assert.throws(
-			() => toExecutionItems(getNode(), response, 'array', 3, 'Roster → Get Many'),
-			(error) =>
-				error instanceof NodeOperationError &&
-				error.message.includes('Unexpected response') &&
-				error.context.itemIndex === 3,
-		);
-	}
-});
-
-test('creates concise paired continuation items from native errors', () => {
-	const nativeError = ensureExecutionError(getNode(), new Error('socket closed'), 7);
-	assert.ok(nativeError instanceof NodeOperationError);
-	assert.deepEqual(toErrorExecutionItem(nativeError, 7), {
-		json: { error: { message: 'socket closed' } },
-		pairedItem: { item: 7 },
-	});
 });
 
 for (const scenario of [

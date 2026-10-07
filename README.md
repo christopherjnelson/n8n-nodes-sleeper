@@ -20,7 +20,7 @@ Created or Updated, League Status Changed, and NFL Week Changed.
 ## Features
 
 - 18 deterministic read operations across 14 resources
-- Exact opaque string IDs, per-input execution, paired-item metadata, and `continueOnFail()`
+- Exact opaque string IDs, per-input execution, paired-item links on successful outputs from all 18 actions, and `continueOnFail()`
 - Raw Sleeper response fields without hidden joins, enrichment, caching, or truncation
 - Operation-specific NFL, NBA, and NHL public API scope with zero credentials and zero runtime dependencies
 - Four Phase 1 polling triggers with first-run baselines and monotonic anti-replay state
@@ -181,8 +181,9 @@ to true. **Output Fields** accepts comma-separated flat field names; blank keeps
 Projection runs for both output modes and always retains `player_id`, falling back to the exact
 map key if the player object has no ID. **Return All** defaults to true; when disabled, **Limit**
 defaults to 50. The top-level **Sort By** control can use `full_name`, `team`, `position`, or
-`player_id`, with ascending order by default. Sorting applies only to **One Item per Player** and
-follows the native map-entry order when no sort is selected.
+`player_id`, with ascending order by default. Sorting applies only to **One Item per Player**;
+Player ID uses numeric-aware string ordering (for example, `200` sorts before `1000`) without
+converting IDs to numbers. The native map-entry order is retained when no sort is selected.
 
 The node applies filters, then sort, then limit, then field projection. These controls run
 locally after the player map is fetched; they do not reduce the API response downloaded from
@@ -205,8 +206,12 @@ bounded with Active Only and Position whenever possible.
 ## Error behavior
 
 The action node validates required and controlled values before transport, then delegates HTTP
-execution and service errors to n8n's declarative request framework. Invalid player-map shapes
-produce a focused node-operation error. Empty array responses emit no fabricated placeholder item.
+execution and service errors to n8n's declarative request framework. Successful outputs from all
+18 actions link to their source input item. Errors raised by n8n's transport or continue-on-fail
+handling follow n8n's own error-item behavior and may not carry paired-item metadata. A successful
+HTTP response with a `null` body becomes a focused not-found error; Sleeper has been observed to
+return HTTP 200 with `null` for an unknown user. Invalid response shapes produce a focused
+node-operation error. Empty array responses emit no fabricated placeholder item.
 
 ## Troubleshooting
 

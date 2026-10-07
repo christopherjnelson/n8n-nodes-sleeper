@@ -68,6 +68,14 @@ export async function formatPlayerMap(
 			const aMissing = a === null || a === undefined || a === '';
 			const bMissing = b === null || b === undefined || b === '';
 			if (aMissing || bMissing) return aMissing === bMissing ? 0 : aMissing ? 1 : -1;
+			if (selectedSort === 'player_id') {
+				return (
+					String(a).localeCompare(String(b), 'en', {
+						numeric: true,
+						sensitivity: 'base',
+					}) * direction
+				);
+			}
 			const av = String(a).toLowerCase();
 			const bv = String(b).toLowerCase();
 			return (av < bv ? -1 : av > bv ? 1 : 0) * direction;
@@ -78,9 +86,7 @@ export async function formatPlayerMap(
 		players = players.map(([playerId, player]) => {
 			const projected: IDataObject = {};
 			for (const field of controls.outputFields) {
-				if (field === 'player_id' && !Object.prototype.hasOwnProperty.call(player, 'player_id')) {
-					projected.player_id = playerId;
-				} else if (Object.prototype.hasOwnProperty.call(player, field)) {
+				if (field !== 'player_id' && Object.prototype.hasOwnProperty.call(player, field)) {
 					projected[field] = player[field];
 				}
 			}
@@ -263,7 +269,47 @@ function invalidDraftTradedPicks(
 ): NodeOperationError {
 	return new NodeOperationError(context.getNode(), 'Sleeper returned invalid draft traded picks', {
 		description,
+		itemIndex: context.getItemIndex(),
 	});
+}
+
+/** Normalize ordinary declarative HTTP responses before routing outputs to downstream nodes. */
+export async function normalizeSleeperResponse(
+	this: IExecuteSingleFunctions,
+	items: INodeExecutionData[],
+	_response: IN8nHttpFullResponse,
+): Promise<INodeExecutionData[]> {
+	void _response;
+	const source = items[0];
+	const body = source?.json;
+	if (body === null) {
+		throw new NodeOperationError(this.getNode(), 'Sleeper resource was not found', {
+			description:
+				'Sleeper returned an empty response. Check the supplied username or resource identifier.',
+			itemIndex: this.getItemIndex(),
+		});
+	}
+	const records = Array.isArray(body) ? body : [body];
+	for (const [index, record] of records.entries()) {
+		if (!isDataObject(record)) {
+			throw new NodeOperationError(this.getNode(), 'Sleeper returned an invalid response', {
+				description: `Expected the response body or array entry ${index} to be an object.`,
+				itemIndex: this.getItemIndex(),
+			});
+		}
+	}
+	return records.map((json) => ({ ...source, json }));
+}
+
+/** Explicitly pair every successful output with its source input item. */
+export async function attachSleeperPairedItem(
+	this: IExecuteSingleFunctions,
+	items: INodeExecutionData[],
+	_response: IN8nHttpFullResponse,
+): Promise<INodeExecutionData[]> {
+	void _response;
+	const itemIndex = this.getItemIndex();
+	return items.map((item) => ({ ...item, pairedItem: { item: itemIndex } }));
 }
 
 /**

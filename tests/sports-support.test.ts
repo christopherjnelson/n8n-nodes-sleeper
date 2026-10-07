@@ -9,7 +9,10 @@ import {
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Sleeper } from '../nodes/Sleeper/Sleeper.node';
-import { formatDraftTradedPicks } from '../nodes/Sleeper/descriptions/response';
+import {
+	attachSleeperPairedItem,
+	formatDraftTradedPicks,
+} from '../nodes/Sleeper/descriptions/response';
 import { validateSleeperRequest } from '../nodes/Sleeper/descriptions/routing';
 import { sportCapabilityForOperation, sportsForCapability } from '../nodes/Sleeper/utils/sports';
 
@@ -39,7 +42,7 @@ function context(
 	} as unknown as IExecuteSingleFunctions;
 }
 
-function tradedPicksContext() {
+function tradedPicksContext(itemIndex = 0) {
 	return {
 		getNode: () => ({
 			name: 'Sleeper',
@@ -48,6 +51,7 @@ function tradedPicksContext() {
 			position: [0, 0],
 			parameters: {},
 		}),
+		getItemIndex: () => itemIndex,
 	} as unknown as IExecuteSingleFunctions;
 }
 
@@ -373,7 +377,16 @@ describe('draft traded-pick lossless response parser', () => {
 	const raw = String.raw`[{"draft_id":1382095101836136448,"round":2,"owner_id":12345,"label":"A\"B","nullable":null}]`;
 
 	it('preserves unsafe opaque ID tokens while leaving safe numbers, strings, escapes, and null intact', async () => {
-		const result = await formatDraftTradedPicks.call(tradedPicksContext(), [], response(raw));
+		const customResult = await formatDraftTradedPicks.call(
+			tradedPicksContext(3),
+			[],
+			response(raw),
+		);
+		const result = await attachSleeperPairedItem.call(
+			tradedPicksContext(3),
+			customResult,
+			response(raw),
+		);
 		expect(result).toEqual([
 			{
 				json: {
@@ -383,6 +396,7 @@ describe('draft traded-pick lossless response parser', () => {
 					label: 'A"B',
 					nullable: null,
 				},
+				pairedItem: { item: 3 },
 			},
 		]);
 	});
@@ -432,8 +446,11 @@ describe('draft traded-pick lossless response parser', () => {
 		'rejects malformed response %j with a focused Node error',
 		async (body) => {
 			await expect(
-				formatDraftTradedPicks.call(tradedPicksContext(), [], response(body)),
-			).rejects.toThrow('invalid draft traded picks');
+				formatDraftTradedPicks.call(tradedPicksContext(3), [], response(body)),
+			).rejects.toMatchObject({
+				message: 'Sleeper returned invalid draft traded picks',
+				context: { itemIndex: 3 },
+			});
 		},
 	);
 

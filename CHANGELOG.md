@@ -7,10 +7,12 @@
   port 5690. Preserve the manual trusted-stage release path and record intentional differences.
 - Add operation-specific NBA and NHL player/state support and observed NBA seasonal user league/draft listings.
 - Add optional local Player → Get Many filtering, sorting, limiting, and flat-field projection controls. Active and supported position filters remain server-side; filtering, sorting, limiting, and projection run after the response is downloaded.
-- Preserve input-item links for player maps and split outputs in multi-input workflows.
+- Preserve source input-item links on successful outputs from all 18 action operations in multi-input workflows; n8n-owned transport and continue-on-fail error items retain n8n's error-item pairing behavior.
 - Use static NFL/NBA Position dropdowns with readable labels and Sleeper codes, defaulting to All Positions (empty query) and preserving saved expressions; keep NHL Position hidden and guarded.
 - Add local rejection and editor notice for NHL position filtering, which returned empty results in live checks.
 - Preserve unsafe numeric opaque IDs in draft traded-pick responses as exact strings without changing safe numeric fields.
+- Sort Player ID values by natural string order so opaque IDs such as `200` precede `1000` without converting IDs to numbers.
+- Turn a successful HTTP `null` response into a focused not-found error for unknown users/resources.
 - Keep existing NFL defaults and all four polling events; no NBA/NHL week trigger is added.
 
 ## [0.2.1] - 2026-09-08

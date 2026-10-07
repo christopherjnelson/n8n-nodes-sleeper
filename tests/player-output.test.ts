@@ -234,30 +234,60 @@ describe('Player → Get Many output controls', () => {
 		]);
 	});
 
-	it('sorts opaque player IDs as text, then limits after filtering and sorting', async () => {
+	it('sorts player IDs numerically, including mixed IDs and stable numeric ties', async () => {
 		const map = {
-			'9007199254740995': { full_name: 'A', team: 'SEA' },
-			'9007199254740993': { full_name: 'B', team: 'SEA' },
-			'9007199254740994': { full_name: 'C', team: 'NYJ' },
+			'1000': { full_name: 'A' },
+			'200': { full_name: 'B' },
+			id001: { full_name: 'C' },
+			id1: { full_name: 'D' },
+			'900719925474099312345678901234567890': { full_name: 'E' },
+			'90071992547409931234567890123456789': { full_name: 'F' },
+			abc2: { full_name: 'G' },
+			abc10: { full_name: 'H' },
 		};
 		const result = await format(
 			{
 				resource: 'player',
 				operation: 'getMany',
 				outputMode: 'splitItems',
-				returnAll: false,
-				limit: 1,
-				playerOptions: { team: 'sea' },
+				returnAll: true,
+				playerOptions: {},
 				sortBy: 'player_id',
 				sortDirection: 'asc',
 			},
 			map,
 		);
-		expect(result).toEqual([
+		expect(result.map((item) => item.json.player_id)).toEqual([
+			'200',
+			'1000',
+			'90071992547409931234567890123456789',
+			'900719925474099312345678901234567890',
+			'abc2',
+			'abc10',
+			'id001',
+			'id1',
+		]);
+		const descending = await format(
 			{
-				json: { player_id: '9007199254740993', full_name: 'B', team: 'SEA' },
-				pairedItem: { item: 0 },
+				resource: 'player',
+				operation: 'getMany',
+				outputMode: 'splitItems',
+				returnAll: true,
+				playerOptions: {},
+				sortBy: 'player_id',
+				sortDirection: 'desc',
 			},
+			map,
+		);
+		expect(descending.map((item) => item.json.player_id)).toEqual([
+			'id001',
+			'id1',
+			'abc10',
+			'abc2',
+			'900719925474099312345678901234567890',
+			'90071992547409931234567890123456789',
+			'1000',
+			'200',
 		]);
 	});
 
