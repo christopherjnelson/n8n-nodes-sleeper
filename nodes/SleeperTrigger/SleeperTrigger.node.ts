@@ -98,8 +98,7 @@ export class SleeperTrigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		subtitle: 'Polling',
-		description:
-			'Starts the workflow when a documented public Sleeper event is observed by polling',
+		description: 'Read public Sleeper fantasy data and start workflows with polling triggers',
 		defaults: {
 			name: 'Sleeper Trigger',
 		},
