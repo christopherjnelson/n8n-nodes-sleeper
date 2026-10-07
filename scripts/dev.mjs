@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const DEV_PORT = '5690';
+export const DEV_BROKER_PORT = '5691';
 
 export function createDevProcessOptions(
 	environment = process.env,
@@ -10,7 +11,11 @@ export function createDevProcessOptions(
 ) {
 	return {
 		arguments: ['dev', ...arguments_],
-		environment: { ...environment, N8N_PORT: DEV_PORT },
+		environment: {
+			...environment,
+			N8N_PORT: DEV_PORT,
+			N8N_RUNNERS_BROKER_PORT: DEV_BROKER_PORT,
+		},
 	};
 }
 
